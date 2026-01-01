@@ -40,6 +40,7 @@ const App = () => {
           <Route path='/Owner' element={<Layout />}>
             <Route index element={<Dashboard />} />  {/* Default route when visiting '/Owner' */}
             <Route path='add-room' element={<AddRoom />} />
+            <Route path='edit-room/:roomId' element={<AddRoom />} />
             <Route path='list-room' element={<ListRoom />} />
           </Route>
         </Routes>

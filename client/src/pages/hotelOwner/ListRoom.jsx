@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Title from '../../components/Title';
 import { useAppContext } from '../../context/AppContext';
 import toast from 'react-hot-toast';
@@ -6,6 +7,7 @@ import toast from 'react-hot-toast';
 const ListRoom = () => {
   const [rooms, setRooms] = useState([]);
   const {axios,getToken,user,currency} = useAppContext();
+  const navigate = useNavigate();
 
 
   // Fetch rooms data when hotel owner 
@@ -68,6 +70,9 @@ const ListRoom = () => {
                 Price / night
               </th>
               <th className="py-3 px-4 text-gray-800 font-medium text-center">
+                Status
+              </th>
+              <th className="py-3 px-4 text-gray-800 font-medium text-center">
                 Actions
               </th>
             </tr>
@@ -95,6 +100,14 @@ const ListRoom = () => {
                     <div className="h-7 w-12 bg-slate-300 rounded-full peer peer-checked:bg-blue-600 transition-colors duration-200"></div>
                     <span className="dot absolute left-1 top-1 w-5 h-5 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-5"></span>
                   </label>
+                </td>
+                <td className="py-3 px-4 border-t border-gray-300 text-center">
+                  <button
+                    onClick={() => navigate(`/Owner/edit-room/${item._id}`)}
+                    className="bg-blue-500 text-white px-4 py-1.5 rounded text-sm hover:bg-blue-600 transition-colors"
+                  >
+                    Edit
+                  </button>
                 </td>
               </tr>
             ))}

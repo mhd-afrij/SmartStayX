@@ -96,13 +96,17 @@ const AllRooms = () => {
 
   const filteredRooms = useMemo(() => {
     if (!Array.isArray(rooms)) return [];
-    return rooms.filter((room) =>
-      room &&
-      room.hotel &&
-      matchRoomType(room) &&
-      matchesPriceRange(room) &&
-      filterDestination(room)
-    ).sort(sortRooms);
+    
+    const filtered = rooms.filter((room) => {
+      // Only include rooms with valid hotel data
+      if (!room || !room.hotel) return false;
+      
+      return matchRoomType(room) &&
+             matchesPriceRange(room) &&
+             filterDestination(room);
+    }).sort(sortRooms);
+    
+    return filtered;
   }, [rooms, selectedFilters, selectedSort, searchParams]);
 
   const clearFilters = () => {
@@ -124,7 +128,17 @@ const AllRooms = () => {
             enhance your stay and create unforgettable memories.
           </p>
         </div>
-        {filteredRooms.map((room) => (
+        {filteredRooms.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-gray-500 text-lg">No rooms found.</p>
+            <p className="text-gray-400 text-sm mt-2">
+              {rooms.length === 0 
+                ? "No rooms available at the moment. Please check back later." 
+                : "Try adjusting your filters to see more results."}
+            </p>
+          </div>
+        ) : (
+          filteredRooms.map((room) => (
           <div
             key={room._id}
             className="flex flex-col md:flex-row items-start py-10 gap-6 border-b border-gray-300 last:pb-30 last:border-0"
@@ -180,7 +194,8 @@ const AllRooms = () => {
               <p className="text-xl font-medium text-gray-700">${room.pricePerNight}/Night</p>
             </div>
           </div>
-        ))}
+          ))
+        )}
       </div>
 
  {/* Filters */}

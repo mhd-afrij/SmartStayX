@@ -1,15 +1,18 @@
-import { use, useState } from "react";
+import { useEffect, useState } from "react";
 import Title from "../../components/Title";
-import { assets,  } from "../../assets/assets";
+import { assets } from "../../assets/assets";
+import { useAppContext } from "../../context/AppContext";
+import toast from "react-hot-toast";
 
 const Dashboard = () => {
 
-  const {currency,user,getToken,axios,toast} = useAppContext();
+  const {currency,user,getToken,axios} = useAppContext();
   const [dashboardData, setDashboardData] = useState({
     bookings: [],
     totalBookings: 0,
     totalRevenue: 0,
   })
+  
   const fetchDashboardData = async()=>{
     try {
       const {data} = await axios.get('/api/bookings/hotel',
@@ -22,13 +25,14 @@ const Dashboard = () => {
       }
     } catch (error) {
       toast.error(error.message)
-      
     }
-    useEffect(()=>{
-      if(user){
-        fetchDashboardData();
-      }
-    }, [user])
+  }
+  
+  useEffect(()=>{
+    if(user){
+      fetchDashboardData();
+    }
+  }, [user])
 
   return (
     <div>
@@ -101,15 +105,15 @@ const Dashboard = () => {
             {dashboardData.bookings.map((item, index) => (
               <tr key={index}>
 
-                <td className="y-3 px-4 text-gray-700 border-t border-gray-300">
-                  {item.user.username}
+                <td className="py-3 px-4 text-gray-700 border-t border-gray-300">
+                  {item.user?.username || 'N/A'}
                 </td>
 
-                 <td className="y-3 px-4 text-gray-700 border-t border-gray-300">
-                  {item.room.roomType}
+                 <td className="py-3 px-4 text-gray-700 border-t border-gray-300">
+                  {item.room?.roomType || 'N/A'}
 
                 </td>
-                <td className="y-3 px-4 text-gray-700 border-t border-gray-300">
+                <td className="py-3 px-4 text-gray-700 border-t border-gray-300">
                   {currency}{item.totalPrice}
 
                 </td>
@@ -128,7 +132,6 @@ const Dashboard = () => {
       </div>
     </div>
   )
-}
 }
 
 export default Dashboard;
