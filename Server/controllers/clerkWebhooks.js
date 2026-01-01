@@ -15,7 +15,7 @@ const clerkWebhooks = async (req, res) => {
     };
 
     // Verifying headers
-    await whook.verify(JSON.stringify(req.body), headers);
+    await webhook.verify(JSON.stringify(req.body), headers);
 
     //Getting data from request
     const {data,type}= req.body
@@ -23,14 +23,15 @@ const clerkWebhooks = async (req, res) => {
     const userData= {
         _id:data.id,
         email:data.email_addresses[0].email_address,
-        username: data.first.name + " " + data.last_name,
+        username: (data.first_name || '') + " " + (data.last_name || ''),
+        name: (data.first_name || '') + " " + (data.last_name || ''),
         image: data.image_url,
     }
 
     //Switch case for different Events
     switch (type) {
         case "user.created":{
-        await User. create(userData);
+        await User.create(userData);
         break;
     }
     case "user.updated":{
