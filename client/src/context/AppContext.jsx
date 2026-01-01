@@ -19,6 +19,7 @@ export const AppProvider = ({ children }) => {
   const { getToken } = useAuth();
 
   const [isOwner, setIsOwner] = useState(false);
+  const [isUserDataLoading, setIsUserDataLoading] = useState(true);
   const [showHotelReg, setShowHotelReg] = useState(false);
   const [searchedCities, setSearchedCities] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -43,6 +44,7 @@ export const AppProvider = ({ children }) => {
       const token = await getToken();
       if (!token) {
         console.log("No token available");
+        setIsUserDataLoading(false);
         return;
       }
 
@@ -53,6 +55,7 @@ export const AppProvider = ({ children }) => {
       if (data.success) {
         setIsOwner(data.role === "hotelOwner");
         setSearchedCities(data.recentSearchedCities || []);
+        setIsUserDataLoading(false);
       } else {
         // If user not found, don't retry - it's a permanent error
         if (data.message && data.message.includes("not found")) {
@@ -60,6 +63,7 @@ export const AppProvider = ({ children }) => {
           // Set default values
           setIsOwner(false);
           setSearchedCities([]);
+          setIsUserDataLoading(false);
           return;
         }
         
@@ -74,6 +78,7 @@ export const AppProvider = ({ children }) => {
           // Set default values instead of showing error
           setIsOwner(false);
           setSearchedCities([]);
+          setIsUserDataLoading(false);
         }
       }
     } catch (error) {
@@ -88,13 +93,17 @@ export const AppProvider = ({ children }) => {
         // Set default values instead of showing error
         setIsOwner(false);
         setSearchedCities([]);
+        setIsUserDataLoading(false);
       }
     }
   };
 
   useEffect(() => {
     if (user) {
+      setIsUserDataLoading(true);
       fetchUser();
+    } else {
+      setIsUserDataLoading(false);
     }
   }, [user]);
 
@@ -109,6 +118,7 @@ export const AppProvider = ({ children }) => {
     getToken,
     isOwner,
     setIsOwner,
+    isUserDataLoading,
     axios,
     showHotelReg,
     setShowHotelReg,

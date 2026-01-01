@@ -1,6 +1,6 @@
 import React, { useContext, useState, useMemo } from "react";
 import { assets, facilityIcons } from "../assets/assets";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import StarRating from "../components/StarRating";
 import { AppContext } from "../context/AppContext";
 
@@ -32,8 +32,9 @@ const RadioButton = ({ label, selected = false, onChange = () => {} }) => {
 };
 
 const AllRooms = () => {
-  const { searchParams, setSearchParams, rooms, currency } = useContext(AppContext);
-  const navigate = useNavigate(); // Use navigate from react-router-dom
+  const { rooms, currency } = useContext(AppContext);
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [openFilter, setOpenFilter] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
@@ -64,7 +65,7 @@ const AllRooms = () => {
 
   const matchRoomType = (room) => {
     if (selectedFilters.roomType.length === 0) return true;
-    return selectedFilters.roomType.includes(room.type);
+    return selectedFilters.roomType.includes(room.roomType);
   };
 
   const matchesPriceRange = (room) => {
@@ -87,13 +88,17 @@ const AllRooms = () => {
   };
 
   const filterDestination = (room) => {
+    if (!searchParams) return true;
     const destination = searchParams.get('destination');
     if (!destination) return true;
-    return room.hotel.city.toLowerCase().includes(destination.toLowerCase());
+    return room.hotel?.city?.toLowerCase().includes(destination.toLowerCase());
   };
 
   const filteredRooms = useMemo(() => {
+    if (!Array.isArray(rooms)) return [];
     return rooms.filter((room) =>
+      room &&
+      room.hotel &&
       matchRoomType(room) &&
       matchesPriceRange(room) &&
       filterDestination(room)
@@ -106,7 +111,7 @@ const AllRooms = () => {
       priceRange: [],
     });
     setSelectedSort('');
-    setSearchParams({});
+    setSearchParams(new URLSearchParams());
   };
 
   return (
