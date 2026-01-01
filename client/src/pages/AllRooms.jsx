@@ -1,6 +1,6 @@
 import React, { useContext, useState, useMemo } from "react";
 import { assets, facilityIcons } from "../assets/assets";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import StarRating from "../components/StarRating";
 import { AppContext } from "../context/AppContext";
 
@@ -32,8 +32,9 @@ const RadioButton = ({ label, selected = false, onChange = () => {} }) => {
 };
 
 const AllRooms = () => {
-  const { searchParams, setSearchParams, rooms, currency } = useContext(AppContext);
-  const navigate = useNavigate(); // Use navigate from react-router-dom
+  const { rooms, currency } = useContext(AppContext);
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [openFilter, setOpenFilter] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
@@ -64,7 +65,7 @@ const AllRooms = () => {
 
   const matchRoomType = (room) => {
     if (selectedFilters.roomType.length === 0) return true;
-    return selectedFilters.roomType.includes(room.type);
+    return selectedFilters.roomType.includes(room.roomType);
   };
 
   const matchesPriceRange = (room) => {
@@ -87,17 +88,25 @@ const AllRooms = () => {
   };
 
   const filterDestination = (room) => {
+    if (!searchParams) return true;
     const destination = searchParams.get('destination');
     if (!destination) return true;
-    return room.hotel.city.toLowerCase().includes(destination.toLowerCase());
+    return room.hotel?.city?.toLowerCase().includes(destination.toLowerCase());
   };
 
   const filteredRooms = useMemo(() => {
-    return rooms.filter((room) =>
-      matchRoomType(room) &&
-      matchesPriceRange(room) &&
-      filterDestination(room)
-    ).sort(sortRooms);
+    if (!Array.isArray(rooms)) return [];
+    
+    const filtered = rooms.filter((room) => {
+      // Only include rooms with valid hotel data
+      if (!room || !room.hotel) return false;
+      
+      return matchRoomType(room) &&
+             matchesPriceRange(room) &&
+             filterDestination(room);
+    }).sort(sortRooms);
+    
+    return filtered;
   }, [rooms, selectedFilters, selectedSort, searchParams]);
 
   const clearFilters = () => {
@@ -106,7 +115,7 @@ const AllRooms = () => {
       priceRange: [],
     });
     setSelectedSort('');
-    setSearchParams({});
+    setSearchParams(new URLSearchParams());
   };
 
   return (
@@ -119,7 +128,17 @@ const AllRooms = () => {
             enhance your stay and create unforgettable memories.
           </p>
         </div>
-        {filteredRooms.map((room) => (
+        {filteredRooms.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-gray-500 text-lg">No rooms found.</p>
+            <p className="text-gray-400 text-sm mt-2">
+              {rooms.length === 0 
+                ? "No rooms available at the moment. Please check back later." 
+                : "Try adjusting your filters to see more results."}
+            </p>
+          </div>
+        ) : (
+          filteredRooms.map((room) => (
           <div
             key={room._id}
             className="flex flex-col md:flex-row items-start py-10 gap-6 border-b border-gray-300 last:pb-30 last:border-0"
@@ -175,7 +194,8 @@ const AllRooms = () => {
               <p className="text-xl font-medium text-gray-700">${room.pricePerNight}/Night</p>
             </div>
           </div>
-        ))}
+          ))
+        )}
       </div>
 
  {/* Filters */}

@@ -3,9 +3,9 @@ import { checkAvailabilityAPI, createBooking, getHotelBookings, getUserBookings}
 import { protect } from '../middleware/authMiddleware.js';
 
 const bookingRouter =express.Router();
-bookingRouter. post('/check-availability',checkAvailabilityAPI);
+bookingRouter.post('/check-availability',checkAvailabilityAPI);
 bookingRouter.post('/book',protect,createBooking);
 bookingRouter.get('/user',protect,getUserBookings);
-bookingRouter.get('/user',protect,getHotelBookings);
+bookingRouter.get('/hotel',protect,getHotelBookings);
 
 export default bookingRouter;

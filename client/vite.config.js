@@ -7,8 +7,10 @@ export default defineConfig({
   plugins: [react(),tailwindcss()],
   // Prevent accessing Server directory
   server: {
+    port: 5173,
     fs: {
       deny: ['../Server']
     }
+    // HMR will use default settings automatically - no explicit config needed
   }
 })

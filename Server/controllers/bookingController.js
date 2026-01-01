@@ -95,7 +95,8 @@ export const getUserBookings = async (req, res) => {
 // GET /api/bookings/hotel
 export const getHotelBookings = async (req, res) => {
   try {
-    const hotel = await Hotel.findOne({ owner: req.auth.userId });
+    const auth = await req.auth();
+    const hotel = await Hotel.findOne({ owner: auth.userId });
     if (!hotel) {
       return res.json({ success: false, message: "No hotel found" });
     }
@@ -114,7 +115,11 @@ export const getHotelBookings = async (req, res) => {
 
     res.json({
       success: true,
-      dashboardData: { totalBookings, totalRevenue },
+      dashboardData: { 
+        totalBookings, 
+        totalRevenue,
+        bookings 
+      },
     });
   } catch (error) {
     res.json({ success: false, message: "Failed to fetch bookings" });

@@ -2,7 +2,8 @@ import User from "../models/User.js";
 
 export const protect =async (req,res,next)=>{
     try {
-        const {userId} = req.auth;
+        const auth = await req.auth();
+        const {userId} = auth;
         if(!userId){
             return res.json({success:false,message:"not authenticated"})
         }

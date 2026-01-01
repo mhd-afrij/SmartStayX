@@ -7,7 +7,7 @@ import AllRooms from './pages/AllRooms';
 import RoomDetails from './pages/RoomDetails';
 import MyBookings from './pages/MyBookings';
 import HotelReg from './components/HotelReg';
-import Layout from './pages/hotelOwner/layout';
+import Layout from './pages/hotelOwner/Layout';
 import Dashboard from './pages/hotelOwner/Dashboard';
 import AddRoom from './pages/hotelOwner/AddRoom';
 import ListRoom from './pages/hotelOwner/ListRoom';
@@ -40,6 +40,7 @@ const App = () => {
           <Route path='/Owner' element={<Layout />}>
             <Route index element={<Dashboard />} />  {/* Default route when visiting '/Owner' */}
             <Route path='add-room' element={<AddRoom />} />
+            <Route path='edit-room/:roomId' element={<AddRoom />} />
             <Route path='list-room' element={<ListRoom />} />
           </Route>
         </Routes>
