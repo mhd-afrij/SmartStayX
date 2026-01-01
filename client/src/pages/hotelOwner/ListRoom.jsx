@@ -1,9 +1,50 @@
-import React, { useState } from 'react';
-import { roomsDummyData } from '../../assets/assets';
+import React, { useEffect, useState } from 'react';
 import Title from '../../components/Title';
+import { useAppContext } from '../../context/AppContext';
+import toast from 'react-hot-toast';
 
 const ListRoom = () => {
-  const [rooms, setRooms] = useState(roomsDummyData);
+  const [rooms, setRooms] = useState([]);
+  const {axios,getToken,user,currency} = useAppContext();
+
+
+  // Fetch rooms data when hotel owner 
+
+  const fetchRooms = async () => {
+    try {
+      const {data} = await axios.get('/api/rooms/Owner', {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      }); 
+      if(data.success){
+        setRooms(data.rooms)
+      }else{
+        toast.error(data.message)
+      }
+      
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  //Toggle Room Availability
+  const toggleAvailability = async(roomId)=>{
+    const {data} =await axios.post('/api/rooms/toggle-availability',{roomId},{
+      headers: { Authorization: `Bearer ${await getToken()}`}})
+      if(data.success){
+        toast.success(data.message);
+        fetchRooms();
+      }else{
+        toast.error(data.message);
+      }
+    }
+
+
+
+  useEffect(()=>{
+    if(user){
+      fetchRooms();
+    }
+  },[user])
 
   return (
     <div>
@@ -41,19 +82,15 @@ const ListRoom = () => {
                   {item.amenities.join(', ')}
                 </td>
                 <td className="py-3 px-4 text-gray-700 border-t border-gray-300 text-center">
-                  {item.pricePerNight}
+                 {currency} {item.pricePerNight}
                 </td>
                 <td className="py-3 px-4 border-t border-gray-300 text-sm text-center">
                   <label className="relative inline-flex items-center cursor-pointer text-gray-900 gap-3">
-                    <input
+                    <input 
                       type="checkbox"
                       className="sr-only peer"
                       checked={item.isAvailable}
-                      onChange={() => {
-                        const updatedRooms = [...rooms];
-                        updatedRooms[index].isAvailable = !updatedRooms[index].isAvailable;
-                        setRooms(updatedRooms);
-                      }}
+                      onChange={() => toggleAvailability(item._id)}
                     />
                     <div className="h-7 w-12 bg-slate-300 rounded-full peer peer-checked:bg-blue-600 transition-colors duration-200"></div>
                     <span className="dot absolute left-1 top-1 w-5 h-5 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-5"></span>
@@ -65,7 +102,7 @@ const ListRoom = () => {
         </table>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default ListRoom;

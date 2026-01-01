@@ -1,25 +1,34 @@
-import React from 'react'
-import Navbar from './components/Navbar'
-import { Route, Routes, useLocation } from 'react-router-dom'
-import Home from './pages/Home'
-import Footer from './components/Footer'
-import AllRooms from './pages/AllRooms'
-import RoomDetails from './pages/RoomDetails'
-import MyBookings from './pages/MyBookings'
-import HotelReg from './components/HotelReg'
-import Layout from './pages/hotelOnwer/layout'
-import Dashboard from './pages/hotelOnwer/Dashboard'
-import AddRoom from './pages/hotelOnwer/AddRoom'
-import ListRoom from './pages/hotelOnwer/ListRoom'
+import React from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import Home from './pages/Home';
+import AllRooms from './pages/AllRooms';
+import RoomDetails from './pages/RoomDetails';
+import MyBookings from './pages/MyBookings';
+import HotelReg from './components/HotelReg';
+import Layout from './pages/hotelOwner/layout';
+import Dashboard from './pages/hotelOwner/Dashboard';
+import AddRoom from './pages/hotelOwner/AddRoom';
+import ListRoom from './pages/hotelOwner/ListRoom';
+import { Toaster } from 'react-hot-toast';
+import { useAppContext } from "./context/AppContext";
+
 
 const App = () => {
   const location = useLocation();
-  const isOwnerPath = location.pathname.includes('owner'); // Check if the path includes 'owner'
-  
+  const { showHotelReg } = useAppContext();
+  const isOwnerPath = location.pathname.startsWith('/Owner'); // Check if the path starts with '/Owner'
+
   return (
     <div>
-      {!isOwnerPath && <Navbar />} {/* Show Navbar only on non-owner paths */}
-      {false && <HotelReg />} {/* This seems like a conditional rendering that’s always false */}
+      <Toaster />
+      
+      {/* Conditionally render Navbar and Footer based on the current path */}
+      {!isOwnerPath && <Navbar />}  {/* Show Navbar only on non-owner paths */}
+      
+      {showHotelReg && <HotelReg />} {/* Show HotelReg if `showHotelReg` is true */}
+      
       <div className='min-h-[70vh]'>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -27,16 +36,19 @@ const App = () => {
           <Route path='/rooms/:id' element={<RoomDetails />} />
           <Route path="/my-bookings" element={<MyBookings />} />
 
-          <Route path='/owner' element={<Layout />}>
-            <Route index element={<Dashboard />} />
+          {/* Layout with nested routes for Owner */}
+          <Route path='/Owner' element={<Layout />}>
+            <Route index element={<Dashboard />} />  {/* Default route when visiting '/Owner' */}
             <Route path='add-room' element={<AddRoom />} />
             <Route path='list-room' element={<ListRoom />} />
           </Route>
         </Routes>
       </div>
-      {!isOwnerPath && <Footer />} {/* Conditionally render Footer only on non-owner pages */}
+      
+      {/* Conditionally render Footer only on non-owner pages */}
+      {!isOwnerPath && <Footer />}
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
