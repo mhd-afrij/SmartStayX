@@ -41,23 +41,34 @@ app.use('/api/bookings',bookingRouter)
 
 const PORT = process.env.PORT || 3000;
 
-// Start database connection and server
+// Initialize Cloudinary configuration (just config, no connection overhead)
+// Safe to run at module level for both local and serverless
+connectCloudinary();
+
+// Lazy database connection helper for serverless environments
+// Mongoose connections are cached, so this is safe to call multiple times
+// Defined before middleware that uses it
+const ensureDBConnection = async () => {
+  if (mongoose.connection.readyState === 1) {
+    return; // Already connected
+  }
+  
+  try {
+    await connectDB();
+  } catch (error) {
+    console.error("❌ Database connection failed:", error.message);
+    // Don't throw - let routes handle connection errors
+  }
+};
+
+// Start database connection and server (only for local development)
 const startServer = async () => {
   try {
-    // Initialize cloudinary (non-blocking)
-    connectCloudinary();
-    
-    // Connect to database and wait for it
     console.log("🔄 Connecting to database...");
-    try {
-      await connectDB();
-      console.log("✅ Database connection established");
-    } catch (error) {
-      console.error("❌ Database connection failed, but server will continue:", error.message);
-      console.log("⚠️  Some features may not work until database is connected");
-    }
+    await ensureDBConnection();
+    console.log("✅ Database connection established");
     
-    // Wait for database connection with timeout
+    // Wait for database connection with timeout (local dev only)
     const maxWaitTime = 10000; // 10 seconds
     const startTime = Date.now();
     
@@ -65,22 +76,28 @@ const startServer = async () => {
       await new Promise(resolve => setTimeout(resolve, 500));
     }
     
-    // Only listen in local development (not on Vercel)
-    if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-      app.listen(PORT, () => {
-        const dbStatus = mongoose.connection.readyState === 1 ? '✅ Connected' : 
-                        mongoose.connection.readyState === 2 ? '⏳ Connecting...' : '❌ Disconnected';
-        console.log(`🚀 Server running on port ${PORT}`);
-        console.log(`📊 Database connection state: ${dbStatus}`);
-      });
-    }
+    // Start HTTP server for local development
+    app.listen(PORT, () => {
+      const dbStatus = mongoose.connection.readyState === 1 ? '✅ Connected' : 
+                      mongoose.connection.readyState === 2 ? '⏳ Connecting...' : '❌ Disconnected';
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📊 Database connection state: ${dbStatus}`);
+    });
   } catch (error) {
     console.error("Error starting server:", error);
   }
 };
 
+// Only start server in local development (NEVER on Vercel)
+// On Vercel, connections will be established lazily on first request
+// startServer() should NEVER run when imported by serverless handler
+// Explicitly check that we're NOT on Vercel before starting server
+const isVercel = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
+const isLocalDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+
+if (!isVercel && isLocalDev) {
+  startServer();
+}
+
 // Export for Vercel serverless function
 export default app;
-
-// Start the server
-startServer();
