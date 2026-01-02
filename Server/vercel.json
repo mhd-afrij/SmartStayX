@@ -1,13 +1,8 @@
 {
-  "functions": {
-    "server.js": {
-      "runtime": "node@16"
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/server.js"
+      "destination": "/api"
     }
   ]
 }
