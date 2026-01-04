@@ -19,8 +19,8 @@ const FeaturedDestination = () => {
       />
 
       <div className="flex flex-row items-center justify-start gap-6 mt-20 overflow-x-auto">
-        {rooms.slice(0, 4).map((room) => (
-          <HotelCard key={room._id || room.id} room={room} />
+        {rooms.slice(0, 4).map((room, index) => (
+          <HotelCard key={room._id || room.id} room={room} index={index} />
         ))}
       </div>
 

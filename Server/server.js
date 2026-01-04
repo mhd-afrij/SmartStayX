@@ -27,12 +27,66 @@ app.use((req, res, next) => {
 // Middleware
 app.use(express.json({ limit: '50mb' })); // Increase body size limit for file uploads
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Initialize Cloudinary (safe to call multiple times)
+connectCloudinary();
+
+// Database connection middleware - ensures DB is connected before handling requests
+let dbConnectionPromise = null;
+const ensureDatabaseConnection = async (req, res, next) => {
+  try {
+    // If already connected, proceed
+    if (mongoose.connection.readyState === 1) {
+      return next();
+    }
+
+    // If connecting, wait for it
+    if (mongoose.connection.readyState === 2) {
+      if (!dbConnectionPromise) {
+        dbConnectionPromise = connectDB();
+      }
+      await dbConnectionPromise;
+      return next();
+    }
+
+    // If disconnected, connect
+    if (mongoose.connection.readyState === 0) {
+      if (!dbConnectionPromise) {
+        dbConnectionPromise = connectDB();
+      }
+      await dbConnectionPromise;
+      return next();
+    }
+
+    next();
+  } catch (error) {
+    console.error('Database connection error:', error);
+    return res.status(503).json({
+      success: false,
+      message: 'Database connection failed. Please try again later.'
+    });
+  }
+};
+
+// Apply database connection middleware to all routes except health check
+app.use((req, res, next) => {
+  if (req.path === '/' || req.path === '/health') {
+    return next();
+  }
+  return ensureDatabaseConnection(req, res, next);
+});
+
 app.use(clerkMiddleware()); // Clerk middleware
 
 // API to Listen to Clerk webhooks
 app.use('/api/clerk', clerkWebhooks);
 
 app.get('/', (req, res) => res.send('API is Working '));
+app.get('/health', (req, res) => {
+  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+  res.json({ status: 'ok', database: dbStatus });
+});
+
 app.use('/api/user', userRouter);
 app.use('/api/hotels', hotelRouter);
 app.use('/api/rooms', roomRouter);
@@ -40,34 +94,30 @@ app.use('/api/bookings', bookingRouter);
 
 const PORT = process.env.PORT || 3000;
 
-// Database connection
+// Database connection for local development
 const connectToDatabase = async () => {
   try {
-    await connectDB();
-    console.log('✅ Database connection established');
+    if (mongoose.connection.readyState === 0) {
+      await connectDB();
+      console.log('✅ Database connection established');
+    }
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
   }
 };
 
-// Serverless Function Export (For Vercel)
+// Start server only for local development
 const startServer = async () => {
   try {
-    // Initialize cloudinary (non-blocking)
-    connectCloudinary();
-
-    // Connect to the database and wait for it
+    // Connect to the database
     console.log('🔄 Connecting to database...');
     await connectToDatabase();
 
-    // Vercel Serverless function: export the express app directly
-    if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-      app.listen(PORT, () => {
-        const dbStatus = mongoose.connection.readyState === 1 ? '✅ Connected' : '❌ Disconnected';
-        console.log(`🚀 Server running on port ${PORT}`);
-        console.log(`📊 Database connection state: ${dbStatus}`);
-      });
-    }
+    app.listen(PORT, () => {
+      const dbStatus = mongoose.connection.readyState === 1 ? '✅ Connected' : '❌ Disconnected';
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📊 Database connection state: ${dbStatus}`);
+    });
   } catch (error) {
     console.error('Error starting server:', error);
   }
