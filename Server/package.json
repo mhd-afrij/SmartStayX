@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@clerk/express": "^1.7.58",
-    "cloudinary": "^2.14.0",
+    "cloudinary": "^2.8.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
@@ -21,7 +21,6 @@
     "mongoose": "^9.0.2",
     "multer": "^2.0.2",
     "node-modules": "^0.0.1",
-    "nodemailer": "^7.0.12",
     "svix": "^1.82.0"
   },
   "devDependencies": {
