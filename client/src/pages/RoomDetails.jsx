@@ -1,24 +1,115 @@
 import { useEffect, useState } from "react";
-import { assets, facilityIcons, roomCommonData, roomsDummyData } from "../assets/assets";
+import { assets, facilityIcons, roomCommonData,  } from "../assets/assets";
 import { useParams } from "react-router-dom";
 import StarRating from "../components/StarRating";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 const RoomDetails = () => {
-  const { id } = useParams();  // Get the dynamic id from URL params
+  const { id } = useParams()
+  const {rooms,axios,getToken,navigate} = useAppContext();
   const [room, setRoom] = useState(null);
-  const [mainImage, setMainImage] = useState(null);
+  const [mainImage, setMainImage] = useState(null)
+  const[checkInDate, setCheckInDate] = useState("")
+  const[checkOutDate, setCheckOutDate] = useState("")
+  const[guests, setGuests] = useState(1)
+
+  const[isAvailable,setIsAvailable]=useState(false);
+  //check is availability of the room
+  const checkAvailability = async () => {
+    try {
+      //check is check in date is greater than check out data
+      if(checkInDate >=checkOutDate){
+        toast.error("Check in date should be less than  check out date");
+        return;
+      }
+      const {data} = await axios.post("/api/bookings/check-availability",{
+        room:id,
+        checkInDate,
+        checkOutDate,
+      });
+
+      if(data.success){
+        if(data.isAvailable){
+          setIsAvailable(true);
+          toast.success("Room is available");
+        }else{
+          setIsAvailable(false);
+          toast.error("Room is not available");
+        }
+      }else{
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+
+  // onSubmithandler function to check avilablity & book the room
+  const onSubmitHandler = async (e) => {
+    try {
+      e.preventDefault();
+      if(!isAvailable){
+        
+        return checkAvailability();
+      }else{
+        const {data} = await axios.post("/api/bookings/book",{
+          room:id,
+          checkInDate,
+          checkOutDate,
+          guests,paymentMethod:"Pay At Hotel"
+        },{
+          headers:{
+            Authorization:`Bearer ${await getToken()}`
+          }
+        });
+        if(data.success){
+          toast.success(data.message);
+          navigate("/my-bookings")
+          scrollTo(0,0)
+
+        }else{
+          toast.error(data.message)
+        }
+      }
+      
+  
+    } catch (error) {
+      toast.error(error.message)
+    }
+  };
+
+
+
+
+
+
+
+
+
+
+
 
   useEffect(() => {
     // Find the room based on the id from URL params
-    const foundRoom = roomsDummyData.find((room) => room._id === id);
-    if (foundRoom) {
-      setRoom(foundRoom);
-      setMainImage(foundRoom.images[0]);
+    if (id && rooms.length > 0) {
+      const foundRoom = rooms.find((room) => room._id === id);
+      if (foundRoom) {
+        setRoom(foundRoom);
+        setMainImage(foundRoom.images[0]);
+      }
     }
-  }, [id]); // Add `id` as a dependency to refetch when `id` changes
+  }, [id, rooms]); 
 
   if (!room) {
-    return <p>Loading...</p>; // Handle the case when room is not yet loaded
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading room details...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -48,26 +139,28 @@ const RoomDetails = () => {
 
       {/* Room Images */}
       <div className="flex flex-col lg:flex-row mt-4 gap-4">
-        <div className="lg:w-1/2 w-full">
+        <div className="lg:w-2/3 w-full">
           <img
             src={mainImage}
             alt="Room"
-            className="w-full h-96 object-cover rounded-xl" // Adjust height for better view
+            className="w-full h-96 object-cover rounded-xl transition-all duration-300"
           />
         </div>
-        <div>
-          {room?.images.length > 1 &&
-            room.images.map((image, index) => (
-              <img
-                onClick={() => setMainImage(image)}
-                key={index}
-                src={image}
-                alt="Room Image"
-                className={`w-full h-40 object-cover rounded-xl mb-4 cursor-pointer shadow-md ${
-                  mainImage === image ? "outline-3 outline outline-orange-500" : ""
-                }`}
-              />
-            ))}
+        <div className="lg:w-1/3 w-full">
+          <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
+            {room?.images.length > 1 &&
+              room.images.map((image, index) => (
+                <img
+                  onClick={() => setMainImage(image)}
+                  key={index}
+                  src={image}
+                  alt="Room Image"
+                  className={`w-full h-28 lg:h-24 object-cover rounded-xl cursor-pointer shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg ${
+                    mainImage === image ? "outline-2 outline outline-orange-500 scale-105" : "opacity-80 hover:opacity-100"
+                  }`}
+                />
+              ))}
+          </div>
         </div>
       </div>
 
@@ -94,7 +187,7 @@ const RoomDetails = () => {
       </div>
 
       {/* Check-In / Check-Out Form */}
-      <form
+      <form onSubmit={onSubmitHandler}
         className="flex flex-col md:flex-row items-start md:items-center
         justify-between bg-white shadow-[0px 0px 20px_rgba(0,0,0,0.15)] p-6 rounded-xl
         mx-auto mt-16 max-w-6xl"
@@ -104,7 +197,7 @@ const RoomDetails = () => {
             <label htmlFor="checkInDate" className="font-medium">
               Check In{" "}
             </label>
-            <input
+            <input onChange={(e)=>setCheckInDate(e.target.value)} min={new Date().toISOString().split('T')[0]} value={checkInDate}
               type="date"
               id="checkInDate"
               placeholder="Check-in"
@@ -118,11 +211,12 @@ const RoomDetails = () => {
             <label htmlFor="checkOutDate" className="font-medium">
               Check out{" "}
             </label>
-            <input
+            <input onChange={(e)=>setCheckOutDate(e.target.value)} min={checkInDate || undefined} disabled={!checkInDate}
               type="date"
               id="checkOutDate"
               placeholder="Check-out"
               className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none"
+              value={checkOutDate}
               required
             />
           </div>
@@ -133,10 +227,10 @@ const RoomDetails = () => {
             <label htmlFor="guests" className="font-medium">
               Guests{" "}
             </label>
-            <input
+            <input onChange={(e)=>setGuests(e.target.value)} value={guests}
               type="number"
               id="guests"
-              placeholder="0"
+              placeholder="1"
               className="max-w-20 rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none"
               required
             />
@@ -144,11 +238,9 @@ const RoomDetails = () => {
         </div>
         <button
           type="submit"
-          className="bg-primary hover:bg-primary-dull
-          active: scale-95 transition-all text-black rounded-md max-md:w-full
-          max-md:mt-6 md: px-25 py-3 md:py-4 text-base cursor-pointer"
+          className="bg-blue-500 hover:bg-blue-600 active:scale-95 transition-all text-white rounded-md max-md:w-full max-md:mt-6 md:px-25 py-3 md:py-4 text-base cursor-pointer font-medium"
         >
-          Check Availability
+          {isAvailable ? "Book Now":"Check Availability"}
         </button>
       </form>
 
@@ -175,11 +267,17 @@ const RoomDetails = () => {
       {/* Hosted by */}
       <div className="flex flex-col items-start gap-4">
         <div className="flex gap-4">
-          <img
-            src={room.hotel.owner.image}
-            alt="Host"
-            className="h-14 w-14 md:h-18 md:w-18 rounded-full"
-          />
+          {room.hotel.owner?.image ? (
+            <img
+              src={room.hotel.owner.image}
+              alt="Host"
+              className="h-14 w-14 md:h-18 md:w-18 rounded-full"
+            />
+          ) : (
+            <div className="h-14 w-14 md:h-18 md:w-18 rounded-full bg-gray-300 flex items-center justify-center">
+              <span className="text-gray-600 text-xl">{room.hotel.name?.charAt(0) || 'H'}</span>
+            </div>
+          )}
           <div>
             <p className="text-lg md:text-xl">Hosted by {room.hotel.name}</p>
             <div className="flex items-center mt-1">
@@ -188,7 +286,7 @@ const RoomDetails = () => {
             </div>
           </div>
         </div>
-        <button className="px-6 py-2.5 mt-4 rounded text-black bg-primary hover:bg-primary-dull transition-all cursor-pointer">
+        <button className="px-6 py-2.5 mt-4 rounded text-white bg-blue-500 hover:bg-blue-600 transition-all cursor-pointer font-medium">
           Contact Now
         </button>
       </div>

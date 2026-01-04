@@ -91,23 +91,14 @@ const AllRooms = () => {
     if (!searchParams) return true;
     const destination = searchParams.get('destination');
     if (!destination) return true;
-    return room.hotel?.city?.toLowerCase().includes(destination.toLowerCase());
+    return room.hotel.city.toLowerCase().includes(destination.toLowerCase());
   };
 
   const filteredRooms = useMemo(() => {
-    if (!Array.isArray(rooms)) return [];
-    
-    const filtered = rooms.filter((room) => {
-      // Only include rooms with valid hotel data
-      if (!room || !room.hotel) return false;
-      
-      return matchRoomType(room) &&
+      return rooms.filter(room =>  matchRoomType(room) &&
              matchesPriceRange(room) &&
-             filterDestination(room);
-    }).sort(sortRooms);
-    
-    return filtered;
-  }, [rooms, selectedFilters, selectedSort, searchParams]);
+             filterDestination(room)).sort(sortRooms);
+  }, [rooms, selectedFilters, selectedSort, searchParams])
 
   const clearFilters = () => {
     setSelectedFilters({
@@ -115,8 +106,8 @@ const AllRooms = () => {
       priceRange: [],
     });
     setSelectedSort('');
-    setSearchParams(new URLSearchParams());
-  };
+    setSearchParams({});
+  }
 
   return (
     <div className="flex flex-col-reverse lg:flex-row items-start justify-between pt-28 md:pt-35 px-4 md:px-16 lg:px-24 xl:px-32">
@@ -137,6 +128,8 @@ const AllRooms = () => {
                 : "Try adjusting your filters to see more results."}
             </p>
           </div>
+
+          
         ) : (
           filteredRooms.map((room) => (
           <div

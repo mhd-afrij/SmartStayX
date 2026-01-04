@@ -21,6 +21,7 @@
     "mongoose": "^9.0.2",
     "multer": "^2.0.2",
     "node-modules": "^0.0.1",
+    "nodemailer": "^7.0.12",
     "svix": "^1.82.0"
   },
   "devDependencies": {
