@@ -1,3 +1,6 @@
+// Import lodash before Cloudinary to ensure it's available for Cloudinary's internal requires
+// Cloudinary uses require('lodash/extend') internally, so we need lodash loaded first
+import _ from 'lodash';
 import {v2 as cloudinary} from "cloudinary";
 
 const connectCloudinary = () => {

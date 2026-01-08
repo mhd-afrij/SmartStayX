@@ -1,6 +1,9 @@
 import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
+// Import lodash before Cloudinary to ensure it's available for Cloudinary's internal requires
+// Cloudinary uses require('lodash/extend') which needs lodash to be loaded first
+import _ from 'lodash';
 import connectDB from './configs/db.js';
 import mongoose from 'mongoose';
 import { clerkMiddleware } from '@clerk/express';
