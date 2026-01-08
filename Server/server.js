@@ -7,8 +7,6 @@ import { clerkMiddleware } from '@clerk/express';
 import clerkWebhooks from './controllers/clerkWebhooks.js';
 import userRouter from './routes/userRoutes.js';
 import hotelRouter from './routes/hotelRoutes.js';
-// Ensure lodash is loaded before Cloudinary to fix lodash/extend module resolution
-import _ from 'lodash';
 import connectCloudinary from './configs/cloudinary.js';
 import roomRouter from './routes/roomRoutes.js';
 import bookingRouter from './routes/bookingRoutes.js';
@@ -30,8 +28,13 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '50mb' })); // Increase body size limit for file uploads
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Initialize Cloudinary (safe to call multiple times)
-connectCloudinary();
+// Initialize Cloudinary (safe to call multiple times) - wrap in try-catch for safety
+try {
+  connectCloudinary();
+} catch (error) {
+  console.error('Cloudinary initialization error:', error.message);
+  // Continue without Cloudinary - file upload routes will handle errors
+}
 
 // Database connection middleware - ensures DB is connected before handling requests
 let dbConnectionPromise = null;
@@ -78,7 +81,13 @@ app.use((req, res, next) => {
   return ensureDatabaseConnection(req, res, next);
 });
 
-app.use(clerkMiddleware()); // Clerk middleware
+// Clerk middleware - wrap in try-catch to prevent crashes
+try {
+  app.use(clerkMiddleware());
+} catch (error) {
+  console.error('Clerk middleware initialization error:', error.message);
+  // Continue without Clerk middleware - protected routes will handle auth errors
+}
 
 // API to Listen to Clerk webhooks
 app.use('/api/clerk', clerkWebhooks);
