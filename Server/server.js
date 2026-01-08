@@ -14,6 +14,27 @@ import connectCloudinary from './configs/cloudinary.js';
 import roomRouter from './routes/roomRoutes.js';
 import bookingRouter from './routes/bookingRoutes.js';
 
+// Validate critical environment variables (non-blocking for optional services)
+const validateEnvVars = () => {
+  const required = ['MONGODB_URI'];
+  const missing = required.filter(key => !process.env[key]);
+  
+  if (missing.length > 0) {
+    console.warn('⚠️  Missing required environment variables:', missing.join(', '));
+    console.warn('⚠️  Some features may not work correctly');
+  }
+  
+  // Log optional but recommended env vars
+  const optional = ['CLERK_SECRET_KEY', 'CLOUDINARY_CLOUD_NAME', 'SMTP_USER'];
+  const missingOptional = optional.filter(key => !process.env[key]);
+  if (missingOptional.length > 0 && process.env.NODE_ENV === 'production') {
+    console.warn('⚠️  Missing optional environment variables:', missingOptional.join(', '));
+  }
+};
+
+// Run validation
+validateEnvVars();
+
 const app = express();
 app.use(cors()); // Enable Cross-Origin Resource Sharing
 
@@ -85,11 +106,17 @@ app.use((req, res, next) => {
 });
 
 // Clerk middleware - wrap in try-catch to prevent crashes
-try {
-  app.use(clerkMiddleware());
-} catch (error) {
-  console.error('Clerk middleware initialization error:', error.message);
-  // Continue without Clerk middleware - protected routes will handle auth errors
+// Only initialize if CLERK_SECRET_KEY is available
+if (process.env.CLERK_SECRET_KEY) {
+  try {
+    app.use(clerkMiddleware());
+    console.log('✅ Clerk middleware initialized');
+  } catch (error) {
+    console.error('❌ Clerk middleware initialization error:', error.message);
+    // Continue without Clerk middleware - protected routes will handle auth errors
+  }
+} else {
+  console.warn('⚠️  CLERK_SECRET_KEY not set - Clerk middleware disabled');
 }
 
 // API to Listen to Clerk webhooks
@@ -105,6 +132,46 @@ app.use('/api/user', userRouter);
 app.use('/api/hotels', hotelRouter);
 app.use('/api/rooms', roomRouter);
 app.use('/api/bookings', bookingRouter);
+
+// 404 handler for unmatched routes
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route ${req.method} ${req.path} not found`
+  });
+});
+
+// Global error handler middleware - MUST be last
+// This catches all unhandled errors and prevents FUNCTION_INVOCATION_FAILED
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', {
+    message: err.message,
+    stack: err.stack,
+    path: req.path,
+    method: req.method
+  });
+
+  // Don't send error details in production for security
+  const isDevelopment = process.env.NODE_ENV !== 'production';
+  
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || 'Internal server error',
+    ...(isDevelopment && { stack: err.stack })
+  });
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  // In production, you might want to exit gracefully
+  // process.exit(1);
+});
 
 const PORT = process.env.PORT || 3000;
 
