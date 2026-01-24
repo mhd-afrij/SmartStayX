@@ -101,22 +101,74 @@ export const getHotelBookings = async (req, res) => {
     if (!hotel) {
       return res.json({ success: false, message: "No hotel found" });
     }
+
     const bookings = await Booking.find({ hotel: hotel._id })
       .populate("room hotel user")
       .sort({ createdAt: -1 });
 
-    // Total bookings
-    const totalBookings = bookings.length;
+    const rooms = await Room.find({ hotel: hotel._id });
+    const totalRooms = rooms.length || 0;
+    const now = new Date();
 
-    // Total revenue
-    const totalRevenue = bookings.reduce(
-      (acc, booking) => acc + booking.totalPrice,
-      0
-    );
+    const totalBookings = bookings.length;
+    const totalRevenue = bookings.reduce((acc, b) => acc + (b.totalPrice || 0), 0);
+
+    const activeStays = bookings.filter(
+      (b) => new Date(b.checkInDate) <= now && new Date(b.checkOutDate) >= now && b.status !== "cancelled"
+    ).length;
+    const occupancyPercent = totalRooms ? Math.round((activeStays / totalRooms) * 100) : 0;
+
+    const revenueToday = bookings
+      .filter((b) => {
+        const d = new Date(b.createdAt);
+        return d.toDateString() === now.toDateString();
+      })
+      .reduce((acc, b) => acc + (b.totalPrice || 0), 0);
+
+    const revenueWeek = bookings
+      .filter((b) => now - new Date(b.createdAt) <= 7 * 24 * 60 * 60 * 1000)
+      .reduce((acc, b) => acc + (b.totalPrice || 0), 0);
+
+    const revenueMonth = bookings
+      .filter((b) => now - new Date(b.createdAt) <= 30 * 24 * 60 * 60 * 1000)
+      .reduce((acc, b) => acc + (b.totalPrice || 0), 0);
+
+    const upcomingBookings = bookings.filter((b) => new Date(b.checkInDate) > now && b.status !== "cancelled").length;
+    const cancelledBookings = bookings.filter((b) => b.status === "cancelled").length;
+    const lastMinuteBookings = bookings.filter((b) => {
+      const created = new Date(b.createdAt);
+      const checkIn = new Date(b.checkInDate);
+      const hoursDiff = (checkIn - created) / (1000 * 60 * 60);
+      return hoursDiff > 0 && hoursDiff <= 48;
+    }).length;
+
+    // Trends for last 7 days
+    const trends = Array.from({ length: 7 }).map((_, idx) => {
+      const day = new Date();
+      day.setDate(now.getDate() - (6 - idx));
+      const label = `${day.getMonth() + 1}/${day.getDate()}`;
+      const bookingsCount = bookings.filter((b) => {
+        const d = new Date(b.createdAt);
+        return d.toDateString() === day.toDateString();
+      }).length;
+      return { label, bookings: bookingsCount };
+    });
 
     res.json({
       success: true,
-      dashboardData: { totalBookings, totalRevenue },
+      dashboardData: {
+        totalBookings,
+        totalRevenue,
+        occupancyPercent,
+        revenue: { today: revenueToday, week: revenueWeek, month: revenueMonth },
+        avgRating: null,
+        upcomingBookings,
+        cancelledBookings,
+        lastMinuteBookings,
+        bookings,
+        rooms,
+        trends,
+      },
     });
   } catch (error) {
     res.json({ success: false, message: "Failed to fetch bookings" });
