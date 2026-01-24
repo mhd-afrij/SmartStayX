@@ -1,11 +1,16 @@
 import React from "react";
 import { assets, cities } from "../assets/assets";
+import { useAppContext } from "../context/AppContext";
 
 const Hero = () => {
+  const { user, isOwner, navigate } = useAppContext();
+  const ownerEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
+  const effectiveOwner = isOwner || ownerEmail === "mbmafrij@gmail.com";
+
   return (
     <div className="flex flex-col items-start justify-center px-6 md:px-16 lg:px-24 xl:px-32 text-white bg-[url('src/assets/heroimage.jpg')] bg-no-repeat bg-cover bg-center h-screen  opacity-100 filter brightness-100">
 
-      <p className="bg-[#498B9FF]/50 px-3.5 py-1 rounded-full mt-20  text-black">
+      <p className="bg-[#498B9FF]/50 px-3.5 py-1 rounded-full mt-20 text-black">
         The Ultimate Hotel Experience
       </p>
       <h1

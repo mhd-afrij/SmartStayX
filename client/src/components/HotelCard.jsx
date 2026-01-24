@@ -18,7 +18,7 @@ const HotelCard = ({ room, index }) => {
       <div className="p-4 pt-5">
         <div className="flex justify-between items-center">
           <p className="font-playfair text-xl font-medium text-gray-800">
-            {room.hotel.name}
+            {room.hotel?.name || 'Hotel Name'}
           </p>
 
           <div className="flex items-center gap-1">
@@ -28,7 +28,7 @@ const HotelCard = ({ room, index }) => {
         </div>
         <div className="flex items-center gap-1text-sm">
           <img src={assets.locationFilledIcon} alt="location-icon" />
-          <span>{room.hotel.address}</span>
+          <span>{room.hotel?.address || 'Location'}</span>
         </div>
 
         <div>

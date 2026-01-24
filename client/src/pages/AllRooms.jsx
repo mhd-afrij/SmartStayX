@@ -1,6 +1,6 @@
 import React, { useContext, useState, useMemo } from "react";
 import { assets, facilityIcons } from "../assets/assets";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import StarRating from "../components/StarRating";
 import { AppContext } from "../context/AppContext";
 
@@ -32,8 +32,9 @@ const RadioButton = ({ label, selected = false, onChange = () => {} }) => {
 };
 
 const AllRooms = () => {
-  const { searchParams, setSearchParams, rooms, currency } = useContext(AppContext);
-  const navigate = useNavigate(); // Use navigate from react-router-dom
+  const { rooms, currency } = useContext(AppContext);
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [openFilter, setOpenFilter] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({

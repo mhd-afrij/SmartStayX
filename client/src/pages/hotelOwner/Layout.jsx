@@ -1,28 +1,27 @@
-import  { useEffect } from 'react';
+import { useEffect } from 'react';
 import Navbar from '../../components/hotelOwner/Navbar';
 import Sidebar from '../../components/hotelOwner/Sidebar';
-import { Outlet } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import { useAppContext } from "../../context/AppContext";
+import { Outlet, useNavigate } from 'react-router-dom';
+import { useAppContext } from '../../context/AppContext';
 
 
 const Layout = () => {
-  const {IsOwner} =useAppContext();
+  const { isOwner, user } = useAppContext();
   const navigate = useNavigate();
 
-  useEffect(()=>{
-    if(!IsOwner){
-      navigate('/')
+  useEffect(() => {
+    if (!user || !isOwner) {
+      navigate('/');
     }
-  })
+  }, [isOwner, user, navigate]);
 
   return (
     <div className='flex flex-col h-screen'>
       <Navbar />
       <div className='flex h-full'>
-        <Sidebar/>
+        <Sidebar />
         <div className='flex-1 p-4 pt-10 md:px-10 h-full'>
-          <Outlet/>
+          <Outlet />
         </div>
       </div>
     </div>

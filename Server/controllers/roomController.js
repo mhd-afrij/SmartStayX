@@ -8,7 +8,9 @@ import Room from "../models/Room.js";
 export const createRoom = async (req,res)=>{
     try{
         const{roomType,pricePerNight,amenities}=req.body;
-        const hotel =await Hotel.findOne({Owner:req.auth.userId})
+        const auth = typeof req.auth === "function" ? req.auth() : req.auth;
+        const userId = auth?.userId;
+        const hotel =await Hotel.findOne({Owner:userId})
 
         if(!hotel)return res.json({success:false,message:"No Hotel Found"});
 
@@ -59,7 +61,9 @@ export const getRooms = async (req,res)=>{
 //Api To get all rooms for a specific hotel
 export const getOwnerRooms = async (req,res)=>{
     try {
-        const hotelData =await Hotel.findOne({owner:req.auth.userId})
+        const auth = typeof req.auth === "function" ? req.auth() : req.auth;
+        const userId = auth?.userId;
+        const hotelData =await Hotel.findOne({owner:userId})
         const rooms =await Room.find({hotel:hotelData._id.toString()}).populate("hotel");
         res.json({success:true,rooms});
     } catch (error) {

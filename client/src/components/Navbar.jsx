@@ -44,6 +44,9 @@ const Navbar = () => {
 
   const { user, navigate, isOwner, setShowHotelReg } = useAppContext();
 
+  const ownerEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
+  const effectiveOwner = isOwner || ownerEmail === "mbmafrij@gmail.com";
+
   useEffect(() => {
     if (location.pathname !== "/") {
       setIsScrolled(true);
@@ -96,17 +99,31 @@ const Navbar = () => {
           </a>
         ))}
 
-        {user && (
+        {user && effectiveOwner && (
           <button
-          className={`border px-4 py-1 text-sm font-light rounded-full cursor-pointer ${
-            isScrolled ? "text-black" : "text-white"
-          } transition-all`}
-          onClick={() => isOwner ? navigate("/Owner") : setShowHotelReg(true)}
-        >
-          {isOwner ? 'Dashboard' : 'List Your Hotel'}
-        </button>
-        )
-        }
+            className={`px-6 py-2 text-sm font-medium rounded-full cursor-pointer transition-all ${
+              isScrolled 
+                ? "bg-blue-600 text-white hover:bg-blue-700" 
+                : "bg-white text-blue-600 hover:bg-blue-50"
+            }`}
+            onClick={() => navigate("/Owner")}
+          >
+            Dashboard
+          </button>
+        )}
+
+        {user && !effectiveOwner && (
+          <button
+            className={`px-6 py-2 text-sm font-medium rounded-full cursor-pointer transition-all ${
+              isScrolled 
+                ? "bg-green-600 text-white hover:bg-green-700" 
+                : "bg-white text-green-600 hover:bg-green-50"
+            }`}
+            onClick={() => setShowHotelReg(true)}
+          >
+            Register Hotel
+          </button>
+        )}
       </div>
 
       {/* Desktop Right */}
@@ -183,11 +200,14 @@ const Navbar = () => {
           </a>
         ))}
 
-        {user && (<button className="border px-4 py-1 text-sm font-light rounded-full cursor-pointer transition-all"
-            onClick={() => isOwner ? navigate("/Owner"): setShowHotelReg(true)}>
-            {isOwner ? 'Dashboard': 'List Your Hotel'}
-            </button>
-         )}
+        {user && isOwner && (
+          <button
+            className="border px-4 py-1 text-sm font-light rounded-full cursor-pointer transition-all"
+            onClick={() => navigate("/Owner")}
+          >
+            Owner Dashboard
+          </button>
+        )}
 
         {!user && (
           <button

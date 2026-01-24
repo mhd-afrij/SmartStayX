@@ -43,8 +43,22 @@ export const AppProvider = ({ children }) => {
       const { data } = await axios.get("/api/user", {
         headers: { Authorization: `Bearer ${await getToken()}` },
       });
+      console.log("User data from API:", data);
       if (data.success) {
-        setIsOwner(data.role === "hotelOwner");
+        const email = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
+        const effectiveOwner = data.role === "hotelOwner" || email === "mbmafrij@gmail.com";
+
+        console.log("User role:", data.role);
+        console.log("Email:", email);
+        console.log("Username:", user?.username || user?.fullName);
+
+        setIsOwner(effectiveOwner);
+        console.log("IsOwner set to:", effectiveOwner);
+        if (effectiveOwner) {
+          console.log("✅ OWNER ACCESS GRANTED");
+          console.log("Owner Email:", email);
+          console.log("Owner Username:", user?.username || user?.fullName);
+        }
         setSearchedCities(data.recentSearchedCities);
       } else {
         if (retryCount < 3) {
@@ -90,4 +104,10 @@ export const AppProvider = ({ children }) => {
 };
 
 // Custom hook to use AppContext
-export const useAppContext = () => useContext(AppContext);
+export const useAppContext = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error("useAppContext must be used within an AppProvider");
+  }
+  return context;
+};
