@@ -10,7 +10,7 @@ export const createRoom = async (req,res)=>{
         const{roomType,pricePerNight,amenities}=req.body;
         const auth = typeof req.auth === "function" ? req.auth() : req.auth;
         const userId = auth?.userId;
-        const hotel =await Hotel.findOne({Owner:userId})
+        const hotel =await Hotel.findOne({owner:userId})
 
         if(!hotel)return res.json({success:false,message:"No Hotel Found"});
 
@@ -47,7 +47,7 @@ export const getRooms = async (req,res)=>{
 
             path: 'hotel',
             populate: {
-            path: 'Owner' ,
+            path: 'owner' ,
             select:'image'
             }
         }).sort({createdAt:-1})

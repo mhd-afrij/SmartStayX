@@ -54,64 +54,99 @@ const ListRoom = () => {
   },[user])
 
   return (
-    <div>
+    <div className="space-y-6">
       <Title
         align="left"
         font="outfit"
         title="Room Listings"
-        subtitle="View, edit, or manage all listed rooms. Keep the information up-to-date to provide the best experience for users."
+        subtitle="Manage all your room listings, update pricing, and control availability."
       />
-      <p className="text-gray-500 mt-8">All Rooms</p>
 
-      <div className="w-full max-w-3xl text-left border border-gray-300 rounded-lg max-h-80 overflow-y-scroll">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="py-3 px-4 text-gray-800 font-medium">Name</th>
-              <th className="py-3 px-4 text-gray-800 font-medium max-sm:hidden">
-                Facility
-              </th>
-              <th className="py-3 px-4 text-gray-800 font-medium text-center">
-                Price / night
-              </th>
-              <th className="py-3 px-4 text-gray-800 font-medium text-center">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="text-sm">
-            {rooms.map((item, index) => (
-              <tr key={index}>
-                <td className="py-3 px-4 text-gray-700 border-t border-gray-300">
-                  {item.roomType}
-                </td>
-                <td className="py-3 px-4 text-gray-700 border-t border-gray-300 max-sm:hidden">
-                  {item.amenities.join(', ')}
-                </td>
-                <td className="py-3 px-4 text-gray-700 border-t border-gray-300 text-center">
-                 {currency} {item.pricePerNight}
-                </td>
-                <td className="py-3 px-4 border-t border-gray-300 text-sm text-center">
-                  <label className="relative inline-flex items-center cursor-pointer text-gray-900 gap-3">
-                    <input onClick={()=>toggleAvailability(item._id)}
+      {rooms.length === 0 ? (
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-12 text-center">
+          <p className="text-slate-500">No rooms listed yet. Add your first room to get started.</p>
+        </div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {rooms.map((room) => (
+            <div
+              key={room._id}
+              className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition"
+            >
+              {/* Room Image */}
+              {room.images && room.images[0] ? (
+                <div className="aspect-video bg-slate-100 overflow-hidden">
+                  <img
+                    src={room.images[0]}
+                    alt={room.roomType}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+                  <span className="text-slate-400 text-sm">No image</span>
+                </div>
+              )}
+
+              {/* Room Details */}
+              <div className="p-4 space-y-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-semibold text-slate-800">{room.roomType}</h3>
+                    <p className="text-lg font-bold text-blue-600 mt-1">
+                      {currency} {room.pricePerNight}
+                      <span className="text-xs text-slate-500 font-normal"> / night</span>
+                    </p>
+                  </div>
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${
+                      room.isAvailable
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-rose-100 text-rose-700"
+                    }`}
+                  >
+                    {room.isAvailable ? "Available" : "Unavailable"}
+                  </span>
+                </div>
+
+                {/* Amenities */}
+                {room.amenities && room.amenities.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {room.amenities.slice(0, 3).map((amenity, idx) => (
+                      <span
+                        key={idx}
+                        className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded"
+                      >
+                        {amenity}
+                      </span>
+                    ))}
+                    {room.amenities.length > 3 && (
+                      <span className="text-xs text-slate-500 px-2 py-1">
+                        +{room.amenities.length - 3} more
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Toggle Availability */}
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-sm text-slate-600">Availability</span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
                       type="checkbox"
                       className="sr-only peer"
-                      checked={item.isAvailable}
-                      onChange={() => {
-                        const updatedRooms = [...rooms];
-                        updatedRooms[index].isAvailable = !updatedRooms[index].isAvailable;
-                        setRooms(updatedRooms);
-                      }}
+                      checked={room.isAvailable}
+                      onChange={() => toggleAvailability(room._id)}
                     />
-                    <div className="h-7 w-12 bg-slate-300 rounded-full peer peer-checked:bg-blue-600 transition-colors duration-200"></div>
-                    <span className="dot absolute left-1 top-1 w-5 h-5 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-5"></span>
+                    <div className="h-6 w-11 bg-slate-300 rounded-full peer peer-checked:bg-emerald-500 transition-colors duration-200"></div>
+                    <span className="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-5 shadow-sm"></span>
                   </label>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
