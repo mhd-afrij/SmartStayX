@@ -53,7 +53,7 @@ const AddRoom = () => {
 
     //check if all inputs are filled
 
-    if (!inputs.roomType || !inputs.pricePerNight || !Object.values(images).some((image) => image)) {
+    if (!selectedHotel || !inputs.roomType || !inputs.pricePerNight || !Object.values(images).some((image) => image)) {
       toast.error("Please fill all fields and upload at least one image.");
       return;
     }
@@ -62,6 +62,7 @@ const AddRoom = () => {
       const formData = new FormData();
       formData.append("roomType", inputs.roomType);
       formData.append("pricePerNight", inputs.pricePerNight);
+      formData.append("hotelId", selectedHotel);
 
       //converting amenities to array & keeping only enable amenities
       const amenities = Object
@@ -97,7 +98,7 @@ const AddRoom = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(data.message)
+      toast.error(error.response?.data?.message || 'Failed to add room')
     }finally{
       setLoading(false);
     }

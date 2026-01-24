@@ -7,12 +7,19 @@ import Room from "../models/Room.js";
 //Api To create a new room for a hotel
 export const createRoom = async (req,res)=>{
     try{
-        const{roomType,pricePerNight,amenities}=req.body;
+        const{roomType,pricePerNight,amenities,hotelId}=req.body;
         const auth = typeof req.auth === "function" ? req.auth() : req.auth;
         const userId = auth?.userId;
-        const hotel =await Hotel.findOne({owner:userId})
 
-        if(!hotel)return res.json({success:false,message:"No Hotel Found"});
+        if(!hotelId){
+            return res.json({success:false,message:"Please select a hotel"});
+        }
+
+        const hotel = await Hotel.findById(hotelId);
+        if(!hotel) return res.json({success:false,message:"No Hotel Found"});
+        if(hotel.owner !== userId){
+            return res.json({success:false,message:"Not authorized to add room to this hotel"});
+        }
 
         //upload images to cloudinary
         const uploadImages= req.files.map(async (file)=>{
@@ -22,19 +29,17 @@ export const createRoom = async (req,res)=>{
 
         const images=await Promise.all(uploadImages)
 
-
         await Room.create({
-            hotel: hotel. id,
+            hotel: hotel._id,
             roomType,
             pricePerNight: +pricePerNight,
             amenities: JSON.parse(amenities),
             images,
-
         })
         res.json({success:true,message: "Room Created successfully"})
 
     } catch(error){
-         res.json({success:true,message:error.message})
+         res.json({success:false,message:error.message})
 
     }
 
@@ -63,8 +68,9 @@ export const getOwnerRooms = async (req,res)=>{
     try {
         const auth = typeof req.auth === "function" ? req.auth() : req.auth;
         const userId = auth?.userId;
-        const hotelData =await Hotel.findOne({owner:userId})
-        const rooms =await Room.find({hotel:hotelData._id.toString()}).populate("hotel");
+        const hotels = await Hotel.find({owner:userId});
+        const hotelIds = hotels.map(h => h._id.toString());
+        const rooms = await Room.find({hotel: { $in: hotelIds }}).populate("hotel");
         res.json({success:true,rooms});
     } catch (error) {
         res.json({success:false,message:error.message});
