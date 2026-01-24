@@ -85,3 +85,25 @@ export const toggleRoomAvailability = async (req,res)=>{
          res.json({success:false,message:error.message});
     }
 }
+
+//Api To delete a room (only by the hotel's owner)
+export const deleteRoom = async (req, res) => {
+    try {
+        const auth = typeof req.auth === "function" ? req.auth() : req.auth;
+        const userId = auth?.userId;
+        const { id } = req.params;
+
+        const room = await Room.findById(id).populate("hotel");
+        if (!room) return res.json({ success: false, message: "Room not found" });
+
+        const ownerHotel = await Hotel.findOne({ owner: userId });
+        if (!ownerHotel || room.hotel._id.toString() !== ownerHotel._id.toString()) {
+            return res.json({ success: false, message: "Not authorized to delete this room" });
+        }
+
+        await Room.findByIdAndDelete(id);
+        res.json({ success: true, message: "Room deleted" });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}

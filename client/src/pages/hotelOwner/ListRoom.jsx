@@ -45,6 +45,22 @@ const ListRoom = () => {
     }
   };
 
+  const deleteRoom = async (roomId) => {
+    try {
+      const { data } = await axios.delete(`/api/rooms/${roomId}`, {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      });
+      if (data.success) {
+        toast.success(data.message);
+        setRooms((prev) => prev.filter((r) => r._id !== roomId));
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete room');
+    }
+  };
+
 
 
   useEffect(()=>{
@@ -93,6 +109,9 @@ const ListRoom = () => {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-semibold text-slate-800">{room.roomType}</h3>
+                    {room.hotel?.name && (
+                      <p className="text-sm text-slate-500">{room.hotel.name}</p>
+                    )}
                     <p className="text-lg font-bold text-blue-600 mt-1">
                       {currency} {room.pricePerNight}
                       <span className="text-xs text-slate-500 font-normal"> / night</span>
@@ -128,19 +147,28 @@ const ListRoom = () => {
                   </div>
                 )}
 
-                {/* Toggle Availability */}
+                {/* Actions */}
                 <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-sm text-slate-600">Availability</span>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={room.isAvailable}
-                      onChange={() => toggleAvailability(room._id)}
-                    />
-                    <div className="h-6 w-11 bg-slate-300 rounded-full peer peer-checked:bg-emerald-500 transition-colors duration-200"></div>
-                    <span className="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-5 shadow-sm"></span>
-                  </label>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-slate-600">Availability</span>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={room.isAvailable}
+                        onChange={() => toggleAvailability(room._id)}
+                      />
+                      <div className="h-6 w-11 bg-slate-300 rounded-full peer peer-checked:bg-emerald-500 transition-colors duration-200"></div>
+                      <span className="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-5 shadow-sm"></span>
+                    </label>
+                  </div>
+
+                  <button
+                    className="text-sm px-3 py-1.5 rounded border border-rose-200 text-rose-700 hover:bg-rose-50"
+                    onClick={() => deleteRoom(room._id)}
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             </div>
