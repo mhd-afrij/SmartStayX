@@ -2,11 +2,8 @@ import { useState } from 'react'
 import { assets, cities } from '../assets/assets'
 import { useAppContext } from '../../src/context/AppContext';
 import toast from 'react-hot-toast'
-import e from 'cors'
-
-
 const HotelReg = () => {
-    const{setShowHotelReg,axios,getToken,setIsOwner}=useAppContext()
+  const{setShowHotelReg,axios,getToken,setIsOwner,navigate}=useAppContext()
 
 
     const[name,setName]=useState("")
@@ -23,11 +20,12 @@ const HotelReg = () => {
           toast.success(data.message)
           setIsOwner(true)
           setShowHotelReg(false)
+          navigate('/Owner')
         }else{
           toast.error(data.message)
         }
       } catch (error) {
-        toast.error(data.message)
+        toast.error(error.message)
         
       }
     }
@@ -52,28 +50,27 @@ const HotelReg = () => {
             {/*Hotel Name */}
           <div className='w-full mt-4'>
             <label htmlFor='name' className='font-medium text-gray-500'>Hotel Name</label>
-            <input type="text" id='name' onChange={()=>setName(e.target.value)} value={name} placeholder="Type here" className="border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light" required/>
-
+            <input type="text" id='name' onChange={(e)=>setName(e.target.value)} value={name} placeholder="Type here" className="border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light" required/>
              {/*Phone */}
-            <label htmlFor='contact' id='contact' onChange={()=>setContact(e.target.value)} value={contact} className='font-medium text-gray-500'>Phone</label>
+            <label htmlFor='contact' className='font-medium text-gray-500'>Phone</label>
 
-            <input id='contact' type="text" placeholder="Type here" className="border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light" required/>
+            <input id='contact' onChange={(e)=>setContact(e.target.value)} value={contact} type="text" placeholder="Type here" className="border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light" required/>
 
 
             {/*Address */}
             <label htmlFor='address' className='font-medium text-gray-500'>Address</label>
 
-            <input id='address'onChange={()=>setAddress(e.target.value)} value={address} type="text" placeholder="Type here" className="border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light" required/>
+            <input id='address' onChange={(e)=>setAddress(e.target.value)} value={address} type="text" placeholder="Type here" className="border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light" required/>
             
 
 
           </div>
           {/*Select city drop down */}
           <div className='w-full mt-4 max-w-60 mr-auto'>
-            <label htmlFor="city" className='font-medium text-gray-500'>City</label>
-            <select onChange={(e)=>setCity(e.target.value)} value={city} id="city" className='className="border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light' required>
+            <label htmlFor="city" className='font-medium text-gray-500'>Country</label>
+            <select onChange={(e)=>setCity(e.target.value)} value={city} id="city" className="border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light" required>
 
-                <option value="">Select City</option>
+              <option value="">Select Country</option>
                 {cities.map((city)=>(
                     <option key={city} value={city}>{city}
                     </option>

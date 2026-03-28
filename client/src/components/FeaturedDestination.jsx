@@ -12,27 +12,33 @@ const FeaturedDestination = () => {
 
 
   return rooms.length> 0 &&(
-    <div className="flex flex-col items-center px-6 md:px-16 lg:px-24 bg-slate-50 py-20">
-      <Title
-        title="Featured Destination"
-        subtitle="Discover our handpicked selection of exceptional properties around the world, offering unparalleled luxury and unforgettable experiences."
-      />
+    <div className="w-full px-6 md:px-16 lg:px-24 bg-slate-50 py-20">
+      <div className="flex flex-col items-center space-y-8">
+        <Title
+          title="Featured Destination"
+          subtitle="Discover our handpicked selection of exceptional properties around the world, offering unparalleled luxury and unforgettable experiences."
+        />
 
-      <div className="flex flex-row items-center justify-start gap-6 mt-20 overflow-x-auto">
-        {rooms.slice(0, 4).map((room) => (
-          <HotelCard key={room._id || room.id} room={room} />
-        ))}
+        <div className="w-full overflow-x-auto scrollbar-hide">
+          <div className="flex gap-6 pb-4 min-w-max">
+            {rooms.slice(0, 8).map((room) => (
+              <div key={room._id || room.id} className="w-72 flex-shrink-0">
+                <HotelCard room={room} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <button
+          onClick={() => {
+            navigate("/rooms");
+            scrollTo(0, 0);
+          }}
+          className="my-8 px-6 py-2.5 text-sm font-semibold border border-slate-300 rounded-lg bg-white hover:bg-slate-50 text-slate-700 transition-all cursor-pointer"
+        >
+          View All Destinations
+        </button>
       </div>
-
-      <button
-        onClick={() => {
-          navigate("/rooms");
-          scrollTo(0, 0);
-        }}
-        className="my-16 px-4 py-2 text-sm font-medium border border-gray-300 rounded bg-white hover:bg-gray-50 transition-all cursor-pointer"
-      >
-        View All Destinations
-      </button>
     </div>
   );
 };

@@ -14,3 +14,13 @@
 .font-playfair{
   font-family: 'Playfair', !important;
 }
+
+/* Hide scrollbar while keeping scrolling functionality */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

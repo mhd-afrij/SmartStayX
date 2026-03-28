@@ -5,8 +5,11 @@ import { NavLink } from "react-router-dom";
 const Sidebar = () => {
   const sidebarLinks = [
     { name: "Dashboard", path: "/Owner", icon: assets.dashboardIcon },
+    { name: "Hotel Mgmt", path: "/Owner/hotel-management", icon: assets.homeIcon },
+    { name: "Payment Mgmt", path: "/Owner/payments", icon: assets.totalRevenueIcon },
     { name: "Add Room", path: "/Owner/add-room", icon: assets.addIcon },
     { name: "List Room", path: "/Owner/list-room", icon: assets.listIcon },
+    { name: "Exclusive Offers", path: "/Owner/offers", icon: assets.badgeIcon },
   ];
 
   return (
@@ -15,13 +18,17 @@ const Sidebar = () => {
         <NavLink
           to={item.path}
           key={index}
-          end="/Owner"
+          end={item.path === "/Owner"}
           className={({ isActive }) =>
-            'flex items-center py-3 px-4 md:px-8 gap-3 ${isActive ? "border-r-4 md:border-r-[6px]bg-blue-600 text-blue-600":"hover:bg-gray-100/90 border-white text-gray=700"}'
+            `flex items-center py-3 px-4 md:px-8 gap-3 border-r-4 transition-colors duration-200 ${
+              isActive
+                ? "md:border-r-[6px] border-blue-600 text-blue-600 bg-blue-50"
+                : "border-transparent hover:bg-gray-100/90 text-gray-700"
+            }`
           }
         >
-          <img src={item.icon} alt={item.name} className="min-h-6 min-w-6" />
-          <p className="md:block hidden text-center">{item.name}</p>
+          <img src={item.icon} alt={item.name} className="h-6 w-6 object-contain shrink-0" />
+          <p className="md:block hidden text-left whitespace-nowrap">{item.name}</p>
         </NavLink>
       ))}
     </div>

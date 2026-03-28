@@ -1,50 +1,45 @@
-import React, { useContext, useState, useMemo } from "react";
-import { assets, facilityIcons } from "../assets/assets";
+import React, { useContext, useState, useMemo, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import StarRating from "../components/StarRating";
 import { AppContext } from "../context/AppContext";
+import { destinationLocaleConfig } from "../assets/assets";
 
 const Checkbox = ({ label, selected = false, onChange = () => {} }) => {
   return (
-    <label className="flex items-center gap-3 cursor-pointer mt-2 text-sm">
+    <label className="flex items-center gap-3 cursor-pointer">
       <input
         type="checkbox"
         checked={selected}
         onChange={(e) => onChange(e.target.checked, label)}
+        className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-2 focus:ring-slate-900/20"
       />
-      <span className="font-light select-none">{label}</span>
-    </label>
-  );
-};
-
-const RadioButton = ({ label, selected = false, onChange = () => {} }) => {
-  return (
-    <label className="flex items-center gap-3 cursor-pointer mt-2 text-sm">
-      <input
-        type="radio"
-        name="sortOption"
-        checked={selected}
-        onChange={() => onChange(label)}
-      />
-      <span className="font-light select-none">{label}</span>
+      <span className="text-sm text-slate-700 font-medium select-none">{label}</span>
     </label>
   );
 };
 
 const AllRooms = () => {
-  const { rooms, currency } = useContext(AppContext);
+  const { rooms, formatPrice, setSelectedCurrency, setSelectedLanguage } = useContext(AppContext);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Auto-update currency and language based on destination
+  useEffect(() => {
+    const destination = searchParams.get("destination");
+    if (destination && destinationLocaleConfig[destination]) {
+      setSelectedLanguage(destinationLocaleConfig[destination].languageCode);
+      setSelectedCurrency(destinationLocaleConfig[destination].currencyCode);
+    }
+  }, [searchParams]);
 
   const [openFilter, setOpenFilter] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
     roomType: [],
     priceRange: [],
   });
-  const [selectedSort, setSelectedSort] = useState('');
+  const [selectedSort, setSelectedSort] = useState("");
 
   const roomTypes = ["Single Bed", "Double Bed", "Luxury Room", "Family Suite"];
-  const priceRanges = ["0 to 500", "500 to 1000", "1000 to 2000", "2000 to 3000"];
+  const priceRanges = ["0 to 100", "100 to 200", "200 to 300", "300 to 400", "400 to 500"];
   const sortOptions = ["Price: Low to High", "Price: High to Low", "Newest First"];
 
   const handleFilterChange = (checked, value, type) => {
@@ -69,11 +64,13 @@ const AllRooms = () => {
   };
 
   const matchesPriceRange = (room) => {
-    return selectedFilters.priceRange.length === 0 ||
+    return (
+      selectedFilters.priceRange.length === 0 ||
       selectedFilters.priceRange.some((range) => {
         const [min, max] = range.split(" to ").map(Number);
         return room.pricePerNight >= min && room.pricePerNight <= max;
-      });
+      })
+    );
   };
 
   const sortRooms = (a, b) => {
@@ -88,9 +85,9 @@ const AllRooms = () => {
   };
 
   const filterDestination = (room) => {
-    const destination = searchParams.get('destination');
+    const destination = searchParams.get("destination");
     if (!destination) return true;
-    return room.hotel.city.toLowerCase().includes(destination.toLowerCase());
+    return room.hotel?.city?.toLowerCase().includes(destination.toLowerCase());
   };
 
   const filteredRooms = useMemo(() => {
@@ -101,114 +98,212 @@ const AllRooms = () => {
     ).sort(sortRooms);
   }, [rooms, selectedFilters, selectedSort, searchParams]);
 
+  const activeFilters = [...selectedFilters.roomType, ...selectedFilters.priceRange];
+
   const clearFilters = () => {
     setSelectedFilters({
       roomType: [],
       priceRange: [],
     });
-    setSelectedSort('');
+    setSelectedSort("");
     setSearchParams({});
   };
 
+  const removeFilter = (value) => {
+    setSelectedFilters((prev) => ({
+      roomType: prev.roomType.filter((item) => item !== value),
+      priceRange: prev.priceRange.filter((item) => item !== value),
+    }));
+  };
+
+  const totalRooms = rooms.length;
+  const filteredCount = filteredRooms.length;
+
   return (
-    <div className="flex flex-col-reverse lg:flex-row items-start justify-between pt-28 md:pt-35 px-4 md:px-16 lg:px-24 xl:px-32">
-      <div>
-        <div className="flex flex-col items-start text-left">
-          <h1 className="font-playfair text-4xl md:text-[40px]">Hotel Rooms</h1>
-          <p className="text-sm md:text-base text-gray-500/90 mt-2 max-w-174">
-            Take advantage of our limited-time offers and special packages to
-            enhance your stay and create unforgettable memories.
-          </p>
+    <div className="pt-20 min-h-screen bg-slate-50">
+      <div className="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+          <div>
+            <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Rooms</p>
+            <h1 className="text-3xl md:text-4xl font-playfair text-slate-900">
+              {searchParams.get("destination")
+                ? `Stays in ${searchParams.get("destination")}`
+                : "Find your next stay"}
+            </h1>
+            <p className="text-sm text-slate-600">
+              Showing {filteredCount} of {totalRooms} rooms
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <select
+              value={selectedSort}
+              onChange={(e) => handleSortChange(e.target.value)}
+              className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/20 bg-white"
+            >
+              <option value="">Sort: Recommended</option>
+              {sortOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={clearFilters}
+              className="px-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 hover:text-slate-900 hover:border-slate-300"
+            >
+              Reset filters
+            </button>
+          </div>
         </div>
-        {filteredRooms.map((room) => (
-          <div
-            key={room._id}
-            className="flex flex-col md:flex-row items-start py-10 gap-6 border-b border-gray-300 last:pb-30 last:border-0"
-          >
-            <img
-              onClick={() => {
-                navigate(`/rooms/${room._id}`);
-                scrollTo(0, 0);
-              }}
-              src={room.images[0]}
-              alt="hotel-img"
-              title="View Room Details"
-              className="max-h-65 md:w-1/2 rounded-xl shadow-lg object-cover cursor-pointer"
-            />
-            <div className="md:w-1/2 flex flex-col gap-2">
-              <p className="text-gray-500">{room.hotel.city}</p>
-              <p
-                onClick={() => {
-                  navigate(`/rooms/${room._id}`);
-                  scrollTo(0, 0);
-                }}
-                className="text-gray-800 text-3xl font-playfair cursor-pointer"
-              >
-                {room.hotel.name}
-              </p>
-              <div className="flex items-center">
-                <StarRating />
-                <p className="ml-2">200+ reviews</p>
-              </div>
-              <div className="flex items-center gap-1 text-gray-500 mt-2 text-sm">
-                <img src={assets.locationIcon} alt="location-icon" />
-                <span>{room.hotel.address}</span>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <aside className="space-y-4 lg:col-span-3">
+            <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Room Type</label>
+                <div className="space-y-2">
+                  {roomTypes.map((room, index) => (
+                    <Checkbox
+                      key={index}
+                      label={room}
+                      selected={selectedFilters.roomType.includes(room)}
+                      onChange={(checked) => handleFilterChange(checked, room, "roomType")}
+                    />
+                  ))}
+                </div>
               </div>
 
-              <div className="flex flex-wrap items-center mt-3 mb-6 gap-4">
-                {room.amenities.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F5F5FF]/70"
-                  >
-                    <img
-                      src={facilityIcons[item]}
-                      alt={item}
-                      className="w-5 h-5"
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Price per night</label>
+                <div className="space-y-2">
+                  {priceRanges.map((range, index) => (
+                    <Checkbox
+                      key={index}
+                      label={range}
+                      selected={selectedFilters.priceRange.includes(range)}
+                      onChange={(checked) => handleFilterChange(checked, range, "priceRange")}
                     />
-                    <p className="text-xs">{item}</p>
-                  </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <main className="space-y-4 min-w-0 lg:col-span-9">
+            {activeFilters.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                {activeFilters.map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => removeFilter(filter)}
+                    className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700"
+                  >
+                    {filter}
+                    <span className="text-slate-400">x</span>
+                  </button>
                 ))}
               </div>
+            )}
 
-              {/* Room Price per night */}
+            {filteredRooms.length === 0 && (
+              <div className="bg-white rounded-xl p-10 text-center border border-slate-200">
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">No rooms found</h3>
+                <p className="text-slate-600 mb-4">Try adjusting your filters.</p>
+                <button
+                  onClick={clearFilters}
+                  className="px-5 py-2.5 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-colors"
+                >
+                  Clear filters
+                </button>
+              </div>
+            )}
 
-              <p className="text-xl font-medium text-gray-700">${room.pricePerNight}/Night</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {filteredRooms.map((room, index) => (
+                <article
+                  key={room._id}
+                  className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition h-full flex flex-col"
+                >
+                  <div
+                    className="relative h-44 bg-slate-100 cursor-pointer"
+                    onClick={() => {
+                      navigate(`/rooms/${room._id}`);
+                      scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                  >
+                    {room.images?.[0] ? (
+                      <img
+                        src={room.images[0]}
+                        alt={room.hotel?.name || "room"}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs uppercase tracking-[0.2em] text-slate-400">
+                        No image
+                      </div>
+                    )}
+                    <div className="absolute top-3 left-3 bg-white/95 px-3 py-1 rounded-full text-xs font-semibold text-slate-800">
+                      {formatPrice(room.pricePerNight)} / night
+                    </div>
+                    {index % 3 === 0 && (
+                      <div className="absolute top-3 right-3 bg-slate-900 text-white px-3 py-1 rounded-full text-[10px] font-semibold tracking-widest">
+                        FEATURED
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-4 space-y-3 flex-1 flex flex-col">
+                    <div>
+                      <h3
+                        onClick={() => {
+                          navigate(`/rooms/${room._id}`);
+                          scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        className="text-lg font-semibold text-slate-900 hover:text-slate-700 transition-colors cursor-pointer line-clamp-1"
+                      >
+                        {room.hotel?.name || "Luxury Hotel"}
+                      </h3>
+                      <p className="text-sm text-slate-600">{room.roomType || room.type || "Signature room"}</p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {room.hotel?.city || room.hotel?.address || "Prime location"}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {room.amenities?.slice(0, 2).map((amenity) => (
+                        <span
+                          key={amenity}
+                          className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs"
+                        >
+                          {amenity}
+                        </span>
+                      ))}
+                      {room.amenities?.length > 2 && (
+                        <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs">
+                          +{room.amenities.length - 2} more
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 mt-auto">
+                      <div className="text-sm text-slate-700">
+                        <span className="font-semibold text-slate-900">{formatPrice(room.pricePerNight)}</span> / night
+                      </div>
+                      <button
+                        onClick={() => {
+                          navigate(`/rooms/${room._id}`);
+                          scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        className="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800"
+                      >
+                        View
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
             </div>
-          </div>
-        ))}
-      </div>
-
- {/* Filters */}
-      <div className="bg-white w-80 border border-gray-300 text-gray-600 max-lg:mb-8 min-lg:mt-16">
-        <div className={`flex items-center justify-between px-5 py-2.5 min-lg:border-gray-300 ${openFilter && "border-b"}`}>
-          <p className="font-medium text-base text-gray-800">FILTER</p>
-          <div className="text-xs cursor-pointer">
-            <span onClick={() => setOpenFilter(!openFilter)} className="lg:hidden">
-              {openFilter ? "HIDE" : "SHOW"}
-            </span>
-            <span className="hidden lg:block">CLEAR</span>
-          </div>
-        </div>
-        <div className={`${openFilter ? "h-auto" : "h-0 lg:h-auto"} overflow-hidden transition-all duration-700`}>
-          <div className="px-5 pt-5">
-            <p className="font-medium text-gray-800 pb-2">Popular Filters</p>
-            {roomTypes.map((room, index) => (
-              <Checkbox key={index} label={room} selected={selectedFilters.roomType.includes(room)} onChange={(checked) => handleFilterChange(checked, room, 'roomType')} />
-            ))}
-          </div>
-          <div className="px-5 pt-5">
-            <p className="font-medium text-gray-800 pb-2">Price Range</p>
-            {priceRanges.map((range, index) => (
-              <Checkbox key={index} label={`${currency} ${range}`} selected={selectedFilters.priceRange.includes(range)} onChange={(checked) => handleFilterChange(checked, range, 'priceRange')} />
-            ))}
-          </div>
-          <div className="px-5 pt-5 pb-7">
-            <p className="font-medium text-gray-800 pb-2">Sort By</p>
-            {sortOptions.map((option, index) => (
-              <RadioButton key={index} label={option} selected={selectedSort === option} onChange={() => handleSortChange(option)} />
-            ))}
-          </div>
+          </main>
         </div>
       </div>
     </div>

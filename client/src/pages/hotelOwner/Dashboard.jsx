@@ -5,7 +5,9 @@ import { useAppContext } from "../../context/AppContext";
 import { toast } from "react-hot-toast";
 
 const Dashboard = () => {
-  const { currency, user, getToken, axios } = useAppContext();
+  const { currency, user, getToken, axios, selectedHotelId, setSelectedHotelId } = useAppContext();
+  const [deletingBookingId, setDeletingBookingId] = useState(null);
+  const [maintenanceRoomId, setMaintenanceRoomId] = useState(null);
   const [dashboardData, setDashboardData] = useState({
     bookings: [],
     rooms: [],
@@ -18,11 +20,13 @@ const Dashboard = () => {
     cancelledBookings: 0,
     lastMinuteBookings: 0,
     trends: [],
+    hotel: null,
+    allHotels: [],
   });
 
   const fetchDashboardData = async () => {
     try {
-      const { data } = await axios.get("/api/bookings/hotel", {
+      const { data } = await axios.get(`/api/bookings/hotel?hotelId=${selectedHotelId}`, {
         headers: { Authorization: `Bearer ${await getToken()}` },
       });
       if (data.success) {
@@ -33,6 +37,8 @@ const Dashboard = () => {
           rooms: data.dashboardData.rooms || [],
           revenue: data.dashboardData.revenue || { today: 0, week: 0, month: 0 },
           trends: data.dashboardData.trends || [],
+          hotel: data.dashboardData.hotel || null,
+          allHotels: data.dashboardData.allHotels || [],
         }));
       } else {
         toast.error(data.message);
@@ -43,6 +49,7 @@ const Dashboard = () => {
   };
 
   const handleToggleAvailability = async (roomId) => {
+    setMaintenanceRoomId(roomId);
     try {
       const { data } = await axios.post(
         "/api/rooms/toggle-availability",
@@ -61,6 +68,33 @@ const Dashboard = () => {
       }
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setMaintenanceRoomId(null);
+    }
+  };
+
+  const handleDeleteBooking = async (bookingId) => {
+    if (!bookingId) return;
+
+    const shouldDelete = window.confirm("Delete this booking record? This action cannot be undone.");
+    if (!shouldDelete) return;
+
+    setDeletingBookingId(bookingId);
+    try {
+      const { data } = await axios.delete(`/api/bookings/owner/${bookingId}`, {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      });
+
+      if (data.success) {
+        toast.success(data.message || "Booking deleted successfully");
+        await fetchDashboardData();
+      } else {
+        toast.error(data.message || "Failed to delete booking");
+      }
+    } catch (error) {
+      toast.error(error.message || "Failed to delete booking");
+    } finally {
+      setDeletingBookingId(null);
     }
   };
 
@@ -73,18 +107,72 @@ const Dashboard = () => {
     if (user) {
       fetchDashboardData();
     }
-  }, [user]);
+  }, [user, selectedHotelId]);
 
   const formatCurrency = (value) => `${currency} ${Number(value || 0).toLocaleString()}`;
 
   return (
     <div className="space-y-8">
-      <Title
-        align="left"
-        font="outfit"
-        title="Dashboard"
-        subtitle="Monitor rooms, bookings, revenue, and guest sentiment in one place."
-      />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <Title
+          align="left"
+          font="outfit"
+          title="Dashboard"
+          subtitle="Monitor rooms, bookings, revenue, and guest sentiment in one place."
+        />
+        
+        {dashboardData.allHotels.length > 0 && (
+          <div className="flex items-center gap-3">
+            <select 
+              value={selectedHotelId} 
+              onChange={(e) => setSelectedHotelId(e.target.value)}
+              className="bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm font-medium outline-indigo-500 shadow-sm"
+            >
+              <option value="all">All Properties</option>
+              {dashboardData.allHotels.map(h => (
+                <option key={h._id} value={h._id}>{h.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+
+      {/* Hotel Details Section */}
+      {dashboardData.hotel ? (
+        <div className="bg-white border text-center lg:text-left border-slate-200 rounded-xl p-6 shadow-sm flex flex-col sm:flex-row items-center gap-6">
+          {dashboardData.hotel.image ? (
+            <img
+              src={dashboardData.hotel.image}
+              alt={dashboardData.hotel.name}
+              className="w-20 h-20 rounded-full object-cover shrink-0 border border-slate-200"
+            />
+          ) : (
+            <div className="w-20 h-20 bg-blue-100 rounded-full flex shrink-0 items-center justify-center text-blue-600 text-3xl font-bold">
+              {dashboardData.hotel.name.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold text-slate-800">{dashboardData.hotel.name}</h2>
+            <div className="flex flex-col sm:flex-row mt-2 text-sm text-slate-500 gap-2 sm:gap-4 items-center lg:items-start justify-center lg:justify-start">
+              <span className="flex items-center gap-1">📍 {dashboardData.hotel.city} (Country), {dashboardData.hotel.address}</span>
+              <span className="hidden sm:inline text-slate-300">|</span>
+              <span className="flex items-center gap-1">📞 {dashboardData.hotel.contact}</span>
+            </div>
+            {dashboardData.hotel.description && (
+              <p className="text-sm text-slate-500 mt-2">{dashboardData.hotel.description}</p>
+            )}
+          </div>
+          <div className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-lg shrink-0 text-center">
+             <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Status</p>
+             <p className="text-emerald-600 font-medium">Active Partner</p>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white border border-slate-200 rounded-xl p-10 shadow-sm flex flex-col items-center justify-center text-center">
+           <h2 className="text-2xl font-bold text-slate-800 mb-3">Welcome to your Partner Dashboard!</h2>
+          <p className="text-slate-500 max-w-md">You haven't registered a hotel yet. Add your property details to start managing rooms, bookings, and revenue.</p>
+        </div>
+      )}
 
       {/* Overview cards */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -172,6 +260,7 @@ const Dashboard = () => {
                 <th className="py-3 px-4 text-left">Total</th>
                 <th className="py-3 px-4 text-left">Status</th>
                 <th className="py-3 px-4 text-left">Payment</th>
+                <th className="py-3 px-4 text-left">Control</th>
               </tr>
             </thead>
             <tbody className="text-slate-700">
@@ -204,6 +293,15 @@ const Dashboard = () => {
                       {item.isPaid ? "Paid" : "Pending"}
                     </span>
                   </td>
+                  <td className="py-3 px-4">
+                    <button
+                      onClick={() => handleDeleteBooking(item._id)}
+                      disabled={deletingBookingId === item._id}
+                      className="text-xs px-3 py-1.5 rounded-md border border-rose-200 text-rose-700 hover:bg-rose-50 transition disabled:opacity-60"
+                    >
+                      {deletingBookingId === item._id ? "Deleting..." : "Delete"}
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -211,11 +309,11 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Room availability */}
+      {/* Room maintenance control */}
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-slate-800">Room Availability</h3>
-          <p className="text-xs text-slate-500">Toggle to block/unblock rooms</p>
+          <h3 className="text-lg font-semibold text-slate-800">Maintenance Control</h3>
+          <p className="text-xs text-slate-500">Put rooms in/out of maintenance mode</p>
         </div>
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {dashboardData.rooms.map((room) => (
@@ -231,14 +329,19 @@ const Dashboard = () => {
                     room.isAvailable ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
                   }`}
                 >
-                  {room.isAvailable ? "Available" : "Blocked"}
+                  {room.isAvailable ? "Available" : "Maintenance"}
                 </span>
               </div>
               <button
-                className="mt-3 text-xs px-3 py-2 rounded-md border border-slate-200 hover:bg-slate-100 transition"
+                className="mt-3 text-xs px-3 py-2 rounded-md border border-slate-200 hover:bg-slate-100 transition disabled:opacity-60"
                 onClick={() => handleToggleAvailability(room._id)}
+                disabled={maintenanceRoomId === room._id}
               >
-                {room.isAvailable ? "Block for maintenance" : "Mark available"}
+                {maintenanceRoomId === room._id
+                  ? "Updating..."
+                  : room.isAvailable
+                  ? "Set Maintenance"
+                  : "Resume Room"}
               </button>
             </div>
           ))}

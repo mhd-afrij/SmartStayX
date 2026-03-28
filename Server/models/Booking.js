@@ -2,11 +2,15 @@ import mongoose from "mongoose";
 
 const bookingSchema = new mongoose.Schema(
   {
-   user:{type:String,ref:"User",required:true},
-   room:{type:String,ref:"room",required:true},
-   hotel:{type:String,ref:"Hotel",required:true},
+  user:{type:String,ref:"User",required:true},
+  room:{type:mongoose.Schema.Types.ObjectId,ref:"Room",required:true},
+  hotel:{type:mongoose.Schema.Types.ObjectId,ref:"Hotel",required:true},
    checkInDate:{type:Date,required:true},
    checkOutDate:{type:Date,required:true},
+    nights:{type:Number,min:1},
+    basePricePerNight:{type:Number,min:0},
+    dynamicPricePerNight:{type:Number,min:0},
+    priceMultiplier:{type:Number,min:1},
    totalPrice:{type:Number,required:true},
    guests:{type:Number,required:true},
    status:{
