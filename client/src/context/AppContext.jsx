@@ -169,7 +169,7 @@ const normalizeCurrencyCode = (value) => {
 };
 
 // Setting default base URL for axios
-axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL || "";
 
 // Creating AppContext
 export const AppContext = createContext();

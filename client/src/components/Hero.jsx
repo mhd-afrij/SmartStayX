@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { assets, cities } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
+import heroImage from "../assets/heroimage.jpg";
 
 const Hero = () => {
   const { user, isOwner, navigate } = useAppContext();
@@ -21,7 +22,10 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-[90vh] overflow-hidden bg-slate-950">
-      <div className="absolute inset-0 bg-[url('src/assets/heroimage.jpg')] bg-cover bg-center" />
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${heroImage})` }}
+      />
       <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-900/30 to-slate-950/80" />
       <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-amber-400/30 blur-3xl" />
       <div className="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-sky-400/20 blur-3xl" />
