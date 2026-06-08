@@ -23,6 +23,7 @@ const normalizeBookingWindow = (checkInDate, checkOutDate) => {
 const checkAvailability = async ({ room, checkInDate, checkOutDate, excludeBookingId }) => {
   const window = normalizeBookingWindow(checkInDate, checkOutDate);
   if (!window) return false;
+  if (typeof room !== 'string') return false;
 
   const query = {
     room,

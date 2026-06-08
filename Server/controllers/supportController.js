@@ -71,7 +71,7 @@ export const getConversationMessages = async (req, res) => {
 export const sendSupportMessage = async (req, res) => {
   try {
     const { conversationId, text } = req.body;
-    if (!conversationId || !text || !text.trim()) {
+    if (typeof conversationId !== 'string' || !text || !text.trim()) {
       return res.json({ success: false, message: "conversationId and text are required" });
     }
 
@@ -108,7 +108,7 @@ export const updateConversationStatus = async (req, res) => {
     const { conversationId, status } = req.body;
     const allowedStatuses = ["open", "resolved", "closed"];
 
-    if (!conversationId || !allowedStatuses.includes(status)) {
+    if (typeof conversationId !== 'string' || !allowedStatuses.includes(status)) {
       return res.json({ success: false, message: "conversationId and valid status are required" });
     }
 

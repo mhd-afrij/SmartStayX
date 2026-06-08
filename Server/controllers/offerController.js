@@ -16,7 +16,7 @@ export const createOffer = async (req, res) => {
     const { title, description, discountPercent, expiryDate, roomId } = req.body;
 
     if (!ownerId) return res.json({ success: false, message: "Not authenticated" });
-    if (!title || !description || !discountPercent || !expiryDate || !roomId) {
+    if (!title || !description || !discountPercent || !expiryDate || typeof roomId !== 'string') {
       return res.json({ success: false, message: "All fields are required" });
     }
 
@@ -103,7 +103,7 @@ export const updateOffer = async (req, res) => {
       return res.json({ success: false, message: "Not authorized to update" });
     }
 
-    if (roomId) {
+    if (typeof roomId === 'string') {
       const room = await Room.findById(roomId);
       if (!room) return res.json({ success: false, message: "Room not found" });
 

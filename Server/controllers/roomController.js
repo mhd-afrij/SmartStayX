@@ -21,7 +21,7 @@ export const createRoom = async (req, res) => {
     const { roomType, pricePerNight, amenities, hotelId } = req.body;
     const userId = getAuthUserId(req);
 
-    if (!hotelId) {
+    if (typeof hotelId !== 'string') {
       return res.json({ success: false, message: "Please select a hotel" });
     }
 

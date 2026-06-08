@@ -190,7 +190,7 @@ const HotelManagement = () => {
                   className="block border border-dashed border-white/[0.08] rounded-xl p-2 cursor-pointer hover:bg-white/[0.04] transition"
                 >
                   <img
-                    src={preview || assets.uploadArea}
+                    src={preview && (preview.startsWith('blob:') || preview.startsWith('http')) ? preview : assets.uploadArea}
                     alt="hotel preview"
                     className="w-full h-48 object-cover rounded-lg"
                   />

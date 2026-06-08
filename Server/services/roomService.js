@@ -81,6 +81,7 @@ const getOwnerRooms = async ({ userId }) => {
 };
 
 const toggleAvailability = async ({ roomId, userId }) => {
+  if (typeof roomId !== 'string') throw Object.assign(new Error('Invalid room ID'), { status: 400 });
   const room = await Room.findById(roomId).populate('hotel');
   if (!room) throw Object.assign(new Error('Room not found'), { status: 404 });
   if (String(room.hotel.owner) !== String(userId)) {

@@ -296,7 +296,7 @@ const ManageOffers = () => {
               />
               <span className="text-xs text-white/40">Click to upload (optional)</span>
             </label>
-            {preview && (
+            {preview && (preview.startsWith('blob:') || preview.startsWith('http')) && (
               <img src={preview} alt="preview" className="mt-3 rounded-xl w-full max-h-48 object-cover" />
             )}
           </div>

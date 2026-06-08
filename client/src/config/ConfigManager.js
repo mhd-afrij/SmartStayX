@@ -88,7 +88,7 @@ class ConfigManager {
   }
 
   getAll() {
-    return { ...this.#config };
+    return JSON.parse(JSON.stringify(this.#config));
   }
 
   isProduction() {

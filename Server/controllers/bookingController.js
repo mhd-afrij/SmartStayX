@@ -109,7 +109,7 @@ export const cancelBooking = async (req, res) => {
     const user = req.user._id;
     const { bookingId } = req.body;
 
-    if (!bookingId) {
+    if (typeof bookingId !== 'string') {
       return res.json({ success: false, message: "bookingId is required" });
     }
 
@@ -145,7 +145,7 @@ export const modifyBooking = async (req, res) => {
     const user = req.user._id;
     const { bookingId, checkInDate, checkOutDate, guests } = req.body;
 
-    if (!bookingId) {
+    if (typeof bookingId !== 'string') {
       return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_REQUIRED });
     }
 
@@ -233,7 +233,7 @@ export const payBooking = async (req, res) => {
     const user = req.user._id;
     const { bookingId } = req.body;
 
-    if (!bookingId) {
+    if (typeof bookingId !== 'string') {
       return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_REQUIRED });
     }
 
@@ -257,7 +257,7 @@ export const setPaymentMethod = async (req, res) => {
     const user = req.user._id;
     const { bookingId, paymentMethod } = req.body;
 
-    if (!bookingId || !paymentMethod) {
+    if (typeof bookingId !== 'string' || !paymentMethod) {
       return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_AND_METHOD_REQUIRED });
     }
 
@@ -286,7 +286,7 @@ export const createCheckoutSession = async (req, res, next) => {
 
     const user = req.user._id;
     const { bookingId } = req.body;
-    if (!bookingId) return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_REQUIRED });
+    if (typeof bookingId !== 'string') return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_REQUIRED });
 
     const booking = await Booking.findOne({ _id: bookingId, user }).populate("room hotel");
     if (!booking) return res.json({ success: false, message: BOOKING_ERRORS.NOT_FOUND });
@@ -377,7 +377,8 @@ export const stripeWebhook = async (req, res, next) => {
     try {
       event = constructEvent(req.body, sig);
     } catch (err) {
-      return res.status(400).send(`Webhook signature verification failed: ${err.message}`);
+      console.error('Webhook signature verification failed:', err.message);
+      return res.status(400).send('Webhook signature verification failed');
     }
 
     // Idempotency check
@@ -447,7 +448,7 @@ export const updateOwnerBookingPayment = async (req, res) => {
       return res.json({ success: false, message: BOOKING_ERRORS.NOT_AUTHORIZED });
     }
 
-    if (!bookingId || typeof isPaid !== "boolean") {
+    if (typeof bookingId !== 'string' || typeof isPaid !== "boolean") {
       return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_AND_PAYMENT_REQUIRED });
     }
 

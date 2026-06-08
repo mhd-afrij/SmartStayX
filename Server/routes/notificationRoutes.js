@@ -1,4 +1,5 @@
 import express from "express";
+import rateLimit from "express-rate-limit";
 import { protect } from "../middleware/authMiddleware.js";
 import {
   getNotifications,
@@ -8,8 +9,14 @@ import {
 
 const notificationRouter = express.Router();
 
-notificationRouter.get("/", protect, getNotifications);
-notificationRouter.put("/:notificationId/read", protect, markAsRead);
-notificationRouter.put("/read-all", protect, markAllAsRead);
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { success: false, message: "Too many requests, please try again later" },
+});
+
+notificationRouter.get("/", limiter, protect, getNotifications);
+notificationRouter.put("/:notificationId/read", limiter, protect, markAsRead);
+notificationRouter.put("/read-all", limiter, protect, markAllAsRead);
 
 export default notificationRouter;

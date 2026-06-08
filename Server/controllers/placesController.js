@@ -184,7 +184,7 @@ export const getItinerary = async (req, res) => {
       return res.json({ success: false, message: "tripId is required" });
     }
 
-    const itinerary = await TripItinerary.findOne({ user: req.user._id, tripId });
+    const itinerary = await TripItinerary.findOne({ user: req.user._id, tripId: String(tripId) });
     res.json({ success: true, itinerary: itinerary || null });
   } catch (error) {
     res.json({ success: false, message: error.message });
@@ -203,7 +203,7 @@ export const upsertItineraryItem = async (req, res) => {
     }
 
     const itinerary = await TripItinerary.findOneAndUpdate(
-      { user: req.user._id, tripId },
+      { user: req.user._id, tripId: String(tripId) },
       {
         $setOnInsert: {
           user: req.user._id,

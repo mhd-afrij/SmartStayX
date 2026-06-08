@@ -16,6 +16,10 @@ export const requestService = async (req, res) => {
     const { serviceType, requestDetails, roomId, hotelId } = req.body;
     const guestId = req.user._id;
 
+    if (typeof roomId !== 'string' || typeof hotelId !== 'string') {
+      return res.json({ success: false, message: 'Invalid room or hotel ID' });
+    }
+
     const activeBooking = await Booking.findOne({
       user: guestId,
       room: roomId,
@@ -68,6 +72,10 @@ export const requestService = async (req, res) => {
 export const updateServiceStatus = async (req, res) => {
   try {
     const { requestId, status } = req.body;
+
+    if (typeof requestId !== 'string') {
+      return res.json({ success: false, message: 'Invalid request ID' });
+    }
 
     const request = await ServiceRequest.findById(requestId);
     if (!request) return res.json({ success: false, message: "Request not found" });
@@ -127,7 +135,7 @@ export const getHotelServiceHistory = async (req, res) => {
       if (!isOwned) {
         return res.json({ success: false, message: "Not authorized for this hotel" });
       }
-      hotelMatch = { hotel: hotelId };
+      hotelMatch = { hotel: String(hotelId) };
     }
 
     const history = await ServiceRequest.find(hotelMatch)
@@ -143,6 +151,7 @@ export const getHotelServiceHistory = async (req, res) => {
 export const addStaff = async (req, res) => {
   try {
     const { name, role, hotelId } = req.body;
+    if (typeof hotelId !== 'string') return res.json({ success: false, message: 'Invalid hotel ID' });
     const staff = await Staff.create({ name, role, hotel: hotelId });
     res.json({ success: true, staff });
   } catch (error) {
@@ -173,7 +182,7 @@ export const getStaffList = async (req, res) => {
       if (!isOwned) {
         return res.json({ success: false, message: "Not authorized for this hotel" });
       }
-      hotelMatch = { hotel: hotelId };
+      hotelMatch = { hotel: String(hotelId) };
     }
 
     const staff = await Staff.find(hotelMatch)
@@ -196,6 +205,10 @@ export const updateStaff = async (req, res) => {
     const { id } = req.params;
     const { name, role } = req.body;
 
+    if (typeof id !== 'string') {
+      return res.json({ success: false, message: 'Invalid staff ID' });
+    }
+
     const staff = await Staff.findByIdAndUpdate(id, { name, role }, { new: true });
     if (!staff) return res.json({ success: false, message: "Staff not found" });
     res.json({ success: true, staff });
@@ -207,6 +220,7 @@ export const updateStaff = async (req, res) => {
 export const deleteStaff = async (req, res) => {
   try {
     const { id } = req.params;
+    if (typeof id !== 'string') return res.json({ success: false, message: "Staff not found" });
     const staff = await Staff.findByIdAndDelete(id);
     if (!staff) return res.json({ success: false, message: "Staff not found" });
     res.json({ success: true, message: "Staff removed" });
@@ -218,6 +232,7 @@ export const deleteStaff = async (req, res) => {
 export const toggleStaffAvailability = async (req, res) => {
   try {
     const { id } = req.params;
+    if (typeof id !== 'string') return res.json({ success: false, message: "Staff not found" });
     const staff = await Staff.findById(id);
     if (!staff) return res.json({ success: false, message: "Staff not found" });
     staff.isAvailable = !staff.isAvailable;
@@ -251,7 +266,7 @@ export const getServiceStats = async (req, res) => {
       if (!isOwned) {
         return res.json({ success: false, message: "Not authorized for this hotel" });
       }
-      hotelMatch = { hotel: hotelId };
+      hotelMatch = { hotel: String(hotelId) };
     }
 
     const [pending, assigned, completed, cancelled] = await Promise.all([

@@ -7,7 +7,7 @@ import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 // Chat intent detection and response generation.
 const detectIntent = (message = "") => {
   const text = message.toLowerCase();
-  if (/(booking|reservation).*(status|confirm)|status.*(booking|reservation)/.test(text)) return "booking_status";
+  if (/\b(booking|reservation)\b[\s\S]{0,50}\b(status|confirm)\b|\bstatus\b[\s\S]{0,50}\b(booking|reservation)\b/.test(text)) return "booking_status";
   if (/(cancel|refund|reschedule)/.test(text)) return "cancellation";
   if (/(available|availability|vacant)/.test(text)) return "availability";
   if (/(pay|payment|card|stripe)/.test(text)) return "payment";
@@ -132,7 +132,7 @@ export const sendChatMessage = async (req, res) => {
       },
     });
 
-    if (conversationId) {
+    if (typeof conversationId === 'string') {
       const update = {
         $push: {
           messages: {
