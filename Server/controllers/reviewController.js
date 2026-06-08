@@ -74,7 +74,8 @@ export const createOrUpdateRoomReview = async (req, res) => {
       return res.json({ success: false, message: "Rating must be between 1 and 5" });
     }
 
-    if (!allowedSatisfaction.has(String(satisfaction || ""))) {
+    const safeSatisfaction = String(satisfaction || "").trim();
+    if (!allowedSatisfaction.has(safeSatisfaction)) {
       return res.json({ success: false, message: "Please select a valid satisfaction option" });
     }
 
@@ -105,7 +106,7 @@ export const createOrUpdateRoomReview = async (req, res) => {
         hotel: room.hotel,
         booking: eligibleBooking._id,
         rating: numericRating,
-        satisfaction,
+        satisfaction: safeSatisfaction,
         comment: String(comment || "").trim(),
       },
       { new: true, upsert: true, setDefaultsOnInsert: true }
