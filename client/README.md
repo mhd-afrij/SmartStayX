@@ -1,28 +1,55 @@
-# React + Vite
+# SmartStayX Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React frontend for the SmartStayX luxury hotel booking platform.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+React 19, Vite, Tailwind CSS, Framer Motion, React Router, Recharts, Clerk Auth, Vitest
 
-## React Compiler
+## Available Scripts
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm run dev          # Start dev server
+npm run build        # Production build
+npm run preview      # Preview production build
+npm test             # Run tests
+npm run test:watch   # Tests in watch mode
+npm run test:coverage # Tests with coverage report
+```
 
 ## Environment Variables
 
-Set these in your Vite environment file to configure shared app behavior without hardcoding values in components:
+Set these in `client/.env`:
 
-- `VITE_BACKEND_URL`
-- `VITE_CLERK_PUBLISHABLE_KEY`
-- `VITE_DEFAULT_LANGUAGE`
-- `VITE_DEFAULT_CURRENCY`
-- `VITE_PLATFORM_EMAIL`
-- `VITE_OWNER_OVERRIDE_EMAIL`
-- `VITE_SUPPORT_EMAIL`
+| Variable | Description |
+|----------|-------------|
+| `VITE_BACKEND_URL` | Backend API base URL |
+| `VITE_CLERK_PUBLISHABLE_KEY` | Clerk publishable key |
+| `VITE_DEFAULT_LANGUAGE` | Default UI language (en) |
+| `VITE_DEFAULT_CURRENCY` | Default currency (USD) |
+| `VITE_PLATFORM_EMAIL` | Platform contact email |
+| `VITE_OWNER_OVERRIDE_EMAIL` | Owner override email |
+| `VITE_SUPPORT_EMAIL` | Support email |
+
+## Project Structure
+
+```
+src/
+├── components/       # Shared UI components (barrel exported)
+├── hotelOwner/       # Owner dashboard pages and components
+├── pages/            # Public pages
+├── services/         # API service layer
+├── context/          # React context (AppContext)
+├── config/           # ConfigManager and app configuration
+├── constants/        # Enums, pricing config, static data
+├── assets/           # SVGs, icons
+└── test/             # Vitest test files
+```
+
+## Barrel Imports
+
+Common components are re-exported from `src/components/index.js` for concise imports:
+
+```js
+import { Hero, HotelCard, Title, StarRating, ErrorBoundary } from '../components'
+```
