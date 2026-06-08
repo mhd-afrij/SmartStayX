@@ -156,18 +156,23 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
 // -----------------------------------------------------------------------
 
 const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, holdMinutes }) => {
+  if (typeof room !== 'string' || !mongoose.Types.ObjectId.isValid(room)) {
+    throw Object.assign(new Error('Invalid room id'), { status: 400 });
+  }
+  const roomId = new mongoose.Types.ObjectId(room).toString();
+
   const window = normalizeBookingWindow(checkInDate, checkOutDate);
   if (!window) throw Object.assign(new Error('Invalid booking dates'), { status: 400 });
 
   // Attempt distributed lock (falls back gracefully if Redis is unavailable)
-  const lock = await acquireLock(room, window.checkIn, window.checkOut);
+  const lock = await acquireLock(roomId, window.checkIn, window.checkOut);
 
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
     const overlapping = await Booking.findOne({
-      room,
+      room: roomId,
       checkInDate: { $lt: new Date(checkOutDate) },
       checkOutDate: { $gt: new Date(checkInDate) },
       status: { $nin: [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED] },
@@ -175,7 +180,7 @@ const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, 
 
     if (overlapping) throw Object.assign(new Error('Room not available'), { status: 409 });
 
-    const roomData = await Room.findById(room).populate('hotel').session(session);
+    const roomData = await Room.findById(roomId).populate('hotel').session(session);
     if (!roomData) throw Object.assign(new Error('Room not found'), { status: 404 });
 
     const pricing = await calculateBookingPricing({ roomData, checkInDate, checkOutDate, guests });
@@ -190,7 +195,7 @@ const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, 
 
     const [booking] = await Booking.create([{
       user: userId,
-      room,
+      room: roomId,
       hotel: roomData.hotel._id,
       guests: pricing.guests,
       checkInDate,
