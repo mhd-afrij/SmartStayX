@@ -1,0 +1,215 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import BookingService from '../../services/BookingService';
+
+const mockApiBase = 'http://localhost:3000';
+
+vi.mock('../../config/ConfigManager', () => ({
+  config: {
+    get: vi.fn((key) => {
+      if (key === 'api.baseUrl') return mockApiBase;
+      if (key === 'api.timeout') return 30000;
+      return null;
+    }),
+  },
+}));
+
+vi.mock('../../config/endpoints', () => ({
+  default: {
+    bookings: {
+      user: '/api/bookings/user',
+      base: '/api/bookings',
+      cancel: '/api/bookings/cancel',
+      modify: '/api/bookings/modify',
+      checkAvailability: '/api/bookings/check-availability',
+      createCheckout: '/api/bookings/create-checkout-session',
+      confirmCheckout: '/api/bookings/confirm-checkout',
+      hotel: (id) => `/api/bookings/hotel/${id}`,
+      ownerDelete: (id) => `/api/bookings/owner/${id}`,
+      ownerUpdatePayment: '/api/bookings/owner/update-payment',
+    },
+  },
+}));
+
+vi.mock('axios', () => {
+  const mockAxios = {
+    get: vi.fn(),
+    post: vi.fn(),
+    delete: vi.fn(),
+  };
+  return { default: mockAxios };
+});
+
+const mockToast = vi.hoisted(() => ({ error: vi.fn(), success: vi.fn() }));
+vi.mock('react-hot-toast', () => ({
+  default: mockToast,
+  toast: mockToast,
+}));
+
+describe('BookingService', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('fetchUserBookings', () => {
+    it('correctly calls GET /api/bookings/user with auth header', async () => {
+      const axios = (await import('axios')).default;
+      axios.get.mockResolvedValue({
+        data: { success: true, bookings: [{ _id: '1' }] },
+      });
+
+      const result = await BookingService.fetchUserBookings('test-token');
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${mockApiBase}/api/bookings/user`,
+        expect.objectContaining({
+          headers: { Authorization: 'Bearer test-token' },
+          timeout: 30000,
+        })
+      );
+      expect(result.success).toBe(true);
+      expect(result.bookings).toHaveLength(1);
+    });
+
+    it('throws and shows toast on error', async () => {
+      const axios = (await import('axios')).default;
+      axios.get.mockRejectedValue({
+        response: { data: { message: 'Auth failed' } },
+      });
+
+      await expect(BookingService.fetchUserBookings('bad-token')).rejects.toThrow();
+      expect(mockToast.error).toHaveBeenCalledWith('Auth failed');
+    });
+  });
+
+  describe('checkAvailability', () => {
+    it('calls POST with room, checkIn, checkOut', async () => {
+      const axios = (await import('axios')).default;
+      axios.post.mockResolvedValue({
+        data: { success: true, isAvailable: true },
+      });
+
+      const result = await BookingService.checkAvailability(
+        'room-id-123',
+        '2025-06-10',
+        '2025-06-15'
+      );
+
+      expect(axios.post).toHaveBeenCalledWith(
+        `${mockApiBase}/api/bookings/check-availability`,
+        {
+          room: 'room-id-123',
+          checkInDate: '2025-06-10',
+          checkOutDate: '2025-06-15',
+        },
+        expect.objectContaining({ timeout: 30000 })
+      );
+      expect(result.success).toBe(true);
+      expect(result.isAvailable).toBe(true);
+    });
+  });
+
+  describe('createCheckoutSession', () => {
+    it('posts bookingId and returns URL', async () => {
+      const axios = (await import('axios')).default;
+      axios.post.mockResolvedValue({
+        data: { success: true, url: 'https://stripe.com/checkout/session_123' },
+      });
+
+      const result = await BookingService.createCheckoutSession('booking-1', 'token');
+
+      expect(axios.post).toHaveBeenCalledWith(
+        `${mockApiBase}/api/bookings/create-checkout-session`,
+        { bookingId: 'booking-1' },
+        expect.objectContaining({
+          headers: { Authorization: 'Bearer token' },
+        })
+      );
+      expect(result.url).toBe('https://stripe.com/checkout/session_123');
+    });
+  });
+
+  describe('confirmCheckoutSession', () => {
+    it('posts sessionId and returns paid status', async () => {
+      const axios = (await import('axios')).default;
+      axios.post.mockResolvedValue({
+        data: { success: true, paid: true },
+      });
+
+      const result = await BookingService.confirmCheckoutSession('session_abc', 'token');
+
+      expect(axios.post).toHaveBeenCalledWith(
+        `${mockApiBase}/api/bookings/confirm-checkout`,
+        { sessionId: 'session_abc' },
+        expect.objectContaining({
+          headers: { Authorization: 'Bearer token' },
+        })
+      );
+      expect(result.paid).toBe(true);
+    });
+  });
+
+  describe('cancel', () => {
+    it('posts bookingId to cancel endpoint', async () => {
+      const axios = (await import('axios')).default;
+      axios.post.mockResolvedValue({
+        data: { success: true, message: 'Booking cancelled' },
+      });
+
+      const result = await BookingService.cancel('booking-1', 'token');
+
+      expect(axios.post).toHaveBeenCalledWith(
+        `${mockApiBase}/api/bookings/cancel`,
+        { bookingId: 'booking-1' },
+        expect.objectContaining({
+          headers: { Authorization: 'Bearer token' },
+        })
+      );
+      expect(result.message).toBe('Booking cancelled');
+    });
+  });
+
+  describe('create', () => {
+    it('posts booking data', async () => {
+      const axios = (await import('axios')).default;
+      axios.post.mockResolvedValue({
+        data: { success: true, booking: { _id: 'new-booking' } },
+      });
+
+      const result = await BookingService.create(
+        { room: 'room-1', checkInDate: '2025-06-10' },
+        'token'
+      );
+
+      expect(axios.post).toHaveBeenCalledWith(
+        `${mockApiBase}/api/bookings`,
+        { room: 'room-1', checkInDate: '2025-06-10' },
+        expect.objectContaining({
+          headers: { Authorization: 'Bearer token' },
+        })
+      );
+      expect(result.booking._id).toBe('new-booking');
+    });
+  });
+
+  describe('error handling', () => {
+    it('handles network errors gracefully', async () => {
+      const axios = (await import('axios')).default;
+      axios.get.mockRejectedValue(new Error('Network Error'));
+
+      await expect(
+        BookingService.fetchUserBookings('token')
+      ).rejects.toThrow('Network Error');
+      expect(mockToast.error).toHaveBeenCalledWith('Network Error');
+    });
+
+    it('handles errors without response data', async () => {
+      const axios = (await import('axios')).default;
+      axios.get.mockRejectedValue({ response: {} });
+
+      await expect(
+        BookingService.fetchUserBookings('token')
+      ).rejects.toThrow();
+      expect(mockToast.error).toHaveBeenCalled();
+    });
+  });
+});
