@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import ServiceRequest from "../models/ServiceRequest.js";
 import Staff from "../models/Staff.js";
 import Booking from "../models/Booking.js";
@@ -205,7 +206,7 @@ export const updateStaff = async (req, res) => {
     const { id } = req.params;
     const { name, role } = req.body;
 
-    if (typeof id !== 'string') {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.json({ success: false, message: 'Invalid staff ID' });
     }
 

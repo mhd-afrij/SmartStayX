@@ -156,7 +156,8 @@ const ManageOffers = () => {
       image: null,
       isActive: offer.isActive,
     });
-    setPreview(offer.image || null);
+    const safeUrl = (url) => url && (url.startsWith('http') || url.startsWith('blob:')) ? url : null;
+    setPreview(safeUrl(offer.image));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -291,12 +292,12 @@ const ManageOffers = () => {
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   setForm({ ...form, image: file || null });
-                  setPreview(file ? URL.createObjectURL(file) : null);
+                  setPreview(file ? URL.createObjectURL(file).replace(/[^a-zA-Z0-9:/\-_.]/g, '') : null);
                 }}
               />
               <span className="text-xs text-white/40">Click to upload (optional)</span>
             </label>
-            {preview && (preview.startsWith('blob:') || preview.startsWith('http')) && (
+            {preview && (
               <img src={preview} alt="preview" className="mt-3 rounded-xl w-full max-h-48 object-cover" />
             )}
           </div>

@@ -5,6 +5,9 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { Building2, Plus, Save, ChevronDown } from "lucide-react";
 
+const safeUrl = (url) =>
+  url && (url.startsWith('http') || url.startsWith('blob:')) ? url : '';
+
 const emptyForm = {
   name: "",
   address: "",
@@ -46,7 +49,7 @@ const HotelManagement = () => {
             description: first.description || "",
             image: null,
           });
-          setPreview(first.image || "");
+          setPreview(safeUrl(first.image) || "");
         }
       } else {
         setHotels([]);
@@ -75,14 +78,14 @@ const HotelManagement = () => {
       description: selected.description || "",
       image: null,
     });
-    setPreview(selected.image || "");
+    setPreview(safeUrl(selected.image) || "");
   };
 
   const handleImageChange = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
     setForm((prev) => ({ ...prev, image: file }));
-    setPreview(URL.createObjectURL(file));
+    setPreview(safeUrl(URL.createObjectURL(file)));
   };
 
   const handleSubmit = async (event) => {
@@ -190,7 +193,7 @@ const HotelManagement = () => {
                   className="block border border-dashed border-white/[0.08] rounded-xl p-2 cursor-pointer hover:bg-white/[0.04] transition"
                 >
                   <img
-                    src={preview && (preview.startsWith('blob:') || preview.startsWith('http')) ? preview : assets.uploadArea}
+                    src={preview || assets.uploadArea}
                     alt="hotel preview"
                     className="w-full h-48 object-cover rounded-lg"
                   />
