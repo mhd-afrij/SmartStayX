@@ -47,6 +47,25 @@ export const checkAvailabilityAPI = async (req, res, next) => {
   }
 };
 
+export const calculatePrice = async (req, res, next) => {
+  try {
+    const { roomId, checkInDate, checkOutDate, guests } = req.body;
+    const roomData = await Room.findById(roomId).populate("hotel");
+    if (!roomData) {
+      return res.json({ success: false, message: BOOKING_ERRORS.ROOM_NOT_FOUND });
+    }
+    const pricing = await bookingService.calculateBookingPricing({
+      roomData,
+      checkInDate,
+      checkOutDate,
+      guests: guests || 1,
+    });
+    res.json({ success: true, pricing });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createBooking = async (req, res, next) => {
   try {
     const userId = req.user._id;

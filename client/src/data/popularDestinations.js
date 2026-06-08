@@ -55,6 +55,13 @@ const popularDestinations = [
     temp: '24°C',
     description: 'Romance, art, and classic city luxury with a strong café-and-boulevard atmosphere.',
   },
+  {
+    name: 'Sri Lanka',
+    image: 'https://images.pexels.com/photos/36847091/pexels-photo-36847091.jpeg?auto=compress&cs=tinysrgb&w=1400',
+    hotels: '38 estates',
+    temp: '28°C',
+    description: 'Tea‑covered highlands, ancient temple cities, wildlife safaris, and palm‑fringed beaches along the Indian Ocean.',
+  },
 ]
 
 export default popularDestinations

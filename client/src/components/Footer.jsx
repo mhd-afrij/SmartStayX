@@ -34,10 +34,10 @@ const Footer = () => {
             <p className="font-space text-xs uppercase tracking-[0.28em] text-white/50 mb-4">COMPANY</p>
             <ul className="flex flex-col gap-3 text-sm text-white/60">
               <li><Link to="/about" className="nav-link">About</Link></li>
-              <li><a href="#" className="nav-link">Careers</a></li>
-              <li><a href="#" className="nav-link">Press</a></li>
-              <li><a href="#" className="nav-link">Blog</a></li>
-              <li><a href="#" className="nav-link">Partners</a></li>
+              <li><a href="#" className="nav-link opacity-50 cursor-not-allowed">Careers</a></li>
+              <li><a href="#" className="nav-link opacity-50 cursor-not-allowed">Press</a></li>
+              <li><Link to="/blog" className="nav-link">Blog</Link></li>
+              <li><a href="#" className="nav-link opacity-50 cursor-not-allowed">Partners</a></li>
             </ul>
           </div>
 
@@ -45,11 +45,11 @@ const Footer = () => {
           <div>
             <p className="font-space text-xs uppercase tracking-[0.28em] text-white/50 mb-4">SUPPORT</p>
             <ul className="flex flex-col gap-3 text-sm text-white/60">
-              <li><a href="#" className="nav-link">Help Center</a></li>
-              <li><a href="#" className="nav-link">Safety Information</a></li>
-              <li><a href="#" className="nav-link">Cancellation Options</a></li>
-              <li><a href="#" className="nav-link">Contact Us</a></li>
-              <li><a href="#" className="nav-link">Accessibility</a></li>
+              <li><a href="#" className="nav-link opacity-50 cursor-not-allowed">Help Center</a></li>
+              <li><a href="#" className="nav-link opacity-50 cursor-not-allowed">Safety Information</a></li>
+              <li><Link to="/my-bookings" className="nav-link">Cancellation Options</Link></li>
+              <li><a href="#" className="nav-link opacity-50 cursor-not-allowed">Contact Us</a></li>
+              <li><a href="#" className="nav-link opacity-50 cursor-not-allowed">Accessibility</a></li>
             </ul>
           </div>
 
@@ -82,6 +82,7 @@ const Footer = () => {
             <li><a href="#" className="hover:text-white/60 transition-colors">Privacy</a></li>
             <li><a href="#" className="hover:text-white/60 transition-colors">Terms</a></li>
             <li><a href="#" className="hover:text-white/60 transition-colors">Sitemap</a></li>
+            <li><a href="#" className="hover:text-white/60 transition-colors">Cookie Policy</a></li>
           </ul>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets';
@@ -80,6 +80,66 @@ const blogData = {
     ],
     image: "https://images.unsplash.com/photo-1505764706515-aa95265c5abc?q=80&w=1400&auto=format&fit=crop",
   },
+  "New York": {
+    title: "New York: The City That Never Sleeps, Where Dreams Take Flight",
+    intro: "New York is an energy — a pulsing, electric rhythm that draws you in from the moment you step onto its streets. From the neon glow of Times Square to the serene pathways of Central Park, every block tells a story of ambition, culture, and reinvention.",
+    highlights: [
+      { label: "Best Time to Visit", value: "April — June & September — November" },
+      { label: "Top Experiences", value: "Statue of Liberty, Broadway show, rooftop bars, world-class museums" },
+      { label: "Vibe", value: "Energetic, iconic, endlessly diverse" },
+    ],
+    tips: [
+      "Book Broadway tickets in advance for the best seats and prices.",
+      "Take the Staten Island Ferry for free skyline views of the Statue of Liberty.",
+      "Explore neighborhoods beyond Manhattan — Brooklyn and Astoria offer incredible food and culture.",
+    ],
+    image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=1400&auto=format&fit=crop",
+  },
+  Singapore: {
+    title: "Singapore: Where the Future Blooms in a Garden City",
+    intro: "Singapore is a vision of tomorrow — a gleaming city-state where futuristic architecture rises above lush rainforest canopies. It is a harmonious blend of cultures, cuisines, and cutting-edge design, all wrapped in impeccable greenery.",
+    highlights: [
+      { label: "Best Time to Visit", value: "February — April" },
+      { label: "Top Experiences", value: "Gardens by the Bay, Marina Bay Sands infinity pool, Hawker Centre food trail" },
+      { label: "Vibe", value: "Futuristic, clean, multicultural" },
+    ],
+    tips: [
+      "Visit the Supertree Grove at night for the free Garden Rhapsody light-and-sound show.",
+      "Eat your way through Chinatown, Little India, and Kampong Glam for the city's best street food.",
+      "Book a table at a rooftop bar overlooking the Marina Bay skyline for sunset cocktails.",
+    ],
+    image: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?q=80&w=1400&auto=format&fit=crop",
+  },
+  Paris: {
+    title: "Paris: The Eternal City of Light, Love, and Refined Living",
+    intro: "Paris is a mood — a leisurely café au lait on a sun-dappled terrace, the soft glow of the Eiffel Tower at dusk, and the hushed reverence of galleries filled with masters. It is the art of living well, elevated to a cultural creed.",
+    highlights: [
+      { label: "Best Time to Visit", value: "April — June & September — October" },
+      { label: "Top Experiences", value: "Louvre Museum, Seine river cruise, Montmartre stroll, patisserie-hopping" },
+      { label: "Vibe", value: "Romantic, artistic, timeless" },
+    ],
+    tips: [
+      "Visit the Louvre on Wednesday or Friday evenings when it stays open late and crowds thin out.",
+      "Skip the long Eiffel Tower queue — book a picnic at Champ de Mars for the best view.",
+      "Explore Le Marais for hidden courtyards, boutique shopping, and the best falafel in the city.",
+    ],
+    image: "https://images.unsplash.com/photo-1550340499-a6c60fc8287c?q=80&w=1400&auto=format&fit=crop",
+  },
+  "Sri Lanka": {
+    title: "Sri Lanka: Teardrop of the Indian Ocean, Wrapped in Emerald and Gold",
+    intro: "Sri Lanka is an island of breathtaking contrasts — misty tea plantations in the central highlands, ancient Buddhist temples carved into rock, wildlife safaris through untamed jungles, and palm-fringed beaches lapped by warm turquoise waters. It is a journey through layers of history, nature, and warm hospitality.",
+    highlights: [
+      { label: "Best Time to Visit", value: "December — March (west) & May — September (east)" },
+      { label: "Top Experiences", value: "Sigiriya Rock Fortress, Ella train ride, Yala safari, Galle Fort walk" },
+      { label: "Vibe", value: "Lush, spiritual, adventurous" },
+    ],
+    tips: [
+      "Take the Kandy-to-Ella train for what many call the most beautiful railway journey on Earth.",
+      "Visit Sigiriya at sunrise to beat the heat and the crowds.",
+      "Try authentic rice and curry served on a banana leaf — the best meals are found in local homes.",
+    ],
+    image: "https://images.pexels.com/photos/36847091/pexels-photo-36847091.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  },
 };
 
 const Blog = () => {
@@ -92,6 +152,10 @@ const Blog = () => {
     ? destinationParam
     : "Maldives";
   const data = blogData[destination];
+
+  useEffect(() => {
+    document.title = `${destination} — SmartStayX Travel Journal`;
+  }, [destination]);
 
   const fallbackDestinations = Object.keys(blogData);
 

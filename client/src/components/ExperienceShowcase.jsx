@@ -2,8 +2,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Title from './Title';
 import { assets } from '../assets/assets';
+import { useAppContext } from '../context/AppContext';
 
 const ExperienceShowcase = () => {
+  const { navigate } = useAppContext();
   const experiences = [
     { title: 'Beach Resorts', image: 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80&w=1200&auto=format&fit=crop' },
     { title: 'Mountain Retreats', image: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?q=80&w=1200&auto=format&fit=crop' },
@@ -38,10 +40,13 @@ const ExperienceShowcase = () => {
               <div className="absolute bottom-5 left-5 right-5">
                 <p className="font-playfair text-3xl text-white">{experience.title}</p>
                 <p className="mt-3 text-sm leading-7 text-white/72">Luxury that shifts with the rhythm of your trip.</p>
-                <div className="mt-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-[#F5D08A]">
+                <button
+                  onClick={() => navigate(`/rooms`)}
+                  className="mt-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-[#F5D08A] transition-all hover:gap-3"
+                >
                   <span>Explore</span>
                   <img src={assets.arrowIcon} alt="arrow" className="w-4" />
-                </div>
+                </button>
               </div>
             </motion.article>
           ))}

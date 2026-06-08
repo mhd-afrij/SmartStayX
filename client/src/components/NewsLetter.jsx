@@ -1,9 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import { assets } from '../assets/assets'
 import Title from './Title'
 
 const NewsLetter = () => {
+  const [email, setEmail] = useState('');
+
+  const handleSubscribe = () => {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+    toast.success('You\'ve been subscribed! Welcome to SmartStayX.');
+    setEmail('');
+  };
+
   return (
     <section className="luxury-section">
       <motion.div
@@ -24,10 +36,13 @@ const NewsLetter = () => {
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-8">
             <input
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()}
               className="luxury-input max-w-72 w-full text-sm"
               placeholder="Enter your email"
             />
-            <button className="gold-button px-7 py-3 text-sm uppercase tracking-[0.18em] whitespace-nowrap">
+            <button onClick={handleSubscribe} className="gold-button px-7 py-3 text-sm uppercase tracking-[0.18em] whitespace-nowrap">
               Subscribe
               <img src={assets.arrowIcon} alt="arrow" className="w-3.5" />
             </button>

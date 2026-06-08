@@ -18,7 +18,7 @@ const ExclusiveOffer = () => {
             : parsed.toLocaleDateString(undefined, { month: "short", day: "numeric" });
     };
 
-    return offerList.length > 0 && (
+    return (
         <section className="luxury-section">
             <div className="mx-auto max-w-7xl">
                 <div className="flex flex-col md:flex-row items-end justify-between gap-4 mb-10">
@@ -38,7 +38,27 @@ const ExclusiveOffer = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {offerList.map((item, index) => {
+                    {offerList.length === 0 ? (
+                        <>
+                            {[1, 2, 3].map((placeholder) => (
+                                <div
+                                    key={placeholder}
+                                    className="flex flex-col justify-end overflow-hidden rounded-[28px] border border-white/10 min-h-[22rem] bg-[#0d1728] animate-pulse"
+                                >
+                                    <div className="p-6 md:p-7 space-y-3">
+                                        <div className="h-6 w-1/2 rounded bg-white/5" />
+                                        <div className="h-4 w-3/4 rounded bg-white/5" />
+                                        <div className="h-3 w-1/3 rounded bg-white/5" />
+                                        <div className="h-4 w-1/4 rounded bg-white/5 mt-4" />
+                                    </div>
+                                </div>
+                            ))}
+                            <div className="lg:col-span-3 flex items-center justify-center py-6">
+                                <p className="text-sm text-white/40">No active offers — check back soon for exclusive packages.</p>
+                            </div>
+                        </>
+                    ) : (
+                        offerList.map((item, index) => {
                         const roomId = item.room?._id || item.room;
                         const ctaHref = roomId ? `/rooms/${roomId}` : '/rooms';
                         const image = item.image || item.imageUrl || item.fallbackImage || item.imageLink;
@@ -79,7 +99,7 @@ const ExclusiveOffer = () => {
                                 </div>
                             </motion.div>
                         );
-                    })}
+                    }))}
                 </div>
             </div>
         </section>

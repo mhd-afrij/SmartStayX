@@ -5,7 +5,7 @@ const ChatBot = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hello! 👋 I'm SmartStayX Assistant. How can I help you today?",
+      text: "Hello! I'm SmartStayX Assistant. How can I help you today?",
       sender: 'bot',
       timestamp: new Date(),
     },
@@ -39,7 +39,6 @@ const ChatBot = () => {
   const getResponse = (userMessage) => {
     const lowerMessage = userMessage.toLowerCase();
 
-    // Check for keywords
     if (lowerMessage.includes('book') || lowerMessage.includes('reserve')) {
       return botResponses.booking;
     } else if (lowerMessage.includes('cancel') || lowerMessage.includes('refund')) {
@@ -69,10 +68,9 @@ const ChatBot = () => {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    
+
     if (!inputValue.trim()) return;
 
-    // Add user message
     const userMessage = {
       id: messages.length + 1,
       text: inputValue,
@@ -84,7 +82,6 @@ const ChatBot = () => {
     setInputValue('');
     setIsLoading(true);
 
-    // Simulate bot response delay
     setTimeout(() => {
       const botResponse = {
         id: messages.length + 2,
@@ -110,37 +107,36 @@ const ChatBot = () => {
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
-      {/* Chat Window */}
       {isOpen && (
-        <div className="bg-white rounded-xl shadow-2xl w-96 h-[500px] flex flex-col mb-4 overflow-hidden">
+        <div className="bg-[#0d1728] rounded-2xl shadow-2xl w-96 h-[500px] flex flex-col mb-4 overflow-hidden border border-white/10">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex items-center justify-between">
+          <div className="bg-gradient-to-r from-[#0d1728] to-[#07111f] p-4 flex items-center justify-between border-b border-white/10">
             <div>
-              <h3 className="font-semibold text-lg">SmartStayX Assistant</h3>
-              <p className="text-xs text-blue-100">Always here to help</p>
+              <h3 className="font-semibold text-white text-lg">SmartStayX Assistant</h3>
+              <p className="text-xs text-white/40">Always here to help</p>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-white hover:bg-blue-800 rounded-full p-1 transition"
+              className="text-white/60 hover:text-white transition rounded-full p-1"
             >
-              ✕
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#07111f]">
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex ${
-                  message.sender === 'user' ? 'justify-end' : 'justify-start'
-                }`}
+                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-xs px-4 py-2 rounded-lg ${
+                  className={`max-w-xs px-4 py-2.5 rounded-2xl ${
                     message.sender === 'user'
-                      ? 'bg-blue-600 text-white rounded-br-none'
-                      : 'bg-gray-200 text-gray-800 rounded-bl-none'
+                      ? 'bg-[#D4A85F] text-[#07111f] rounded-br-sm'
+                      : 'bg-white/5 text-white/80 rounded-bl-sm border border-white/5'
                   }`}
                 >
                   <p className="text-sm">{message.text}</p>
@@ -149,11 +145,11 @@ const ChatBot = () => {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg rounded-bl-none">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                <div className="bg-white/5 text-white px-4 py-3 rounded-2xl rounded-bl-sm border border-white/5">
+                  <div className="flex gap-1.5">
+                    <div className="w-2 h-2 bg-[#D4A85F] rounded-full animate-bounce" />
+                    <div className="w-2 h-2 bg-[#D4A85F] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                    <div className="w-2 h-2 bg-[#D4A85F] rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
                   </div>
                 </div>
               </div>
@@ -163,14 +159,14 @@ const ChatBot = () => {
 
           {/* Quick Questions */}
           {messages.length === 1 && (
-            <div className="px-4 py-2 bg-white border-t border-gray-200">
-              <p className="text-xs text-gray-600 mb-2">Quick questions:</p>
-              <div className="space-y-2">
+            <div className="px-4 py-3 bg-[#0d1728] border-t border-white/10">
+              <p className="text-xs text-white/40 mb-2">Quick questions:</p>
+              <div className="space-y-1.5">
                 {quickQuestions.map((question, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleQuickQuestion(question)}
-                    className="w-full text-left text-xs px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition"
+                    className="w-full text-left text-xs px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition border border-white/5"
                   >
                     {question}
                   </button>
@@ -180,20 +176,20 @@ const ChatBot = () => {
           )}
 
           {/* Input Area */}
-          <form onSubmit={handleSendMessage} className="border-t border-gray-200 p-3 bg-white">
+          <form onSubmit={handleSendMessage} className="border-t border-white/10 p-3 bg-[#0d1728]">
             <div className="flex gap-2">
               <input
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Ask a question..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+                className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#D4A85F]/50 transition"
                 disabled={isLoading}
               />
               <button
                 type="submit"
                 disabled={isLoading}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition disabled:opacity-50 text-sm font-medium"
+                className="bg-[#D4A85F] hover:bg-[#c49a4e] text-[#07111f] px-4 py-2 rounded-xl transition disabled:opacity-50 text-sm font-medium"
               >
                 Send
               </button>
@@ -208,13 +204,17 @@ const ChatBot = () => {
         className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition transform hover:scale-110 ${
           isOpen
             ? 'bg-red-500 hover:bg-red-600 text-white'
-            : 'bg-blue-600 hover:bg-blue-700 text-white'
+            : 'bg-[#D4A85F] hover:bg-[#c49a4e] text-[#07111f]'
         }`}
       >
         {isOpen ? (
-          <span className="text-xl">✕</span>
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
         ) : (
-          <span className="text-xl">💬</span>
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
         )}
       </button>
     </div>

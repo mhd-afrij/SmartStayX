@@ -30,11 +30,13 @@ const PopularDestinations = () => {
                 'xl:col-span-4',
                 'xl:col-span-4',
                 'xl:col-span-4',
+                'xl:col-span-12',
               ];
               return (
                 <motion.button
-                  key={destination.name}
+                  key={`${destination.name}-${index}`}
                   type="button"
+                  aria-label={`View destination ${destination.name}`}
                   onClick={() => navigate(`/blog?destination=${encodeURIComponent(destination.name)}`)}
                   whileHover={{ y: -4 }}
                   className={`group relative overflow-hidden rounded-[24px] border border-white/10 text-left ${spans[index]}`}
@@ -42,6 +44,7 @@ const PopularDestinations = () => {
                   <img
                     src={destination.image}
                     alt={destination.name}
+                    loading="lazy"
                     className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#07111f]/95 via-[#07111f]/40 to-transparent" />
@@ -49,7 +52,7 @@ const PopularDestinations = () => {
                     {destination.hotels} · {destination.temp}
                   </span>
                   <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
-                    <p className={`font-playfair text-white ${index === 0 ? 'text-4xl md:text-5xl' : index === 4 ? 'text-3xl md:text-4xl' : 'text-2xl md:text-3xl'}`}>
+                    <p className={`font-playfair text-white ${index === 0 ? 'text-4xl md:text-5xl' : index === 4 || index === 8 ? 'text-3xl md:text-4xl' : 'text-2xl md:text-3xl'}`}>
                       {destination.name}
                     </p>
                     <p className="mt-2 max-w-xl text-sm leading-6 text-white/60">

@@ -1,11 +1,17 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Title from './Title';
 import { useAppContext } from '../context/AppContext';
+import popularDestinations from '../data/popularDestinations';
 
 const AIPlannerSection = () => {
   const { navigate } = useAppContext();
   const suggestions = ['Best month to go', 'Private airport transfer', 'Sunset suite', 'Wellness retreat'];
+
+  const previewDest = useMemo(() => {
+    const randomIndex = Math.floor(Math.random() * popularDestinations.length);
+    return popularDestinations[randomIndex];
+  }, []);
 
   return (
     <section id="ai-planner" className="luxury-section">
@@ -42,10 +48,10 @@ const AIPlannerSection = () => {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(212,168,95,0.14),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.06),transparent_26%)]" />
           <div className="relative space-y-4">
             <p className="font-space text-xs uppercase tracking-[0.24em] text-white/50">Preview</p>
-            <p className="font-playfair text-3xl text-white">3 nights in Bali</p>
+            <p className="font-playfair text-3xl text-white">3 nights in {previewDest.name}</p>
             <div className="space-y-3 text-sm text-white/70">
               <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-white/5 px-4 py-4">
-                <span>Beach villa stay</span>
+                <span>{previewDest.name} stay</span>
                 <span className="text-[#F5D08A]">2 nights</span>
               </div>
               <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-white/5 px-4 py-4">

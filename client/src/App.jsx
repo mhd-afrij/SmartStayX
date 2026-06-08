@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ChatBot from './components/ChatBot';
+import BackToTop from './components/BackToTop';
+import ErrorBoundary from './components/ErrorBoundary';
 import Home from './pages/Home';
 import AllRooms from './pages/AllRooms';
 import RoomDetails from './pages/RoomDetails';
 import MyBookings from './pages/MyBookings';
 import About from './pages/About';
 import Experience from './pages/Experience';
-import TripPlanner from './pages/TripPlanner';
-import Blog from './pages/Blog';
 import HotelReg from './components/HotelReg';
 import Layout from './hotelOwner/pages/Layout.jsx';
 import Dashboard from './hotelOwner/pages/Dashboard';
@@ -22,6 +22,9 @@ import PaymentManagement from './hotelOwner/pages/PaymentManagement';
 import { Toaster } from 'react-hot-toast';
 import { useAppContext } from "./context/AppContext";
 import { motion } from 'framer-motion';
+
+const TripPlanner = lazy(() => import('./pages/TripPlanner'));
+const Blog = lazy(() => import('./pages/Blog'));
 
 
 const App = () => {
@@ -60,17 +63,26 @@ const App = () => {
       
       {showHotelReg && <HotelReg />} {/* Show HotelReg if `showHotelReg` is true */}
       
-      {/* Route content */}
+       {/* Route content */}
       <div className='min-h-[70vh]'>
+        <ErrorBoundary>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/rooms" element={<AllRooms />} />
           <Route path='/rooms/:id' element={<RoomDetails />} />
           <Route path="/my-bookings" element={<MyBookings />} />
           <Route path="/about" element={<About />} />
-          <Route path="/trip-planner" element={<TripPlanner />} />
+          <Route path="/trip-planner" element={
+            <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[#07111f]"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[#D4A85F] border-t-transparent" /></div>}>
+              <TripPlanner />
+            </Suspense>
+          } />
           <Route path="/experience" element={<Experience />} />
-          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog" element={
+            <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[#07111f]"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[#D4A85F] border-t-transparent" /></div>}>
+              <Blog />
+            </Suspense>
+          } />
 
           {/* Owner dashboard layout and nested routes */}
           <Route path='/Owner' element={<Layout />}>
@@ -82,6 +94,7 @@ const App = () => {
             <Route path='payments' element={<PaymentManagement />} />
           </Route>
         </Routes>
+        </ErrorBoundary>
       </div>
       
       {/* Chatbot on public pages only */}
@@ -89,6 +102,9 @@ const App = () => {
       
       {/* Footer on public pages only */}
       {!isOwnerPath && <Footer />}
+      
+      {/* Back to top button */}
+      <BackToTop />
     </div>
   );
 };

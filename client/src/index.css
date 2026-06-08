@@ -185,6 +185,33 @@ body {
   display: none;
 }
 
+.booking-date-input,
+.booking-select {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  caret-color: #000;
+  color-scheme: light;
+}
+
+.booking-date-input::-webkit-datetime-edit,
+.booking-date-input::-webkit-datetime-edit-fields-wrapper,
+.booking-date-input::-webkit-datetime-edit-text,
+.booking-date-input::-webkit-datetime-edit-month-field,
+.booking-date-input::-webkit-datetime-edit-day-field,
+.booking-date-input::-webkit-datetime-edit-year-field {
+  color: #000 !important;
+}
+
+.booking-date-input::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  filter: none;
+}
+
+.booking-select option {
+  color: #000;
+  background: #fff;
+}
+
 .gold-button {
   display: inline-flex;
   align-items: center;

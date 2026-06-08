@@ -33,4 +33,11 @@ export const paymentMethodBody = z.object({
   paymentMethod: z.string().min(1),
 });
 
-export default { checkAvailabilityBody, createBookingBody, bookingIdBody, modifyBookingBody, paymentMethodBody, sessionIdBody };
+export const calculatePriceBody = z.object({
+  roomId: z.string().min(1),
+  checkInDate: z.string().min(1),
+  checkOutDate: z.string().min(1),
+  guests: z.preprocess((v) => (v === undefined ? 1 : Number(v)), z.number().int().positive()).optional(),
+});
+
+export default { checkAvailabilityBody, createBookingBody, bookingIdBody, modifyBookingBody, paymentMethodBody, sessionIdBody, calculatePriceBody };

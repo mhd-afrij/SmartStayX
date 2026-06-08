@@ -1,21 +1,28 @@
 import TripItinerary from "../models/TripItinerary.js";
+import getRedis from "../utils/redisClient.js";
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
-const cache = new Map();
-const CACHE_TTL = 5 * 60 * 1000;
+const CACHE_TTL = 300;
 
-const getCache = (key) => {
-  const entry = cache.get(key);
-  if (!entry) return null;
-  if (entry.expiresAt < Date.now()) {
-    cache.delete(key);
+const getCache = async (key) => {
+  const redis = getRedis();
+  if (!redis) return null;
+  try {
+    const cached = await redis.get(`places:${key}`);
+    return cached ? JSON.parse(cached) : null;
+  } catch {
     return null;
   }
-  return entry.value;
 };
 
-const setCache = (key, value) => {
-  cache.set(key, { value, expiresAt: Date.now() + CACHE_TTL });
+const setCache = async (key, value) => {
+  const redis = getRedis();
+  if (!redis) return;
+  try {
+    await redis.set(`places:${key}`, JSON.stringify(value), "EX", CACHE_TTL);
+  } catch {
+    // best-effort
+  }
 };
 
 const readQueryLocation = (query) => {
@@ -55,7 +62,7 @@ const fetchPlaces = async ({ type, radius, queryValue, lat, lng }) => {
   }
 
   const cacheKey = `${type}:${radius}:${queryValue || ""}:${lat || ""}:${lng || ""}`;
-  const cached = getCache(cacheKey);
+  const cached = await getCache(cacheKey);
   if (cached) return cached;
 
   const endpoint = queryValue
@@ -77,7 +84,7 @@ const fetchPlaces = async ({ type, radius, queryValue, lat, lng }) => {
     results: Array.isArray(data.results) ? data.results.map(normalizePlace) : [],
   };
 
-  setCache(cacheKey, payload);
+  await setCache(cacheKey, payload);
   return payload;
 };
 

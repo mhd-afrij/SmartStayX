@@ -274,37 +274,40 @@ function DateSelectionStep({
     <div className="space-y-5">
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow-md shadow-blue-500/20">1</div>
-        <h3 className="text-lg font-semibold text-slate-800">Step 1: Select Dates & Guests</h3>
+        <h3 className="text-lg font-semibold text-black">Step 1: Select Dates & Guests</h3>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-600 mb-2">Check-in Date</label>
+          <label className="block text-sm font-medium text-black mb-2">Check-in Date</label>
           <input
             type="date" value={checkInDate}
             onChange={(e) => setCheckInDate(e.target.value)}
-            className="w-full bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="booking-date-input w-full bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl px-3 py-2.5 text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed [&::-webkit-inner-spin-button]:appearance-none"
+            style={{ color: '#000000', WebkitTextFillColor: '#000000', colorScheme: 'light' }}
             disabled={isDisabled}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-600 mb-2">Check-out Date</label>
+          <label className="block text-sm font-medium text-black mb-2">Check-out Date</label>
           <input
             type="date" value={checkOutDate}
             onChange={(e) => setCheckOutDate(e.target.value)}
-            className="w-full bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="booking-date-input w-full bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl px-3 py-2.5 text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed [&::-webkit-inner-spin-button]:appearance-none"
+            style={{ color: '#000000', WebkitTextFillColor: '#000000', colorScheme: 'light' }}
             disabled={isDisabled}
           />
         </div>
       </div>
       <div>
-        <label className="block text-sm font-medium text-slate-600 mb-2">Number of Guests</label>
+        <label className="block text-sm font-medium text-black mb-2">Number of Guests</label>
         <select
           value={guests} onChange={(e) => setGuests(e.target.value)}
-          className="w-full bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="booking-select w-full bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl px-3 py-2.5 text-black focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ color: '#000000', WebkitTextFillColor: '#000000', colorScheme: 'light' }}
           disabled={isDisabled}
         >
           {[1, 2, 3, 4, 5, 6].map((n) => (
-            <option key={n} value={n}>{n} Guest{n > 1 ? "s" : ""}</option>
+            <option key={n} value={n} className="text-black">{n} Guest{n > 1 ? "s" : ""}</option>
           ))}
         </select>
       </div>

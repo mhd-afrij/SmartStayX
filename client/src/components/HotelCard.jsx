@@ -24,6 +24,7 @@ const HotelCard = ({ room, index }) => {
           <img
             src={coverImage}
             alt={room.roomType || 'Room'}
+            loading="lazy"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
 

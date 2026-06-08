@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { assets } from "../assets/assets";
 import { useClerk, UserButton } from "@clerk/clerk-react";
 import { useAppContext } from "../context/AppContext";
@@ -18,9 +18,14 @@ const Navbar = () => {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const [currencyOpen, setCurrencyOpen] = useState(false);
+
+  const langRef = useRef(null);
+  const currencyRef = useRef(null);
 
   const { openSignIn, openSignUp } = useClerk();
-  const { user, navigate, isOwner, translate } = useAppContext();
+  const { user, navigate, isOwner, translate, selectedLanguage, setSelectedLanguage, languageOptions, selectedCurrency, setSelectedCurrency, currencyOptions } = useAppContext();
 
   const ownerEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
   const effectiveOwner = isOwner || ownerEmail === "mbmafrij@gmail.com";
@@ -31,6 +36,15 @@ const Navbar = () => {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
+      if (currencyRef.current && !currencyRef.current.contains(e.target)) setCurrencyOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -62,8 +76,80 @@ const Navbar = () => {
         ))}
       </div>
 
-      {/* Auth and owner actions */}
-      <div className="flex items-center gap-3">
+      {/* Language, Currency, Auth and owner actions */}
+      <div className="flex items-center gap-2">
+        {/* Language dropdown */}
+        <div className="relative hidden md:block" ref={langRef}>
+          <button
+            onClick={() => { setLangOpen(!langOpen); setCurrencyOpen(false); }}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs uppercase tracking-[0.12em] text-white/70 hover:text-white border border-white/10 hover:border-white/30 rounded-lg transition-all"
+          >
+            <span>{selectedLanguage.toUpperCase()}</span>
+            <svg className={`w-3 h-3 transition-transform ${langOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          <AnimatePresence>
+            {langOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -6, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -6, scale: 0.96 }}
+                transition={{ duration: 0.15 }}
+                className="absolute right-0 mt-2 w-36 bg-[#0c1a2e] border border-white/10 rounded-xl shadow-2xl backdrop-blur-xl overflow-hidden z-50"
+              >
+                {languageOptions.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => { setSelectedLanguage(lang.code); setLangOpen(false); }}
+                    className={`w-full text-left px-3.5 py-2.5 text-xs uppercase tracking-[0.1em] transition-colors ${
+                      selectedLanguage === lang.code
+                        ? "text-[#D4A85F] bg-white/6"
+                        : "text-white/70 hover:text-white hover:bg-white/6"
+                    }`}
+                  >
+                    {lang.label}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Currency dropdown */}
+        <div className="relative hidden md:block" ref={currencyRef}>
+          <button
+            onClick={() => { setCurrencyOpen(!currencyOpen); setLangOpen(false); }}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs uppercase tracking-[0.12em] text-white/70 hover:text-white border border-white/10 hover:border-white/30 rounded-lg transition-all"
+          >
+            <span>{selectedCurrency}</span>
+            <svg className={`w-3 h-3 transition-transform ${currencyOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          <AnimatePresence>
+            {currencyOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -6, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -6, scale: 0.96 }}
+                transition={{ duration: 0.15 }}
+                className="absolute right-0 mt-2 w-40 bg-[#0c1a2e] border border-white/10 rounded-xl shadow-2xl backdrop-blur-xl overflow-hidden z-50"
+              >
+                {currencyOptions.map((cur) => (
+                  <button
+                    key={cur.code}
+                    onClick={() => { setSelectedCurrency(cur.code); setCurrencyOpen(false); }}
+                    className={`w-full text-left px-3.5 py-2.5 text-xs uppercase tracking-[0.1em] transition-colors ${
+                      selectedCurrency === cur.code
+                        ? "text-[#D4A85F] bg-white/6"
+                        : "text-white/70 hover:text-white hover:bg-white/6"
+                    }`}
+                  >
+                    {cur.symbol} — {cur.label}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         {user && effectiveOwner && (
           <button
             onClick={() => navigate("/Owner")}
@@ -74,7 +160,12 @@ const Navbar = () => {
         )}
 
         {user ? (
-          <UserButton />
+          <>
+            <span className="hidden md:block text-xs text-white/50 mr-1">
+              Hi, {user.firstName || user.primaryEmailAddress?.emailAddress?.split('@')[0] || 'Guest'}
+            </span>
+            <UserButton />
+          </>
         ) : (
           <div className="hidden md:flex gap-2">
             <button
@@ -122,6 +213,28 @@ const Navbar = () => {
               </a>
             ))}
             <div className="flex gap-3 pt-4 border-t border-white/8">
+              <div className="flex gap-2 flex-1">
+                <select
+                  value={selectedLanguage}
+                  onChange={(e) => setSelectedLanguage(e.target.value)}
+                  className="flex-1 bg-white/6 border border-white/10 rounded-lg px-3 py-2.5 text-xs uppercase tracking-[0.1em] text-white/80 outline-none focus:border-[#D4A85F]/50"
+                >
+                  {languageOptions.map((lang) => (
+                    <option key={lang.code} value={lang.code} className="bg-[#07111f]">{lang.label}</option>
+                  ))}
+                </select>
+                <select
+                  value={selectedCurrency}
+                  onChange={(e) => setSelectedCurrency(e.target.value)}
+                  className="flex-1 bg-white/6 border border-white/10 rounded-lg px-3 py-2.5 text-xs uppercase tracking-[0.1em] text-white/80 outline-none focus:border-[#D4A85F]/50"
+                >
+                  {currencyOptions.map((cur) => (
+                    <option key={cur.code} value={cur.code} className="bg-[#07111f]">{cur.symbol} — {cur.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-3 pt-2 border-t border-white/8">
               {user ? (
                 <UserButton />
               ) : (
