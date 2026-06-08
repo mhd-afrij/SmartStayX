@@ -1,0 +1,53 @@
+name: SmartStayX CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Frontend
+      - name: Install Client Dependencies
+        run: |
+          cd client
+          npm install
+
+      - name: Run Client Tests
+        run: |
+          cd client
+          npm test -- --run
+        continue-on-error: false
+
+      - name: Build Frontend
+        run: |
+          cd client
+          npm run build
+
+      # Backend
+      - name: Install Server Dependencies
+        run: |
+          cd server
+          npm install
+
+      - name: Run Server Tests
+        run: |
+          cd server
+          npm test
+        continue-on-error: false
