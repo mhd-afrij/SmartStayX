@@ -50,6 +50,9 @@ export const checkAvailabilityAPI = async (req, res, next) => {
 export const calculatePrice = async (req, res, next) => {
   try {
     const { roomId, checkInDate, checkOutDate, guests } = req.body;
+    if (typeof roomId !== "string" || !mongoose.Types.ObjectId.isValid(roomId)) {
+      return res.json({ success: false, message: BOOKING_ERRORS.ROOM_NOT_FOUND });
+    }
     const roomData = await Room.findById(roomId).populate("hotel");
     if (!roomData) {
       return res.json({ success: false, message: BOOKING_ERRORS.ROOM_NOT_FOUND });
