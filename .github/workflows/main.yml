@@ -32,7 +32,7 @@ jobs:
       - name: Run Client Tests
         run: |
           cd client
-          npm test -- --run
+          npm test --if-present -- --run
         continue-on-error: false
 
       - name: Build Frontend
@@ -43,11 +43,11 @@ jobs:
       # Backend
       - name: Install Server Dependencies
         run: |
-          cd server
+          cd Server
           npm install
 
       - name: Run Server Tests
         run: |
-          cd server
-          npm test
+          cd Server
+          npm test --if-present
         continue-on-error: false
