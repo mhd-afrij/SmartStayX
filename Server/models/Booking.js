@@ -24,6 +24,9 @@ const bookingSchema = new mongoose.Schema(
     idempotencyKey: { type: String, index: true },
     paymentMethod: { type: String, required: true, default: "Pay At Hotel" },
     isPaid: { type: Boolean, default: false },
+    offer: { type: mongoose.Schema.Types.ObjectId, ref: "Offer" },
+    offerDiscountPercent: { type: Number, min: 0, max: 100 },
+    originalPricePerNight: { type: Number, min: 0 },
   },
   { timestamps: true }
 );

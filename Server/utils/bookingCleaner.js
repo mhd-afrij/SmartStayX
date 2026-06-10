@@ -19,10 +19,7 @@ export const startBookingCleaner = (options = {}) => {
         logger.info('Released %d expired booking holds', res.modifiedCount)
       }
     } catch (err) {
-      logger.error('bookingCleaner error: DB connectivity issue')
-      if (process.env.NODE_ENV !== 'production') {
-        logger.debug('bookingCleaner stack: %s', err.stack)
-      }
+      logger.error('bookingCleaner error: %s', err.message)
     }
   }, intervalMs)
 

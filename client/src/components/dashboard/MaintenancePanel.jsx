@@ -13,8 +13,7 @@ const priorityConfig = {
   low: { label: "Low", color: "text-[#22C55E] bg-[#22C55E]/10 border-[#22C55E]/20" },
 };
 
-const MaintenancePanel = ({ rooms = [], onToggle, togglingId }) => {
-  // Maintenance form state.
+const MaintenancePanel = ({ rooms = [], onToggle, togglingId, onReport, submittingReport = false }) => {
   const [showForm, setShowForm] = useState(false);
   const [newIssue, setNewIssue] = useState("");
   const [newRoom, setNewRoom] = useState("");
@@ -30,10 +29,8 @@ const MaintenancePanel = ({ rooms = [], onToggle, togglingId }) => {
       transition={{ duration: 0.5, delay: 0.35 }}
       className="relative rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl overflow-hidden"
     >
-      {/* Maintenance panel background */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-[#EF4444]/5 rounded-full blur-3xl" />
 
-      {/* Maintenance content */}
       <div className="relative z-10 p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -56,7 +53,6 @@ const MaintenancePanel = ({ rooms = [], onToggle, togglingId }) => {
           </button>
         </div>
 
-        {/* Maintenance report form */}
         <AnimatePresence>
           {showForm && (
             <motion.div
@@ -85,15 +81,20 @@ const MaintenancePanel = ({ rooms = [], onToggle, togglingId }) => {
                     </option>
                   ))}
                 </select>
-                <button className="w-full py-2 text-xs font-medium rounded-lg bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/20 hover:bg-[#F59E0B]/20 transition-colors">
-                  Submit Report
+                <button
+                  onClick={() => {
+                    if (onReport) onReport(newIssue, newRoom);
+                  }}
+                  disabled={submittingReport || !newIssue.trim() || !newRoom}
+                  className="w-full py-2 text-xs font-medium rounded-lg bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/20 hover:bg-[#F59E0B]/20 transition-colors disabled:opacity-50"
+                >
+                  {submittingReport ? "Submitting…" : "Submit Report"}
                 </button>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Rooms currently under maintenance */}
         <div className="space-y-2">
           {maintenanceItems.length === 0 && (
             <div className="text-center py-6">

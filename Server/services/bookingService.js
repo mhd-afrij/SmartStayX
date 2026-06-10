@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Booking from '../models/Booking.js';
 import Room from '../models/Room.js';
+import Offer from '../models/Offer.js';
 import { BOOKING_STATUS } from '../constants/bookingStatuses.js';
 import bookingConfig from '../configs/bookingConfig.js';
 import { acquireLock, releaseLock, extendLock } from '../utils/redisClient.js';
@@ -93,7 +94,7 @@ const getLastMinuteDiscount = (checkIn, hotelRules) => {
 // Pricing calculation (all rules applied)
 // -----------------------------------------------------------------------
 
-const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, guests }) => {
+const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, guests, offerId }) => {
   const window = normalizeBookingWindow(checkInDate, checkOutDate);
   if (!window) throw Object.assign(new Error('Invalid booking dates'), { status: 400 });
 
@@ -139,7 +140,24 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
   multiplier -= losDisc;
 
   const finalMultiplier = Math.max(0.5, Number(multiplier.toFixed(2)));
-  const dynamicPrice = Number((basePrice * finalMultiplier).toFixed(2));
+  let dynamicPrice = Number((basePrice * finalMultiplier).toFixed(2));
+
+  // 6) Offer discount
+  let offerDiscountPercent = 0;
+  if (offerId) {
+    const offer = await Offer.findOne({
+      _id: offerId,
+      room: roomData._id,
+      hotel: hotelId,
+      isActive: true,
+      expiryDate: { $gte: new Date() },
+    });
+    if (offer) {
+      offerDiscountPercent = offer.discountPercent;
+      dynamicPrice = Number((dynamicPrice * (1 - offerDiscountPercent / 100)).toFixed(2));
+    }
+  }
+
   const totalPrice = Number((dynamicPrice * nights).toFixed(2));
 
   return {
@@ -149,6 +167,10 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
     dynamicPricePerNight: dynamicPrice,
     priceMultiplier: finalMultiplier,
     totalPrice,
+    offerDiscountPercent,
+    originalPricePerNight: offerDiscountPercent > 0
+      ? Number((basePrice * finalMultiplier).toFixed(2))
+      : undefined,
   };
 };
 
@@ -156,7 +178,7 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
 // Booking creation with distributed lock
 // -----------------------------------------------------------------------
 
-const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, holdMinutes }) => {
+const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, holdMinutes, offerId }) => {
   if (typeof room !== 'string' || !mongoose.Types.ObjectId.isValid(room)) {
     throw Object.assign(new Error('Invalid room id'), { status: 400 });
   }
@@ -184,7 +206,7 @@ const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, 
     const roomData = await Room.findById(roomId).populate('hotel').session(session);
     if (!roomData) throw Object.assign(new Error('Room not found'), { status: 404 });
 
-    const pricing = await calculateBookingPricing({ roomData, checkInDate, checkOutDate, guests });
+    const pricing = await calculateBookingPricing({ roomData, checkInDate, checkOutDate, guests, offerId });
 
     const hotelRules = await getHotelPricingRules(roomData.hotel?._id);
     const effectiveHoldMinutes = holdMinutes || hotelRules.holdMinutes || bookingConfig.holdMinutes;
@@ -211,6 +233,9 @@ const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, 
       holdExpiresAt,
       idempotencyKey,
       status: BOOKING_STATUS.PENDING,
+      offer: pricing.offerDiscountPercent > 0 ? offerId : undefined,
+      offerDiscountPercent: pricing.offerDiscountPercent > 0 ? pricing.offerDiscountPercent : undefined,
+      originalPricePerNight: pricing.originalPricePerNight,
     }], { session });
 
     await session.commitTransaction();

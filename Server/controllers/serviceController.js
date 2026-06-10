@@ -152,7 +152,11 @@ export const getHotelServiceHistory = async (req, res) => {
 export const addStaff = async (req, res) => {
   try {
     const { name, role, hotelId } = req.body;
-    if (typeof hotelId !== 'string') return res.json({ success: false, message: 'Invalid hotel ID' });
+    if (!hotelId || hotelId === "all" || typeof hotelId !== 'string') {
+      return res.json({ success: false, message: 'Please select a valid hotel before adding staff' });
+    }
+    const hotel = await Hotel.findById(hotelId);
+    if (!hotel) return res.json({ success: false, message: 'Hotel not found' });
     const staff = await Staff.create({ name, role, hotel: hotelId });
     res.json({ success: true, staff });
   } catch (error) {

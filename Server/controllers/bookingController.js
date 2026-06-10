@@ -10,6 +10,7 @@ import { constructEvent, getStripe } from "../utils/stripeUtil.js";
 import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 import { BOOKING_ERRORS, BOOKING_SUCCESS } from "../constants/messages.js";
 import bookingConfig from "../configs/bookingConfig.js";
+import { notifyNewBooking, notifyPaymentReceived, notifyCancellation } from "../utils/notificationHelper.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -49,7 +50,7 @@ export const checkAvailabilityAPI = async (req, res, next) => {
 
 export const calculatePrice = async (req, res, next) => {
   try {
-    const { roomId, checkInDate, checkOutDate, guests } = req.body;
+    const { roomId, checkInDate, checkOutDate, guests, offerId } = req.body;
     if (typeof roomId !== "string" || !mongoose.Types.ObjectId.isValid(roomId)) {
       return res.json({ success: false, message: BOOKING_ERRORS.ROOM_NOT_FOUND });
     }
@@ -62,6 +63,7 @@ export const calculatePrice = async (req, res, next) => {
       checkInDate,
       checkOutDate,
       guests: guests || 1,
+      offerId: offerId || undefined,
     });
     res.json({ success: true, pricing });
   } catch (error) {
@@ -72,8 +74,9 @@ export const calculatePrice = async (req, res, next) => {
 export const createBooking = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const { room, checkInDate, checkOutDate, guests } = req.body;
-    const result = await bookingService.createBooking({ userId, room, checkInDate, checkOutDate, guests });
+    const { room, checkInDate, checkOutDate, guests, offerId } = req.body;
+    const result = await bookingService.createBooking({ userId, room, checkInDate, checkOutDate, guests, offerId });
+    notifyNewBooking(result.booking);
     res.json({
       success: true,
       message: BOOKING_SUCCESS.CREATED,
@@ -133,6 +136,7 @@ export const cancelBooking = async (req, res) => {
 
     booking.status = BOOKING_STATUS.CANCELLED;
     await booking.save();
+    notifyCancellation(booking);
 
     return res.json({ success: true, message: BOOKING_SUCCESS.CANCELLED, booking });
   } catch (error) {
@@ -245,6 +249,7 @@ export const payBooking = async (req, res) => {
     booking.isPaid = true;
     booking.status = BOOKING_STATUS.CONFIRMED;
     await booking.save();
+    notifyPaymentReceived(booking);
 
     res.json({ success: true, booking });
   } catch (error) {
@@ -358,6 +363,7 @@ export const confirmCheckoutSession = async (req, res, next) => {
         booking.status = BOOKING_STATUS.CONFIRMED;
         booking.paymentMethod = "Stripe";
         await booking.save();
+        notifyPaymentReceived(booking);
       }
       return res.json({ success: true, paid: true, booking });
     }
@@ -390,7 +396,8 @@ export const stripeWebhook = async (req, res, next) => {
       const bookingId = session?.metadata?.bookingId || session.client_reference_id;
       if (bookingId && session?.payment_status === "paid") {
         try {
-          await bookingService.confirmPayment({ bookingId });
+          const paidBooking = await bookingService.confirmPayment({ bookingId });
+          if (paidBooking) notifyPaymentReceived(paidBooking);
         } catch (err) {
           console.error("Failed to confirm payment via webhook:", err.message);
         }
@@ -474,6 +481,38 @@ export const updateOwnerBookingPayment = async (req, res) => {
     return res.json({ success: true, message: BOOKING_SUCCESS.PAYMENT_UPDATED, booking });
   } catch (error) {
     return res.json({ success: false, message: BOOKING_ERRORS.FAILED_OWNER_UPDATE });
+  }
+};
+
+export const updateOwnerBookingStatus = async (req, res) => {
+  try {
+    const ownerId = req.user?._id;
+    const { bookingId } = req.params;
+    const { status } = req.body;
+
+    if (!ownerId) {
+      return res.json({ success: false, message: BOOKING_ERRORS.NOT_AUTHORIZED });
+    }
+    if (!bookingId || !status) {
+      return res.json({ success: false, message: "bookingId and status are required" });
+    }
+
+    const booking = await Booking.findById(bookingId).populate("room hotel user");
+    if (!booking) {
+      return res.json({ success: false, message: BOOKING_ERRORS.NOT_FOUND });
+    }
+
+    const ownerHotel = await Hotel.findOne({ _id: booking.hotel, owner: ownerId });
+    if (!ownerHotel) {
+      return res.json({ success: false, message: BOOKING_ERRORS.NOT_AUTHORIZED_UPDATE });
+    }
+
+    booking.status = status;
+    await booking.save();
+
+    return res.json({ success: true, message: "Booking status updated", booking });
+  } catch (error) {
+    return res.json({ success: false, message: error.message });
   }
 };
 

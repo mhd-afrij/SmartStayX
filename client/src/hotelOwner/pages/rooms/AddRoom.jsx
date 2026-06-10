@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { assets } from "../../../assets/assets";
 import { useAppContext } from "../../../context/AppContext";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
@@ -8,7 +7,6 @@ import { Plus, Image, ChevronDown } from "lucide-react";
 const AddRoom = () => {
   const { axios, getToken, user } = useAppContext();
 
-  // Room creation form state.
   const [hotels, setHotels] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [images, setImages] = useState({ 1: null, 2: null, 3: null, 4: null });
@@ -27,19 +25,21 @@ const AddRoom = () => {
 
   const fetchHotels = async () => {
     try {
-      // Load all hotels plus the owner default hotel.
-      const { data } = await axios.get('/api/hotels/all');
+      const token = await getToken();
+      const { data } = await axios.get("/api/hotels/owner", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (data.success) {
-        setHotels(data.hotels);
-        const ownerHotelData = await axios.get('/api/hotels/owner', {
-          headers: { Authorization: `Bearer ${await getToken()}` },
-        });
-        if (ownerHotelData.data.success) {
-          setSelectedHotel(ownerHotelData.data.hotel._id);
+        const ownerHotels = data.hotels ?? [];
+        setHotels(ownerHotels);
+        if (ownerHotels.length === 1) {
+          setSelectedHotel(ownerHotels[0]._id);
         }
+      } else {
+        toast.error(data.message || "Failed to load hotels");
       }
     } catch (error) {
-      console.error('Failed to fetch hotels');
+      toast.error(error.response?.data?.message || "Failed to load hotels");
     }
   };
 
@@ -49,7 +49,6 @@ const AddRoom = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    // Require the core room details and at least one image.
     if (!selectedHotel || !inputs.roomType || !inputs.pricePerNight || !Object.values(images).some((image) => image)) {
       toast.error("Please fill all fields and upload at least one image.");
       return;
@@ -95,7 +94,6 @@ const AddRoom = () => {
       animate={{ opacity: 1 }}
       className="space-y-6 pb-10"
     >
-      {/* Page header */}
       <div>
         <h1 className="text-xl font-bold text-white tracking-tight">Add Room</h1>
         <p className="text-sm text-white/40 mt-1">
@@ -103,10 +101,8 @@ const AddRoom = () => {
         </p>
       </div>
 
-      {/* Room creation form */}
       <form onSubmit={onSubmitHandler} className="rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl p-6">
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Image uploads */}
           <div className="lg:col-span-2 space-y-6">
             <div>
               <p className="text-sm font-medium text-white/60 mb-2">Images</p>
@@ -139,7 +135,6 @@ const AddRoom = () => {
               </div>
             </div>
 
-            {/* Hotel and room selectors */}
             <div className="grid gap-4 md:grid-cols-3">
               <div className="md:col-span-2">
                 <p className="text-sm font-medium text-white/60 mb-1.5">Hotel Name</p>
@@ -169,7 +164,6 @@ const AddRoom = () => {
               </div>
             </div>
 
-            {/* Pricing and room type */}
             <div className="grid gap-4 md:grid-cols-3">
               <div className="md:col-span-2">
                 <p className="text-sm font-medium text-white/60 mb-1.5">Room Type</p>
@@ -201,7 +195,6 @@ const AddRoom = () => {
               </div>
             </div>
 
-            {/* Amenity toggles */}
             <div>
               <p className="text-sm font-medium text-white/60 mb-2">Amenities</p>
               <div className="flex flex-wrap gap-2">

@@ -14,6 +14,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Hotel,
+  Users,
+  ConciergeBell,
+  MessageSquare,
+  Award,
 } from "lucide-react";
 
 // Owner sidebar navigation links.
@@ -24,6 +28,10 @@ const links = [
   { name: "Add Room", path: "/Owner/add-room", icon: PlusCircle },
   { name: "Room List", path: "/Owner/list-room", icon: List },
   { name: "Offers", path: "/Owner/offers", icon: Star },
+  { name: "Staff Management", path: "/Owner/staff-management", icon: Users },
+  { name: "Service Management", path: "/Owner/service-management", icon: ConciergeBell },
+  { name: "Guest Reviews", path: "/Owner/reviews", icon: MessageSquare },
+  { name: "Testimonials", path: "/Owner/testimonials", icon: Award },
 ];
 
 const Sidebar = () => {

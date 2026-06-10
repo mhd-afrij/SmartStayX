@@ -11,6 +11,7 @@ export const createBookingBody = z.object({
   checkInDate: z.string().min(1),
   checkOutDate: z.string().min(1),
   guests: z.preprocess((v) => (v === undefined ? 1 : Number(v)), z.number().int().positive()),
+  offerId: z.string().optional(),
 });
 
 export const bookingIdBody = z.object({
@@ -38,6 +39,7 @@ export const calculatePriceBody = z.object({
   checkInDate: z.string().min(1),
   checkOutDate: z.string().min(1),
   guests: z.preprocess((v) => (v === undefined ? 1 : Number(v)), z.number().int().positive()).optional(),
+  offerId: z.string().optional(),
 });
 
 export default { checkAvailabilityBody, createBookingBody, bookingIdBody, modifyBookingBody, paymentMethodBody, sessionIdBody, calculatePriceBody };

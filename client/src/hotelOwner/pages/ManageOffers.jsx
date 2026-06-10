@@ -11,7 +11,6 @@ const emptyForm = {
 };
 
 const ManageOffers = () => {
-  // Offer management state.
   const { axios, getToken, user, fetchOffers } = useAppContext();
   const [offers, setOffers] = useState([]);
   const [hotels, setHotels] = useState([]);
@@ -22,9 +21,14 @@ const ManageOffers = () => {
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    return () => {
+      if (preview?.startsWith("blob:")) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
+
   const loadRooms = async () => {
     try {
-      // Load the owner's rooms for offer targeting.
       const { data } = await axios.get("/api/rooms/Owner", {
         headers: { Authorization: `Bearer ${await getToken()}` },
       });
@@ -36,7 +40,6 @@ const ManageOffers = () => {
 
   const loadHotels = async () => {
     try {
-      // Load the owner's hotels for offer targeting.
       const { data } = await axios.get("/api/hotels/owner", {
         headers: { Authorization: `Bearer ${await getToken()}` },
       });
@@ -48,7 +51,6 @@ const ManageOffers = () => {
 
   const loadOffers = async () => {
     try {
-      // Load current offers for the owner.
       const { data } = await axios.get("/api/offers/owner", {
         headers: { Authorization: `Bearer ${await getToken()}` },
       });
@@ -172,7 +174,6 @@ const ManageOffers = () => {
       animate={{ opacity: 1 }}
       className="space-y-6 pb-10"
     >
-      {/* Page header */}
       <div>
         <h1 className="text-xl font-bold text-white tracking-tight">Exclusive Offers</h1>
         <p className="text-sm text-white/40 mt-1">
@@ -180,10 +181,8 @@ const ManageOffers = () => {
         </p>
       </div>
 
-      {/* Offer editor and offer list */}
       <div className="grid gap-6 lg:grid-cols-[2fr_3fr]">
         <form onSubmit={handleSubmit} className="rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl p-5 space-y-4 h-fit">
-          {/* Offer form fields */}
           <div className="flex items-center gap-2 pb-2 border-b border-white/[0.06]">
             <div className="w-7 h-7 rounded-lg bg-[#D4A85F]/10 border border-[#D4A85F]/20 flex items-center justify-center">
               <Tag className="w-3.5 h-3.5 text-[#D4A85F]" />
@@ -292,7 +291,7 @@ const ManageOffers = () => {
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   setForm({ ...form, image: file || null });
-                  setPreview(file ? URL.createObjectURL(file).replace(/[^a-zA-Z0-9:/\-_.]/g, '') : null);
+                  setPreview(file ? URL.createObjectURL(file) : null);
                 }}
               />
               <span className="text-xs text-white/40">Click to upload (optional)</span>
@@ -319,7 +318,6 @@ const ManageOffers = () => {
           </div>
         </form>
 
-        {/* Saved offers list */}
         <div className="space-y-3">
           {sortedOffers.length === 0 && (
             <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl p-8 text-center">

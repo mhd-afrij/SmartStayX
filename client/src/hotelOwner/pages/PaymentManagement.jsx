@@ -1,11 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { CreditCard, Search, ChevronDown, Building2, Trash2, CheckCircle, XCircle } from "lucide-react";
+import ConfirmModal from "../../components/dashboard/ConfirmModal";
+import Pagination from "../../components/dashboard/shared/Pagination";
+
+const PER_PAGE = 10;
+
+const METHOD_BADGE = {
+  Stripe: "border-[#4F46E5]/20 bg-[#4F46E5]/10 text-[#4F46E5]",
+  Cash: "border-[#D4A85F]/20 bg-[#D4A85F]/10 text-[#D4A85F]",
+};
 
 const PaymentManagement = () => {
-  // Payment list, filters, and action state.
   const { axios, getToken, user, formatPrice } = useAppContext();
   const [bookings, setBookings] = useState([]);
   const [hotels, setHotels] = useState([]);
@@ -14,10 +22,25 @@ const PaymentManagement = () => {
   const [deletingId, setDeletingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
+  const [confirmState, setConfirmState] = useState({ open: false, id: null, title: "", message: "" });
+
+  const requestConfirm = (id, title, message) => {
+    setConfirmState({ open: true, id, title, message });
+  };
+
+  const handleConfirmed = () => {
+    const { id } = confirmState;
+    setConfirmState({ open: false, id: null, title: "", message: "" });
+    if (id) handleDeleteBooking(id);
+  };
+
+  useEffect(() => {
+    setPage(0);
+  }, [search, selectedHotelId]);
 
   const loadPayments = async (hotelId = selectedHotelId) => {
     try {
-      // Fetch booking/payment records for the selected property.
       setLoading(true);
       const { data } = await axios.get(`/api/bookings/hotel?hotelId=${hotelId}`, {
         headers: { Authorization: `Bearer ${await getToken()}` },
@@ -51,7 +74,7 @@ const PaymentManagement = () => {
     try {
       const { data } = await axios.post(
         "/api/bookings/owner/update-payment",
-        { bookingId, isPaid, paymentMethod: "Stripe" },
+        { bookingId, isPaid },
         { headers: { Authorization: `Bearer ${await getToken()}` } }
       );
       if (data.success) {
@@ -68,8 +91,6 @@ const PaymentManagement = () => {
   };
 
   const handleDeleteBooking = async (bookingId) => {
-    const shouldDelete = window.confirm("Delete this booking record? This action cannot be undone.");
-    if (!shouldDelete) return;
     setDeletingId(bookingId);
     try {
       const { data } = await axios.delete(`/api/bookings/owner/${bookingId}`, {
@@ -88,15 +109,23 @@ const PaymentManagement = () => {
     }
   };
 
-  const filtered = bookings.filter((b) => {
-    if (!search) return true;
-    const q = search.toLowerCase();
-    return (
-      (b.user?.name || b.user?.username || "").toLowerCase().includes(q) ||
-      (b.hotel?.name || "").toLowerCase().includes(q) ||
-      (b.room?.roomType || "").toLowerCase().includes(q)
-    );
-  });
+  const filtered = useMemo(() => {
+    return bookings.filter((b) => {
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return (
+        (b.user?.name || b.user?.username || "").toLowerCase().includes(q) ||
+        (b.hotel?.name || "").toLowerCase().includes(q) ||
+        (b.room?.roomType || "").toLowerCase().includes(q)
+      );
+    });
+  }, [bookings, search]);
+
+  const pages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const paginated = useMemo(
+    () => filtered.slice(page * PER_PAGE, (page + 1) * PER_PAGE),
+    [filtered, page]
+  );
 
   return (
     <motion.div
@@ -104,7 +133,6 @@ const PaymentManagement = () => {
       animate={{ opacity: 1 }}
       className="space-y-6 pb-10"
     >
-      {/* Page header and hotel filter */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-white tracking-tight">Payment Management</h1>
@@ -130,7 +158,6 @@ const PaymentManagement = () => {
         )}
       </div>
 
-      {/* Payment table */}
       <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl overflow-hidden">
         <div className="p-5 border-b border-white/[0.06]">
           <div className="flex items-center justify-between">
@@ -156,7 +183,6 @@ const PaymentManagement = () => {
           </div>
         </div>
 
-        {/* Payment states */}
         {loading ? (
           <div className="p-8">
             <div className="flex items-center gap-3">
@@ -167,84 +193,98 @@ const PaymentManagement = () => {
         ) : filtered.length === 0 ? (
           <div className="p-8 text-center text-white/30 text-sm">No bookings found for this filter.</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-white/[0.06]">
-                  {["Guest", "Hotel", "Room", "Total", "Method", "Status", "Actions"].map((h) => (
-                    <th key={h} className="py-3 px-4 text-left text-xs font-medium text-white/40 uppercase tracking-wider">
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((item) => (
-                  <tr key={item._id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#D4A85F]/20 to-[#D4A85F]/5 border border-white/[0.06] flex items-center justify-center">
-                          <span className="text-[10px] font-medium text-white/60">
-                            {(item.user?.name || item.user?.username || "G").charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <span className="text-white/80">{item.user?.name || item.user?.username || "Guest"}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 text-white/60">{item.hotel?.name || "Hotel"}</td>
-                    <td className="py-3 px-4 text-white/60">{item.room?.roomType || "Room"}</td>
-                    <td className="py-3 px-4 text-white font-space">{formatPrice(item.totalPrice)}</td>
-                    <td className="py-3 px-4">
-                      <span className="inline-block px-2 py-0.5 text-[10px] font-medium rounded-full border border-[#4F46E5]/20 bg-[#4F46E5]/10 text-[#4F46E5]">
-                        Stripe
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={`inline-block px-2 py-0.5 text-[10px] font-medium rounded-full border ${
-                          item.isPaid
-                            ? "border-[#22C55E]/20 bg-[#22C55E]/10 text-[#22C55E]"
-                            : "border-[#F59E0B]/20 bg-[#F59E0B]/10 text-[#F59E0B]"
-                        }`}
-                      >
-                        {item.isPaid ? "Paid" : "Unpaid"}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => updatePayment(item._id, true)}
-                          disabled={updatingId === item._id || deletingId === item._id || item.status === "cancelled"}
-                          className="p-1.5 rounded-lg border border-white/[0.06] text-[#22C55E]/50 hover:text-[#22C55E] hover:border-[#22C55E]/20 hover:bg-[#22C55E]/10 transition-all disabled:opacity-40"
-                          title="Mark Paid"
-                        >
-                          <CheckCircle className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => updatePayment(item._id, false)}
-                          disabled={updatingId === item._id || deletingId === item._id || item.status === "cancelled"}
-                          className="p-1.5 rounded-lg border border-white/[0.06] text-[#F59E0B]/50 hover:text-[#F59E0B] hover:border-[#F59E0B]/20 hover:bg-[#F59E0B]/10 transition-all disabled:opacity-40"
-                          title="Mark Unpaid"
-                        >
-                          <XCircle className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteBooking(item._id)}
-                          disabled={updatingId === item._id || deletingId === item._id}
-                          className="p-1.5 rounded-lg border border-white/[0.06] text-white/30 hover:text-[#EF4444] hover:border-[#EF4444]/20 hover:bg-[#EF4444]/10 transition-all disabled:opacity-40"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/[0.06]">
+                    {["Guest", "Hotel", "Room", "Total", "Method", "Status", "Actions"].map((h) => (
+                      <th key={h} className="py-3 px-4 text-left text-xs font-medium text-white/40 uppercase tracking-wider">
+                        {h}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {paginated.map((item) => (
+                    <tr key={item._id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#D4A85F]/20 to-[#D4A85F]/5 border border-white/[0.06] flex items-center justify-center">
+                            <span className="text-[10px] font-medium text-white/60">
+                              {(item.user?.name || item.user?.username || "G").charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <span className="text-white/80">{item.user?.name || item.user?.username || "Guest"}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-white/60">{item.hotel?.name || "Hotel"}</td>
+                      <td className="py-3 px-4 text-white/60">{item.room?.roomType || "Room"}</td>
+                      <td className="py-3 px-4 text-white font-space">{formatPrice(item.totalPrice)}</td>
+                      <td className="py-3 px-4">
+                        <span className={`inline-block px-2 py-0.5 text-[10px] font-medium rounded-full border ${METHOD_BADGE[item.paymentMethod] || "border-white/[0.06] bg-white/[0.04] text-white/60"}`}>
+                          {item.paymentMethod || "N/A"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`inline-block px-2 py-0.5 text-[10px] font-medium rounded-full border ${
+                            item.isPaid
+                              ? "border-[#22C55E]/20 bg-[#22C55E]/10 text-[#22C55E]"
+                              : "border-[#F59E0B]/20 bg-[#F59E0B]/10 text-[#F59E0B]"
+                          }`}
+                        >
+                          {item.isPaid ? "Paid" : "Unpaid"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => updatePayment(item._id, true)}
+                            disabled={updatingId === item._id || deletingId === item._id || item.status === "cancelled"}
+                            className="p-1.5 rounded-lg border border-white/[0.06] text-[#22C55E]/50 hover:text-[#22C55E] hover:border-[#22C55E]/20 hover:bg-[#22C55E]/10 transition-all disabled:opacity-40"
+                            title="Mark Paid"
+                          >
+                            <CheckCircle className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => updatePayment(item._id, false)}
+                            disabled={updatingId === item._id || deletingId === item._id || item.status === "cancelled"}
+                            className="p-1.5 rounded-lg border border-white/[0.06] text-[#F59E0B]/50 hover:text-[#F59E0B] hover:border-[#F59E0B]/20 hover:bg-[#F59E0B]/10 transition-all disabled:opacity-40"
+                            title="Mark Unpaid"
+                          >
+                            <XCircle className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => requestConfirm(item._id, "Delete Booking", "Delete this booking record? This action cannot be undone.")}
+                            disabled={updatingId === item._id || deletingId === item._id}
+                            className="p-1.5 rounded-lg border border-white/[0.06] text-white/30 hover:text-[#EF4444] hover:border-[#EF4444]/20 hover:bg-[#EF4444]/10 transition-all disabled:opacity-40"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="px-4 pb-4">
+              <Pagination page={page} pages={pages} onPage={setPage} />
+            </div>
+          </>
         )}
       </div>
+
+      <ConfirmModal
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        variant="danger"
+        onConfirm={handleConfirmed}
+        onCancel={() => setConfirmState({ open: false, id: null, title: "", message: "" })}
+      />
     </motion.div>
   );
 };

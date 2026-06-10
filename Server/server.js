@@ -25,6 +25,7 @@ import recommendationRouter from './routes/recommendationRoutes.js'
 import supportRouter from './routes/supportRoutes.js'
 import testimonialRouter from './routes/testimonialRoutes.js'
 import reviewRouter from './routes/reviewRoutes.js'
+import notificationRouter from './routes/notificationRoutes.js'
 import placesRouter from './routes/placesRoutes.js'
 import itineraryRouter from './routes/itineraryRoutes.js'
 import transportRouter from './routes/transportRoutes.js'
@@ -120,6 +121,7 @@ app.use('/api/recommendations', recommendationRouter)
 app.use('/api/support', supportRouter)
 app.use('/api/testimonials', testimonialRouter)
 app.use('/api/reviews', reviewRouter)
+app.use('/api/notifications', notificationRouter)
 app.use('/api/places', placesRouter)
 app.use('/api/routes', transportRouter)
 app.use('/api/itinerary', itineraryRouter)

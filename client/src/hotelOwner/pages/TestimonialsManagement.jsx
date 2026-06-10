@@ -1,7 +1,8 @@
-﻿import { useEffect, useMemo, useState } from "react"
-import Title from "../../components/Title"
+﻿import { useCallback, useEffect, useMemo, useState } from "react"
 import { useAppContext } from "../../context/AppContext"
 import { toast } from "react-hot-toast"
+import { Eye, EyeOff, Award } from "lucide-react"
+import StatusBadge from "../../components/dashboard/shared/StatusBadge"
 
 const TestimonialsManagement = () => {
   const { axios, getToken, user } = useAppContext()
@@ -66,78 +67,89 @@ const TestimonialsManagement = () => {
     }
   }
 
-  useEffect(() => {
-    const fetchTestimonials = async () => {
-      if (!user) return
-      setLoading(true)
-      try {
-        const token = await getToken()
-        const { data } = await axios.get("/api/testimonials/owner", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        if (data.success) {
-          setRows(data.testimonials || [])
-        } else {
-          toast.error(data.message || "Failed to load testimonials")
-        }
-      } catch (error) {
-        toast.error(error.message || "Failed to load testimonials")
-      } finally {
-        setLoading(false)
+  const fetchTestimonials = useCallback(async () => {
+    if (!user) return
+    setLoading(true)
+    try {
+      const token = await getToken()
+      const { data } = await axios.get("/api/testimonials/owner", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (data.success) {
+        setRows(data.testimonials || [])
+      } else {
+        toast.error(data.message || "Failed to load testimonials")
       }
+    } catch (error) {
+      toast.error(error.message || "Failed to load testimonials")
+    } finally {
+      setLoading(false)
     }
-    fetchTestimonials()
   }, [user, axios, getToken])
 
+  useEffect(() => {
+    fetchTestimonials()
+  }, [fetchTestimonials])
+
   return (
-    <div className="space-y-6">
-      <Title align="left" font="outfit" title="Testimonials" subtitle="Manage guest feedback visibility for your storefront." />
+    <div className="space-y-6 pb-10">
+      <div>
+        <h1 className="text-xl font-bold text-white tracking-tight">Testimonials</h1>
+        <p className="text-sm text-white/40 mt-1">Manage guest feedback visibility for your storefront.</p>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="glass border border-slate-200 rounded-xl p-4 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 perspective-1000 tilt-card">
-          <p className="text-slate-500 text-sm">Total Testimonials</p>
-          <p className="text-2xl font-semibold gradient-text">{rows.length}</p>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl p-5">
+          <p className="text-xs uppercase tracking-[0.15em] text-white/50">Total Testimonials</p>
+          <p className="mt-2 text-3xl font-bold text-white">{rows.length}</p>
         </div>
-        <div className="glass border border-slate-200 rounded-xl p-4 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 perspective-1000 tilt-card">
-          <p className="text-slate-500 text-sm">Visible</p>
-          <p className="text-2xl font-semibold gradient-text-warm">{visibleCount}</p>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl p-5">
+          <p className="text-xs uppercase tracking-[0.15em] text-white/50">Visible</p>
+          <p className="mt-2 text-3xl font-bold text-[#22C55E]">{visibleCount}</p>
         </div>
-        <div className="glass border border-slate-200 rounded-xl p-4 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 perspective-1000 tilt-card">
-          <p className="text-slate-500 text-sm">Hidden</p>
-          <p className="text-2xl font-semibold gradient-text">{rows.length - visibleCount}</p>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl p-5">
+          <p className="text-xs uppercase tracking-[0.15em] text-white/50">Hidden</p>
+          <p className="mt-2 text-3xl font-bold text-[#EF4444]">{rows.length - visibleCount}</p>
         </div>
       </div>
 
-      <div className="glass border border-slate-200 rounded-xl shadow-sm p-4">
+      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="glass-dark text-white/90">
-              <tr>
-                <th className="py-3 px-4 text-left">Guest</th>
-                <th className="py-3 px-4 text-left">Location</th>
-                <th className="py-3 px-4 text-left">Rating</th>
-                <th className="py-3 px-4 text-left">Review</th>
-                <th className="py-3 px-4 text-left">Status</th>
-                <th className="py-3 px-4 text-left">Action</th>
+            <thead>
+              <tr className="border-b border-white/[0.08]">
+                <th className="py-3 px-4 text-left text-xs font-medium text-white/50 uppercase tracking-[0.15em]">Guest</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-white/50 uppercase tracking-[0.15em]">Location</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-white/50 uppercase tracking-[0.15em]">Rating</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-white/50 uppercase tracking-[0.15em]">Review</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-white/50 uppercase tracking-[0.15em]">Status</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-white/50 uppercase tracking-[0.15em]">Action</th>
               </tr>
             </thead>
-            <tbody className="text-slate-700">
+            <tbody>
               {rows.map((item) => (
-                <tr key={item._id} className="border-t border-slate-100 align-top hover:bg-white/50 transition-all duration-200 perspective-1000 cursor-default">
-                  <td className="py-3 px-4 font-medium">{item.name}</td>
-                  <td className="py-3 px-4">{item.address}</td>
-                  <td className="py-3 px-4">{item.rating}/5</td>
-                  <td className="py-3 px-4 max-w-md">{item.review}</td>
+                <tr key={item._id} className="border-t border-white/[0.04] hover:bg-white/[0.02] transition-colors align-top">
+                  <td className="py-3 px-4 text-white/80 font-medium">{item.name}</td>
+                  <td className="py-3 px-4 text-white/60">{item.address}</td>
+                  <td className="py-3 px-4 text-white/80">{item.rating}/5</td>
+                  <td className="py-3 px-4 text-white/60 max-w-md">{item.review}</td>
                   <td className="py-3 px-4">
-                    <span className={`px-2 py-1 text-xs rounded-full backdrop-blur-sm border ${item.isVisible ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-slate-200/80 text-slate-700 border-slate-300"}`}>
-                      {item.isVisible ? "Visible" : "Hidden"}
-                    </span>
+                    <StatusBadge status={item.isVisible ? "visible" : "hidden"} />
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
-                      <button onClick={() => startEdit(item)} className="text-xs px-3 py-1.5 rounded-md border border-blue-200 text-blue-700 hover:bg-blue-50 hover:scale-105 transition-all duration-200">Edit</button>
-                      <button onClick={() => toggleVisibility(item)} className="text-xs px-3 py-1.5 rounded-md border border-slate-200 hover:bg-slate-100 hover:scale-105 transition-all duration-200">
-                        {item.isVisible ? "Hide" : "Show"}
+                      <button
+                        onClick={() => startEdit(item)}
+                        className="text-xs px-3 py-1.5 rounded-lg border border-white/[0.06] text-white/50 hover:text-[#D4A85F] hover:border-[#D4A85F]/20 hover:bg-[#D4A85F]/10 transition-all"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => toggleVisibility(item)}
+                        className="p-1.5 rounded-lg border border-white/[0.06] text-white/30 hover:text-[#F59E0B] hover:border-[#F59E0B]/20 hover:bg-[#F59E0B]/10 transition-all"
+                        title={item.isVisible ? "Hide" : "Show"}
+                      >
+                        {item.isVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                       </button>
                     </div>
                   </td>
@@ -147,32 +159,60 @@ const TestimonialsManagement = () => {
           </table>
         </div>
 
-        {loading && <p className="text-sm text-slate-500 mt-4">Loading testimonials...</p>}
+        {loading && <p className="text-sm text-white/40 p-4 border-t border-white/[0.06]">Loading testimonials...</p>}
 
         {editingId !== null && (
-          <div className="mt-5 glass border border-slate-200 rounded-xl p-4">
-            <h4 className="text-sm font-semibold text-slate-800 mb-3">Edit Testimonial</h4>
+          <div className="m-5 rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl p-5">
+            <h4 className="text-sm font-semibold text-white mb-3">Edit Testimonial</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-slate-600">Guest Name</label>
-                <input value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))} className="w-full mt-1 border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white/70 backdrop-blur-sm outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition" />
+                <label className="text-xs text-white/60">Guest Name</label>
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+                  className="luxury-input mt-1"
+                />
               </div>
               <div>
-                <label className="text-xs text-slate-600">Location</label>
-                <input value={form.address} onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))} className="w-full mt-1 border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white/70 backdrop-blur-sm outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition" />
+                <label className="text-xs text-white/60">Location</label>
+                <input
+                  value={form.address}
+                  onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}
+                  className="luxury-input mt-1"
+                />
               </div>
               <div>
-                <label className="text-xs text-slate-600">Rating (1-5)</label>
-                <input type="number" min="1" max="5" value={form.rating} onChange={(e) => setForm((prev) => ({ ...prev, rating: e.target.value }))} className="w-full mt-1 border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white/70 backdrop-blur-sm outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition" />
+                <label className="text-xs text-white/60">Rating (1-5)</label>
+                <input
+                  type="number" min="1" max="5"
+                  value={form.rating}
+                  onChange={(e) => setForm((prev) => ({ ...prev, rating: e.target.value }))}
+                  className="luxury-input mt-1"
+                />
               </div>
               <div className="md:col-span-2">
-                <label className="text-xs text-slate-600">Review</label>
-                <textarea rows="4" value={form.review} onChange={(e) => setForm((prev) => ({ ...prev, review: e.target.value }))} className="w-full mt-1 border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white/70 backdrop-blur-sm outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition" />
+                <label className="text-xs text-white/60">Review</label>
+                <textarea
+                  rows="4"
+                  value={form.review}
+                  onChange={(e) => setForm((prev) => ({ ...prev, review: e.target.value }))}
+                  className="luxury-input mt-1 resize-none"
+                />
               </div>
             </div>
             <div className="mt-4 flex items-center gap-2">
-              <button onClick={saveEdit} className="text-xs px-4 py-2 rounded-md bg-gradient-to-r from-slate-800 to-slate-700 text-white hover:from-slate-700 hover:to-slate-600 hover:shadow-lg hover:scale-105 transition-all duration-200">Save Changes</button>
-              <button onClick={cancelEdit} className="text-xs px-4 py-2 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-100 hover:scale-105 transition-all duration-200">Cancel</button>
+              <button
+                onClick={saveEdit}
+                className="px-4 py-2 text-sm font-medium rounded-xl bg-gradient-to-r from-[#D4A85F] to-[#F5D08A] text-[#0B1220] hover:shadow-lg hover:shadow-[#D4A85F]/20 transition-all"
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={cancelEdit}
+                className="px-4 py-2 text-sm font-medium rounded-xl border border-white/[0.06] text-white/50 hover:text-white hover:bg-white/[0.06] transition-all"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         )}

@@ -1,7 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, PlusCircle, FileText } from "lucide-react";
 
 const HeroWelcome = ({ hotel, user }) => {
+  const navigate = useNavigate();
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -48,7 +50,10 @@ const HeroWelcome = ({ hotel, user }) => {
               View Report
               <ArrowRight className="w-3 h-3 opacity-0 -ml-2 group-hover:opacity-100 group-hover:ml-0 transition-all" />
             </button>
-            <button className="group flex items-center gap-2 px-4 py-2.5 text-xs font-medium rounded-xl bg-gradient-to-r from-[#D4A85F] to-[#F5D08A] text-[#0B1220] hover:shadow-lg hover:shadow-[#D4A85F]/20 transition-all">
+            <button
+              onClick={() => navigate("/rooms")}
+              className="group flex items-center gap-2 px-4 py-2.5 text-xs font-medium rounded-xl bg-gradient-to-r from-[#D4A85F] to-[#F5D08A] text-[#0B1220] hover:shadow-lg hover:shadow-[#D4A85F]/20 transition-all"
+            >
               <PlusCircle className="w-4 h-4" />
               New Booking
             </button>

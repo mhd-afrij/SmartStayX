@@ -1,7 +1,9 @@
 import { useEffect, useState, useMemo, useCallback } from "react"
-import Title from "../../components/Title"
+import { motion } from "framer-motion"
 import { useAppContext } from "../../context/AppContext"
 import { toast } from "react-hot-toast"
+import { ConciergeBell, CheckCircle, XCircle } from "lucide-react"
+import ConfirmModal from "../../components/dashboard/ConfirmModal"
 
 const SERVICE_TYPES = ["Housekeeping", "Maintenance", "Room Service", "Other"]
 const STATUS_OPTIONS = ["pending", "assigned", "completed", "cancelled"]
@@ -13,6 +15,17 @@ const ServiceManagement = () => {
   const [processingId, setProcessingId] = useState(null)
   const [filterType, setFilterType] = useState("all")
   const [filterStatus, setFilterStatus] = useState("all")
+  const [confirmState, setConfirmState] = useState({ open: false, id: null, title: "", message: "", status: "" })
+
+  const requestConfirm = (id, title, message, status) => {
+    setConfirmState({ open: true, id, title, message, status })
+  }
+
+  const handleConfirmed = () => {
+    const { id, status } = confirmState
+    setConfirmState({ open: false, id: null, title: "", message: "", status: "" })
+    if (id && status) executeStatusUpdate(id, status)
+  }
 
   const fetchRequests = useCallback(async () => {
     try {
@@ -36,8 +49,7 @@ const ServiceManagement = () => {
     if (user) fetchRequests()
   }, [user, fetchRequests])
 
-  const handleUpdateStatus = async (requestId, status) => {
-    if (!window.confirm(`Mark this request as "${status}"?`)) return
+  const executeStatusUpdate = async (requestId, status) => {
     setProcessingId(requestId)
     try {
       const { data } = await axios.post(
@@ -56,6 +68,10 @@ const ServiceManagement = () => {
     } finally {
       setProcessingId(null)
     }
+  }
+
+  const handleUpdateStatus = (requestId, status) => {
+    requestConfirm(requestId, "Update Status", `Mark this request as "${status}"?`, status)
   }
 
   const filtered = useMemo(() => {
@@ -79,114 +95,170 @@ const ServiceManagement = () => {
 
   const statusBadge = (status) => {
     const map = {
-      pending: "bg-amber-100 text-amber-700 border-amber-200",
-      assigned: "bg-blue-100 text-blue-700 border-blue-200",
-      completed: "bg-emerald-100 text-emerald-700 border-emerald-200",
-      cancelled: "bg-rose-100 text-rose-700 border-rose-200",
+      pending: "bg-amber-900/30 text-amber-400 border-amber-700/30",
+      assigned: "bg-blue-900/30 text-blue-400 border-blue-700/30",
+      completed: "bg-emerald-900/30 text-emerald-400 border-emerald-700/30",
+      cancelled: "bg-rose-900/30 text-rose-400 border-rose-700/30",
     }
     return map[status] || ""
   }
 
-  return (
-    <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-[linear-gradient(120deg,_#0f172a_0%,_#1d4ed8_55%,_#22d3ee_110%)] p-6 md:p-8 text-white shadow-xl">
-        <div className="absolute -top-20 -right-16 h-52 w-52 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -bottom-20 -left-16 h-56 w-56 rounded-full bg-cyan-300/20 blur-2xl" />
-        <div className="relative z-10">
-          <p className="inline-flex rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.2em]">Guest Services</p>
-          <Title align="left" font="outfit" title="Service Requests" subtitle="View, filter, and manage all guest service requests across your properties." />
-        </div>
-      </section>
+  const statCards = [
+    { label: "Total", value: stats.total, color: "from-slate-500/20 to-slate-600/10 border-slate-500/30", textColor: "text-slate-300" },
+    { label: "Pending", value: stats.pending, color: "from-amber-500/20 to-amber-600/10 border-amber-500/30", textColor: "text-amber-400" },
+    { label: "Assigned", value: stats.assigned, color: "from-blue-500/20 to-blue-600/10 border-blue-500/30", textColor: "text-blue-400" },
+    { label: "Completed", value: stats.completed, color: "from-emerald-500/20 to-emerald-600/10 border-emerald-500/30", textColor: "text-emerald-400" },
+    { label: "Cancelled", value: stats.cancelled, color: "from-rose-500/20 to-rose-600/10 border-rose-500/30", textColor: "text-rose-400" },
+  ]
 
-      <section className="grid gap-3 sm:grid-cols-5">
-        {[
-          { label: "Total", value: stats.total, color: "slate" },
-          { label: "Pending", value: stats.pending, color: "amber" },
-          { label: "Assigned", value: stats.assigned, color: "blue" },
-          { label: "Completed", value: stats.completed, color: "emerald" },
-          { label: "Cancelled", value: stats.cancelled, color: "rose" },
-        ].map((s) => (
-          <div key={s.label} className={`rounded-xl border border-${s.color}-200 bg-${s.color}-50/60 p-3 text-center`}>
-            <p className="text-xs uppercase tracking-wider text-slate-500">{s.label}</p>
-            <p className={`mt-1 text-2xl font-bold text-${s.color}-700`}>{s.value}</p>
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pb-10">
+      <div>
+        <h1 className="text-xl font-bold text-white tracking-tight">Service Requests</h1>
+        <p className="text-sm text-white/40 mt-1">View, filter, and manage all guest service requests across your properties.</p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-5">
+        {statCards.map((s) => (
+          <div key={s.label} className={`luxury-card p-4 bg-gradient-to-br ${s.color}`}>
+            <p className="text-xs uppercase tracking-[0.15em] text-white/50">{s.label}</p>
+            <p className={`mt-2 text-2xl font-bold ${s.textColor}`}>{s.value}</p>
           </div>
         ))}
-      </section>
+      </div>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="mb-4 flex flex-wrap gap-3">
-          <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700">
-            <option value="all">All Types</option>
-            {SERVICE_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+      <div className="luxury-card overflow-hidden">
+        <div className="p-4 border-b border-white/8 flex flex-wrap items-center gap-3">
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            className="luxury-select text-sm min-w-[8rem]"
+          >
+            <option value="all" className="bg-[#0d1728]">All Types</option>
+            {SERVICE_TYPES.map((t) => <option key={t} value={t} className="bg-[#0d1728]">{t}</option>)}
           </select>
-          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700">
-            <option value="all">All Statuses</option>
-            {STATUS_OPTIONS.map((t) => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="luxury-select text-sm min-w-[8rem]"
+          >
+            <option value="all" className="bg-[#0d1728]">All Statuses</option>
+            {STATUS_OPTIONS.map((t) => (
+              <option key={t} value={t} className="bg-[#0d1728]">
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </option>
+            ))}
           </select>
-          <span className="self-center text-xs text-slate-500">{filtered.length} request{filtered.length !== 1 ? "s" : ""}</span>
+          <span className="text-xs text-white/40 ml-auto">{filtered.length} request{filtered.length !== 1 ? "s" : ""}</span>
         </div>
 
         {loading ? (
-          <p className="text-sm text-slate-500">Loading...</p>
+          <div className="p-8 text-center">
+            <div className="h-8 w-8 mx-auto animate-spin rounded-full border-2 border-[#D4A85F] border-t-transparent" />
+            <p className="mt-3 text-sm text-white/40">Loading requests...</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[800px] text-sm">
-              <thead className="text-white glass-dark">
-                <tr>
-                  <th className="py-3 px-4 text-left font-semibold">Type</th>
-                  <th className="py-3 px-4 text-left font-semibold">Details</th>
-                  <th className="py-3 px-4 text-left font-semibold">Room</th>
-                  <th className="py-3 px-4 text-left font-semibold">Staff</th>
-                  <th className="py-3 px-4 text-left font-semibold">Requested</th>
-                  <th className="py-3 px-4 text-left font-semibold">Status</th>
-                  <th className="py-3 px-4 text-left font-semibold">Actions</th>
+              <thead>
+                <tr className="border-b border-white/8 text-white/50 text-xs uppercase tracking-[0.15em]">
+                  <th className="py-4 px-5 text-left font-medium">Type</th>
+                  <th className="py-4 px-5 text-left font-medium">Details</th>
+                  <th className="py-4 px-5 text-left font-medium">Room</th>
+                  <th className="py-4 px-5 text-left font-medium">Staff</th>
+                  <th className="py-4 px-5 text-left font-medium">Requested</th>
+                  <th className="py-4 px-5 text-left font-medium">Status</th>
+                  <th className="py-4 px-5 text-right font-medium">Actions</th>
                 </tr>
               </thead>
-              <tbody className="text-slate-700">
+              <tbody className="divide-y divide-white/5">
                 {filtered.map((r) => (
-                  <tr key={r._id} className="border-t border-slate-100 hover:bg-slate-50/70">
-                    <td className="py-3 px-4 font-medium">{r.serviceType}</td>
-                    <td className="py-3 px-4 max-w-[200px] truncate">{r.requestDetails || "-"}</td>
-                    <td className="py-3 px-4">{r.room?.roomType || "N/A"}</td>
-                    <td className="py-3 px-4">{r.staffAssigned?.name || "Unassigned"}</td>
-                    <td className="py-3 px-4 text-xs">{formatDate(r.createdAt)}</td>
-                    <td className="py-3 px-4">
-                      <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-medium ${statusBadge(r.status)}`}>{r.status}</span>
+                  <tr key={r._id} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-5">
+                      <span className="font-medium text-white">{r.serviceType}</span>
                     </td>
-                    <td className="py-3 px-4">
-                      <div className="flex gap-1">
+                    <td className="py-4 px-5 max-w-[200px]">
+                      <span className="text-white/60 truncate block">{r.requestDetails || "-"}</span>
+                    </td>
+                    <td className="py-4 px-5 text-white/70">{r.room?.roomType || "N/A"}</td>
+                    <td className="py-4 px-5">
+                      <span className="text-white/70">{r.staffAssigned?.name || "Unassigned"}</span>
+                    </td>
+                    <td className="py-4 px-5 text-xs text-white/40">{formatDate(r.createdAt)}</td>
+                    <td className="py-4 px-5">
+                      <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${statusBadge(r.status)}`}>
+                        {r.status}
+                      </span>
+                    </td>
+                    <td className="py-4 px-5">
+                      <div className="flex items-center justify-end gap-1">
                         {r.status === "assigned" && (
                           <>
-                            <button onClick={() => handleUpdateStatus(r._id, "completed")} disabled={processingId === r._id} className="text-xs px-2.5 py-1.5 rounded-lg border border-emerald-200 text-emerald-700 hover:bg-emerald-50 disabled:opacity-60">
-                              Complete
+                            <button
+                              onClick={() => handleUpdateStatus(r._id, "completed")}
+                              disabled={processingId === r._id}
+                              className="p-2 rounded-lg hover:bg-white/5 text-white/40 hover:text-emerald-400 transition-colors disabled:opacity-40"
+                              title="Mark completed"
+                            >
+                              <CheckCircle className="w-4 h-4" />
                             </button>
-                            <button onClick={() => handleUpdateStatus(r._id, "cancelled")} disabled={processingId === r._id} className="text-xs px-2.5 py-1.5 rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-50 disabled:opacity-60">
-                              Cancel
+                            <button
+                              onClick={() => handleUpdateStatus(r._id, "cancelled")}
+                              disabled={processingId === r._id}
+                              className="p-2 rounded-lg hover:bg-white/5 text-white/40 hover:text-rose-400 transition-colors disabled:opacity-40"
+                              title="Cancel"
+                            >
+                              <XCircle className="w-4 h-4" />
                             </button>
                           </>
                         )}
                         {r.status === "pending" && (
-                          <button onClick={() => handleUpdateStatus(r._id, "cancelled")} disabled={processingId === r._id} className="text-xs px-2.5 py-1.5 rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-50 disabled:opacity-60">
-                            Cancel
+                          <button
+                            onClick={() => handleUpdateStatus(r._id, "cancelled")}
+                            disabled={processingId === r._id}
+                            className="p-2 rounded-lg hover:bg-white/5 text-white/40 hover:text-rose-400 transition-colors disabled:opacity-40"
+                            title="Cancel"
+                          >
+                            <XCircle className="w-4 h-4" />
                           </button>
                         )}
-                        {r.status === "completed" && <span className="text-xs text-slate-400 italic">Done</span>}
-                        {r.status === "cancelled" && <span className="text-xs text-slate-400 italic">Closed</span>}
+                        {r.status === "completed" && (
+                          <span className="text-xs text-emerald-400/60 italic flex items-center gap-1">
+                            <CheckCircle className="w-3.5 h-3.5" /> Done
+                          </span>
+                        )}
+                        {r.status === "cancelled" && (
+                          <span className="text-xs text-rose-400/60 italic flex items-center gap-1">
+                            <XCircle className="w-3.5 h-3.5" /> Closed
+                          </span>
+                        )}
                       </div>
                     </td>
                   </tr>
                 ))}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="py-10 text-center text-sm text-slate-500">No service requests found.</td>
+                    <td colSpan={7} className="py-16 text-center">
+                      <ConciergeBell className="w-10 h-10 mx-auto text-white/20 mb-3" />
+                      <p className="text-white/40">No service requests found.</p>
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
         )}
-      </section>
-    </div>
+      </div>
+
+      <ConfirmModal
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        variant="danger"
+        onConfirm={handleConfirmed}
+        onCancel={() => setConfirmState({ open: false, id: null, title: "", message: "", status: "" })}
+      />
+    </motion.div>
   )
 }
 

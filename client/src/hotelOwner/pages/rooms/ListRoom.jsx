@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppContext } from '../../../context/AppContext';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
@@ -9,7 +9,6 @@ const AMENITY_OPTIONS = [
 ];
 
 const ListRoom = () => {
-  // Room list and edit state.
   const [rooms, setRooms] = useState([]);
   const [roomTypeFilter, setRoomTypeFilter] = useState('all');
   const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +17,6 @@ const ListRoom = () => {
   const [editForm, setEditForm] = useState({
     roomType: '', pricePerNight: '', amenities: {}, isAvailable: true,
   });
-  const hasFetched = useRef(false);
   const { axios, getToken, user, currency } = useAppContext();
 
   const roomTypeOptions = [
@@ -32,7 +30,6 @@ const ListRoom = () => {
   const fetchRooms = async () => {
     if (isLoading) return;
     try {
-      // Load the owner's rooms from the API.
       setIsLoading(true);
       const token = await getToken();
       const { data } = await axios.get('/api/rooms/Owner', {
@@ -146,11 +143,10 @@ const ListRoom = () => {
   };
 
   useEffect(() => {
-    if (user && !hasFetched.current) {
-      hasFetched.current = true;
+    if (user) {
       fetchRooms();
     }
-  }, [user?.id]);
+  }, [user]);
 
   return (
     <motion.div
@@ -158,7 +154,6 @@ const ListRoom = () => {
       animate={{ opacity: 1 }}
       className="space-y-6 pb-10"
     >
-      {/* Page header and filters */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-white tracking-tight">Room Listings</h1>
@@ -182,7 +177,6 @@ const ListRoom = () => {
         </div>
       </div>
 
-      {/* Room grid and empty states */}
       {rooms.length === 0 && !isLoading ? (
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl p-12 text-center">
           <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#D4A85F]/20 to-[#D4A85F]/5 border border-[#D4A85F]/20 flex items-center justify-center">

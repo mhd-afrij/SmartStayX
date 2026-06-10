@@ -9,12 +9,19 @@ import { BOOKING_STATUS } from '../constants/bookingStatuses'
 import { FALLBACK_VALUES } from '../constants/pricingConfig'
 
 const MyBookings = () => {
-    const { getToken, formatPrice, translate } = useAppContext();
+    const { getToken, formatPrice, translate, user } = useAppContext();
     const [bookings, setBookings] = useState([])
     const [loading, setLoading] = useState(true)
     const [payingId, setPayingId] = useState(null)
     const [cancelingId, setCancelingId] = useState(null)
     const [serviceModal, setServiceModal] = useState({ open: false, roomId: null, hotelId: null })
+
+    const confirmedBookings = bookings.filter((b) => b.status === "confirmed");
+    const latestConfirmed = confirmedBookings[confirmedBookings.length - 1];
+
+    const openServiceFor = (roomId, hotelId) => {
+        setServiceModal({ open: true, roomId, hotelId });
+    };
 
     const fetchBookings = async ({ showLoader = false } = {}) => {
         try {
@@ -149,7 +156,10 @@ const MyBookings = () => {
             <div className="absolute inset-0 mesh-glow opacity-40" />
 
             <div className="relative mx-auto max-w-6xl px-4 md:px-8 lg:px-10">
-                <Title title={translate('myBookings')} subtitle={translate('myBookingsSubtitle')} />
+                <div className="flex items-start justify-between gap-4">
+                    <Title title={translate('myBookings')} subtitle={translate('myBookingsSubtitle')} />
+
+                </div>
 
                 {bookings.length === 0 && !loading && (
                     <p className="text-center text-white/40 py-16">{translate('noBookings')}</p>

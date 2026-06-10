@@ -15,8 +15,14 @@ const paymentConfig = {
   pending: { label: "Pending", color: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20" },
 };
 
-const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency }) => {
-  // Search, sorting, and pagination state.
+const ALLOWED_TRANSITIONS = {
+  upcoming: ["checked-in", "cancelled"],
+  "checked-in": ["completed", "cancelled"],
+  completed: [],
+  cancelled: [],
+};
+
+const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency, onStatusChange, updatingStatusId }) => {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
@@ -24,13 +30,12 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency }) 
   const perPage = 5;
 
   const filtered = useMemo(() => {
-    // Apply search and sort before paginating the bookings.
     let list = [...bookings];
     if (search) {
       const q = search.toLowerCase();
       list = list.filter(
         (b) =>
-          (b.user?.username || "").toLowerCase().includes(q) ||
+          (b.user?.name || b.user?.username || "").toLowerCase().includes(q) ||
           (b.room?.roomType || "").toLowerCase().includes(q) ||
           (b.status || "").toLowerCase().includes(q)
       );
@@ -72,7 +77,6 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency }) 
       transition={{ duration: 0.5, delay: 0.3 }}
       className="relative rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl overflow-hidden"
     >
-      {/* Table header and search */}
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-medium text-white">Recent Bookings</h3>
@@ -91,7 +95,6 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency }) 
           </div>
         </div>
 
-        {/* Scrollable booking table */}
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -120,6 +123,8 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency }) 
               {paginated.map((item) => {
                 const st = statusConfig[item.status] || statusConfig.upcoming;
                 const pm = item.isPaid ? paymentConfig.paid : paymentConfig.pending;
+                const guestName = item.user?.name || item.user?.username || "Guest";
+                const initial = guestName.charAt(0).toUpperCase();
                 return (
                   <tr
                     key={item._id}
@@ -129,10 +134,10 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency }) 
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#D4A85F]/20 to-[#D4A85F]/5 border border-white/[0.06] flex items-center justify-center">
                           <span className="text-[10px] font-medium text-white/60">
-                            {(item.user?.username || "G").charAt(0).toUpperCase()}
+                            {initial}
                           </span>
                         </div>
-                        <span className="text-white/80">{item.user?.username || "Guest"}</span>
+                        <span className="text-white/80">{guestName}</span>
                       </div>
                     </td>
                     <td className="py-3 px-3 text-white/60">{item.room?.roomType || "Room"}</td>
@@ -166,13 +171,32 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency }) 
                       </span>
                     </td>
                     <td className="py-3 px-3">
-                      <button
-                        onClick={() => onDelete(item._id)}
-                        disabled={deletingId === item._id}
-                        className="p-1.5 rounded-lg border border-white/[0.06] text-white/30 hover:text-[#EF4444] hover:border-[#EF4444]/20 hover:bg-[#EF4444]/10 transition-all disabled:opacity-50"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="flex items-center gap-1">
+                        {onStatusChange && ALLOWED_TRANSITIONS[item.status]?.length > 0 && (
+                          <select
+                            value=""
+                            onChange={(e) => {
+                              if (e.target.value) onStatusChange(item._id, e.target.value);
+                            }}
+                            disabled={updatingStatusId === item._id}
+                            className="p-1 text-[10px] rounded-lg border border-white/[0.06] bg-[#0B1220] text-white/70 outline-none focus:border-[#D4A85F]/30 transition-colors disabled:opacity-50"
+                          >
+                            <option value="" className="bg-[#0B1220]">Set status</option>
+                            {ALLOWED_TRANSITIONS[item.status].map((s) => (
+                              <option key={s} value={s} className="bg-[#0B1220]">
+                                {statusConfig[s]?.label || s}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                        <button
+                          onClick={() => onDelete(item._id)}
+                          disabled={deletingId === item._id}
+                          className="p-1.5 rounded-lg border border-white/[0.06] text-white/30 hover:text-[#EF4444] hover:border-[#EF4444]/20 hover:bg-[#EF4444]/10 transition-all disabled:opacity-50"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -188,7 +212,6 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency }) 
           </table>
         </div>
 
-        {/* Pagination controls */}
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/[0.06]">
           <span className="text-xs text-white/30">
             Showing {page * perPage + 1}-{Math.min((page + 1) * perPage, filtered.length)} of{" "}

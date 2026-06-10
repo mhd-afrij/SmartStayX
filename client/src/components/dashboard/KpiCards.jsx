@@ -16,7 +16,6 @@ const containerVariants = {
   },
 };
 
-// Individual KPI card animation.
 const cardVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: {
@@ -27,7 +26,6 @@ const cardVariants = {
 };
 
 function AnimatedCounter({ value, suffix = "", decimals = 0 }) {
-  // Animate the metric number when the card enters view.
   const [display, setDisplay] = useState(0);
   const ref = useRef(null);
   const hasAnimated = useRef(false);
@@ -68,7 +66,6 @@ function AnimatedCounter({ value, suffix = "", decimals = 0 }) {
 }
 
 const MiniSparkline = ({ data, color }) => {
-  // Render a small inline trend chart.
   if (!data || data.length === 0) return null;
   const max = Math.max(...data);
   const min = Math.min(...data);
@@ -138,51 +135,57 @@ const cards = [
   },
 ];
 
-const KpiCards = ({ data, currency }) => {
-  // Format money values for the dashboard cards.
-  const formatCurrency = (value) =>
-    `${currency} ${Number(value || 0).toLocaleString()}`;
+const buildMetrics = (data) => {
+  const trends = data.trends || [];
+  const hasTrends = trends.length >= 2;
 
-  const getTrend = (key) => {
-    if (!data.trends || data.trends.length < 2) return null;
-    const vals = data.trends.map((t) => t.bookings || 0);
-    const recent = vals.slice(-2);
-    if (recent.length < 2) return null;
-    const diff = ((recent[1] - recent[0]) / (recent[0] || 1)) * 100;
-    return diff;
+  const bookingTrend = hasTrends ? trends.map((t) => t.bookings ?? 0) : [];
+  const revenueTrend = hasTrends ? trends.map((t) => t.revenue ?? 0) : [];
+
+  const calcTrend = (arr) => {
+    if (arr.length < 2) return null;
+    const last = arr[arr.length - 1];
+    const prev = arr[arr.length - 2];
+    return prev === 0 ? null : ((last - prev) / prev) * 100;
   };
 
-  const trend = getTrend("bookings");
-  const sparklineData = data.trends?.map((t) => t.bookings || 0) || [];
-
-  const metrics = [
+  return [
     {
       value: data.totalBookings,
       suffix: "",
       decimals: 0,
-      trend: trend,
-      sparkline: sparklineData,
+      trend: calcTrend(bookingTrend),
+      sparkline: bookingTrend,
     },
     {
       value: data.totalRevenue,
-      prefix: currency,
       suffix: "",
       decimals: 0,
-      sparkline: sparklineData.map((b) => b * (data.totalRevenue / (data.totalBookings || 1))),
+      trend: calcTrend(revenueTrend),
+      sparkline: revenueTrend,
     },
     {
       value: data.occupancyPercent,
       suffix: "%",
       decimals: 0,
-      sparkline: sparklineData.map(() => data.occupancyPercent + Math.random() * 10 - 5),
+      trend: null,
+      sparkline: [],
     },
     {
       value: data.avgRating || 0,
       suffix: "",
       decimals: 1,
+      trend: null,
       sparkline: [],
     },
   ];
+};
+
+const KpiCards = ({ data, currency }) => {
+  const formatCurrency = (value) =>
+    `${currency} ${Number(value || 0).toLocaleString()}`;
+
+  const metrics = buildMetrics(data);
 
   return (
     <motion.div
@@ -191,7 +194,6 @@ const KpiCards = ({ data, currency }) => {
       animate="visible"
       className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
     >
-      {/* KPI cards */}
       {cards.map((card, i) => {
         const metric = metrics[i];
         return (

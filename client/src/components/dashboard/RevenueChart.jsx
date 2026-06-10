@@ -17,23 +17,6 @@ const filters = [
   { key: "12m", label: "12 months" },
 ];
 
-// Fallback data used when the API does not provide revenue trends.
-const generateData = (days) => {
-  const data = [];
-  for (let i = 0; i < days; i++) {
-    const date = new Date();
-    date.setDate(date.getDate() - (days - 1 - i));
-    const base = 2000 + Math.random() * 3000;
-    const peak = Math.sin((i / days) * Math.PI * 2) * 500;
-    data.push({
-      date: date.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-      revenue: Math.round(base + peak + Math.random() * 400),
-      bookings: Math.round(5 + Math.random() * 15),
-    });
-  }
-  return data;
-};
-
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
@@ -56,21 +39,42 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const RevenueChart = ({ revenueData }) => {
-  // Filter selection and hover state.
   const [activeFilter, setActiveFilter] = useState("7d");
   const [hovered, setHovered] = useState(null);
 
   const chartData = useMemo(() => {
-    // Use live data when available, otherwise generate a placeholder trend.
     if (revenueData?.length > 0) return revenueData;
-    const counts = { "7d": 7, "30d": 30, "12m": 90 };
-    return generateData(counts[activeFilter] || 7);
-  }, [activeFilter, revenueData]);
+    return [];
+  }, [revenueData]);
 
   const totalRevenue = useMemo(
-    () => chartData.reduce((sum, d) => sum + d.revenue, 0),
+    () => chartData.reduce((sum, d) => sum + (d.revenue || 0), 0),
     [chartData]
   );
+
+  if (chartData.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="relative rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl overflow-hidden"
+      >
+        <div className="relative z-10 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-[#4F46E5]/10 border border-[#4F46E5]/20 flex items-center justify-center">
+              <DollarSign className="w-4 h-4 text-[#4F46E5]" />
+            </div>
+            <h3 className="text-sm font-medium text-white">Revenue Overview</h3>
+          </div>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <DollarSign className="w-10 h-10 text-white/20 mb-3" />
+            <p className="text-sm text-white/40">No revenue data yet</p>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -79,7 +83,6 @@ const RevenueChart = ({ revenueData }) => {
       transition={{ duration: 0.5, delay: 0.1 }}
       className="relative rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl overflow-hidden"
     >
-      {/* Chart header and filters */}
       <div className="absolute top-0 left-1/4 right-0 h-px bg-gradient-to-r from-transparent via-[#4F46E5]/30 to-transparent" />
 
       <div className="relative z-10 p-6">
@@ -115,7 +118,6 @@ const RevenueChart = ({ revenueData }) => {
           </div>
         </div>
 
-        {/* Revenue area chart */}
         <div className="h-[280px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart

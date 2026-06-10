@@ -19,6 +19,10 @@ import AddRoom from './hotelOwner/pages/rooms/AddRoom';
 import ListRoom from './hotelOwner/pages/rooms/ListRoom';
 import ManageOffers from './hotelOwner/pages/ManageOffers';
 import PaymentManagement from './hotelOwner/pages/PaymentManagement';
+import StaffManagement from './hotelOwner/pages/StaffManagement';
+import ServiceManagement from './hotelOwner/pages/ServiceManagement';
+import ReviewsManagement from './hotelOwner/pages/ReviewsManagement';
+import TestimonialsManagement from './hotelOwner/pages/TestimonialsManagement';
 import { Toaster } from 'react-hot-toast';
 import { useAppContext } from "./context/AppContext";
 import { motion } from 'framer-motion';
@@ -92,6 +96,10 @@ const App = () => {
             <Route path='list-room' element={<ListRoom />} />
             <Route path='offers' element={<ManageOffers />} />
             <Route path='payments' element={<PaymentManagement />} />
+            <Route path='staff-management' element={<StaffManagement />} />
+            <Route path='service-management' element={<ServiceManagement />} />
+            <Route path='reviews' element={<ReviewsManagement />} />
+            <Route path='testimonials' element={<TestimonialsManagement />} />
           </Route>
         </Routes>
         </ErrorBoundary>

@@ -6,11 +6,12 @@ import { toast } from "react-hot-toast";
 import React from "react";  
 
 const CURRENCY_OPTIONS = [
-  { code: "AED", symbol: "AED", label: "Dirham (AED)", rate: 3.67 },
-  { code: "SGD", symbol: "S$", label: "Singapore Dollar (SGD)", rate: 1.35 },
   { code: "USD", symbol: "$", label: "US Dollar (USD)", rate: 1 },
-  { code: "GBP", symbol: "GBP", label: "Pound Sterling (GBP)", rate: 0.79 },
-  { code: "LKR", symbol: "Rs", label: "Sri Lankan Rupee (LKR)", rate: 300 },
+  { code: "EUR", symbol: "€", label: "Euro (EUR)", rate: 0.92 },
+  { code: "GBP", symbol: "£", label: "Pound Sterling (GBP)", rate: 0.79 },
+  { code: "AED", symbol: "د.إ", label: "Dirham (AED)", rate: 3.67 },
+  { code: "SGD", symbol: "S$", label: "Singapore Dollar (SGD)", rate: 1.35 },
+  { code: "LKR", symbol: "₨", label: "Sri Lankan Rupee (LKR)", rate: 300 },
 ];
 
 const LANGUAGE_OPTIONS = [
@@ -525,6 +526,21 @@ export const AppProvider = ({ children }) => {
   const [searchedCities, setSearchedCities] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [offers, setOffers] = useState([]);
+  const [dashboardData, setDashboardData] = useState({
+    bookings: [],
+    rooms: [],
+    totalBookings: 0,
+    totalRevenue: 0,
+    occupancyPercent: 0,
+    revenue: { today: 0, week: 0, month: 0 },
+    avgRating: null,
+    upcomingBookings: 0,
+    cancelledBookings: 0,
+    lastMinuteBookings: 0,
+    trends: [],
+    hotel: null,
+    allHotels: [],
+  })
 
   const currencyConfig =
     CURRENCY_OPTIONS.find((item) => item.code === selectedCurrency) || CURRENCY_OPTIONS[0];
@@ -670,6 +686,8 @@ export const AppProvider = ({ children }) => {
     offers,
     setOffers,
     fetchOffers,
+    dashboardData,
+    setDashboardData,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

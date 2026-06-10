@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
 import { Building2, ChevronDown } from "lucide-react";
 import { useAppContext } from "../../context/AppContext";
+import ErrorBoundary from "../../components/ErrorBoundary";
+import ConfirmModal from "../../components/dashboard/ConfirmModal";
 import HeroWelcome from "../../components/dashboard/HeroWelcome";
 import KpiCards from "../../components/dashboard/KpiCards";
 import RevenueChart from "../../components/dashboard/RevenueChart";
@@ -11,30 +13,26 @@ import BookingsTable from "../../components/dashboard/BookingsTable";
 import MaintenancePanel from "../../components/dashboard/MaintenancePanel";
 
 const Dashboard = () => {
-  const { currency, user, getToken, axios, selectedHotelId, setSelectedHotelId } = useAppContext();
+  const { currency, user, getToken, axios, selectedHotelId, setSelectedHotelId, dashboardData, setDashboardData } = useAppContext();
 
-  // Dashboard interaction state.
   const [deletingBookingId, setDeletingBookingId] = useState(null);
   const [maintenanceRoomId, setMaintenanceRoomId] = useState(null);
-  const [dashboardData, setDashboardData] = useState({
-    bookings: [],
-    rooms: [],
-    totalBookings: 0,
-    totalRevenue: 0,
-    occupancyPercent: 0,
-    revenue: { today: 0, week: 0, month: 0 },
-    avgRating: null,
-    upcomingBookings: 0,
-    cancelledBookings: 0,
-    lastMinuteBookings: 0,
-    trends: [],
-    hotel: null,
-    allHotels: [],
-  });
+  const [submittingReport, setSubmittingReport] = useState(false);
+  const [updatingStatusId, setUpdatingStatusId] = useState(null);
+  const [confirmState, setConfirmState] = useState({ open: false, id: null, title: "", message: "" });
 
-  const fetchDashboardData = async () => {
+  const requestConfirm = (id, title, message) => {
+    setConfirmState({ open: true, id, title, message });
+  };
+
+  const handleConfirmed = () => {
+    const { id } = confirmState;
+    setConfirmState({ open: false, id: null, title: "", message: "" });
+    if (id) handleDeleteBooking(id);
+  };
+
+  const fetchDashboardData = useCallback(async () => {
     try {
-      // Load bookings, revenue, rooms, and hotel data for the selected property.
       const { data } = await axios.get(`/api/bookings/hotel?hotelId=${selectedHotelId}`, {
         headers: { Authorization: `Bearer ${await getToken()}` },
       });
@@ -55,10 +53,9 @@ const Dashboard = () => {
     } catch (error) {
       toast.error(error.message);
     }
-  };
+  }, [axios, getToken, selectedHotelId, setDashboardData]);
 
   const handleToggleAvailability = async (roomId) => {
-    // Toggle maintenance availability for a room.
     setMaintenanceRoomId(roomId);
     try {
       const { data } = await axios.post(
@@ -84,10 +81,7 @@ const Dashboard = () => {
   };
 
   const handleDeleteBooking = async (bookingId) => {
-    // Remove an owner booking after confirmation.
     if (!bookingId) return;
-    const shouldDelete = window.confirm("Delete this booking record? This action cannot be undone.");
-    if (!shouldDelete) return;
     setDeletingBookingId(bookingId);
     try {
       const { data } = await axios.delete(`/api/bookings/owner/${bookingId}`, {
@@ -106,15 +100,60 @@ const Dashboard = () => {
     }
   };
 
+  const handleSubmitReport = useCallback(async (issue, roomId) => {
+    setSubmittingReport(true);
+    try {
+      const { data } = await axios.post(
+        "/api/maintenance/report",
+        { issue, roomId, hotelId: selectedHotelId },
+        { headers: { Authorization: `Bearer ${await getToken()}` } }
+      );
+      if (data.success) {
+        toast.success(data.message || "Issue reported");
+      } else {
+        toast.error(data.message || "Failed to report issue");
+      }
+    } catch (error) {
+      toast.error(error.message || "Failed to report issue");
+    } finally {
+      setSubmittingReport(false);
+    }
+  }, [axios, getToken, selectedHotelId]);
+
+  const handleStatusChange = useCallback(async (bookingId, status) => {
+    setUpdatingStatusId(bookingId);
+    try {
+      const { data } = await axios.patch(`/api/bookings/owner/${bookingId}/status`, { status }, {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      });
+      if (data.success) {
+        toast.success(data.message || "Status updated");
+        setDashboardData((prev) => ({
+          ...prev,
+          bookings: prev.bookings.map((b) =>
+            b._id === bookingId ? { ...b, status } : b
+          ),
+        }));
+      } else {
+        toast.error(data.message || "Failed to update status");
+      }
+    } catch (error) {
+      toast.error(error.message || "Failed to update status");
+    } finally {
+      setUpdatingStatusId(null);
+    }
+  }, [axios, getToken, setDashboardData]);
+
   useEffect(() => {
     if (user) {
       fetchDashboardData();
     }
-  }, [user, selectedHotelId]);
+  }, [user, fetchDashboardData]);
 
   const formatCurrency = (value) => `${currency} ${Number(value || 0).toLocaleString()}`;
 
   const isLoading = !dashboardData.hotel && dashboardData.bookings.length === 0;
+  const hasNoHotel = dashboardData.allHotels.length === 0;
 
   return (
     <motion.div
@@ -123,11 +162,9 @@ const Dashboard = () => {
       transition={{ duration: 0.3 }}
       className="space-y-6 pb-10"
     >
-      {/* Hero welcome and summary blocks */}
       <HeroWelcome hotel={dashboardData.hotel} user={user} />
 
-      {/* Empty-state message when no hotel exists yet */}
-      {!dashboardData.hotel && dashboardData.bookings.length === 0 && !isLoading && (
+      {hasNoHotel && !isLoading && (
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -137,14 +174,19 @@ const Dashboard = () => {
             <span className="text-2xl">🏨</span>
           </div>
           <h2 className="text-xl font-bold text-white mb-2">Welcome to your Partner Dashboard!</h2>
-          <p className="text-sm text-white/50 max-w-md mx-auto">
+          <p className="text-sm text-white/50 max-w-md mx-auto mb-6">
             You haven't registered a hotel yet. Add your property details to start managing rooms,
             bookings, and revenue.
           </p>
+          <a
+            href="/Owner/hotel-management"
+            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl bg-gradient-to-r from-[#D4A85F] to-[#F5D08A] text-[#0B1220] hover:shadow-lg hover:shadow-[#D4A85F]/20 transition-all"
+          >
+            Register Your Hotel
+          </a>
         </motion.div>
       )}
 
-  {/* Hotel selector and KPI cards */}
       {dashboardData.allHotels.length > 0 && (
         <>
           <div className="flex items-center justify-between">
@@ -166,38 +208,58 @@ const Dashboard = () => {
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30 pointer-events-none" />
             </div>
           </div>
-          <KpiCards data={dashboardData} currency={currency} />
+          <ErrorBoundary>
+            <KpiCards data={dashboardData} currency={currency} />
+          </ErrorBoundary>
         </>
       )}
 
-      {/* Revenue and booking breakdown */}
       {dashboardData.bookings.length > 0 && (
         <div className="grid gap-4 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <RevenueChart revenueData={dashboardData.trends} />
+            <ErrorBoundary>
+              <RevenueChart revenueData={dashboardData.trends} />
+            </ErrorBoundary>
           </div>
-          <BookingDonut bookings={dashboardData.bookings} />
+          <ErrorBoundary>
+            <BookingDonut bookings={dashboardData.bookings} />
+          </ErrorBoundary>
         </div>
       )}
 
-      {/* Booking table */}
       {dashboardData.bookings.length > 0 && (
-        <BookingsTable
-          bookings={dashboardData.bookings}
-          onDelete={handleDeleteBooking}
-          deletingId={deletingBookingId}
-          formatCurrency={formatCurrency}
-        />
+        <ErrorBoundary>
+          <BookingsTable
+            bookings={dashboardData.bookings}
+            onDelete={(id) => requestConfirm(id, "Delete Booking", "Delete this booking record? This action cannot be undone.")}
+            deletingId={deletingBookingId}
+            formatCurrency={formatCurrency}
+            onStatusChange={handleStatusChange}
+            updatingStatusId={updatingStatusId}
+          />
+        </ErrorBoundary>
       )}
 
-      {/* Maintenance controls */}
       {dashboardData.rooms.length > 0 && (
-        <MaintenancePanel
-          rooms={dashboardData.rooms}
-          onToggle={handleToggleAvailability}
-          togglingId={maintenanceRoomId}
-        />
+        <ErrorBoundary>
+          <MaintenancePanel
+            rooms={dashboardData.rooms}
+            onToggle={handleToggleAvailability}
+            togglingId={maintenanceRoomId}
+            onReport={handleSubmitReport}
+            submittingReport={submittingReport}
+          />
+        </ErrorBoundary>
       )}
+
+      <ConfirmModal
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        variant="danger"
+        onConfirm={handleConfirmed}
+        onCancel={() => setConfirmState({ open: false, id: null, title: "", message: "" })}
+      />
     </motion.div>
   );
 };

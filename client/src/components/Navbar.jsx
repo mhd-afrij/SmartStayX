@@ -12,7 +12,6 @@ const Navbar = () => {
     { key: "hotels", path: "/rooms" },
     { key: "tripPlanner", path: "/trip-planner" },
     { key: "blog", path: "/blog" },
-    { key: "experience", path: "/experience" },
     { key: "about", path: "/about" },
   ];
 
@@ -64,12 +63,12 @@ const Navbar = () => {
       </Link>
 
       {/* Desktop navigation */}
-      <div className="hidden md:flex items-center gap-8 flex-1 justify-center">
+      <div className="hidden md:flex items-center gap-6 flex-1 justify-center overflow-hidden">
         {navLinks.map((link, i) => (
           <a
             key={i}
             href={link.path}
-            className="nav-link text-sm font-medium uppercase tracking-[0.18em]"
+            className="nav-link text-sm font-medium uppercase tracking-[0.18em] whitespace-nowrap"
           >
             {translate(link.key)}
           </a>
@@ -164,6 +163,12 @@ const Navbar = () => {
             <span className="hidden md:block text-xs text-white/50 mr-1">
               Hi, {user.firstName || user.primaryEmailAddress?.emailAddress?.split('@')[0] || 'Guest'}
             </span>
+            <button
+              onClick={() => navigate("/my-bookings")}
+              className="hidden md:block px-3 py-1.5 text-xs uppercase tracking-[0.12em] text-white/70 hover:text-white border border-white/10 hover:border-white/30 rounded-lg transition-all"
+            >
+              {translate("myBookings")}
+            </button>
             <UserButton />
           </>
         ) : (
@@ -236,7 +241,15 @@ const Navbar = () => {
             </div>
             <div className="flex gap-3 pt-2 border-t border-white/8">
               {user ? (
-                <UserButton />
+                <>
+                  <button
+                    onClick={() => { navigate("/my-bookings"); setIsMenuOpen(false); }}
+                    className="ghost-button flex-1 px-4 py-3 text-xs uppercase tracking-[0.18em]"
+                  >
+                    {translate("myBookings")}
+                  </button>
+                  <UserButton />
+                </>
               ) : (
                 <>
                   <button onClick={openSignIn} className="ghost-button flex-1 px-4 py-3 text-xs uppercase tracking-[0.18em]">{translate("login")}</button>

@@ -12,7 +12,7 @@ const connectDB = async () => {
     await mongoose.connect(baseUri, {
       dbName: 'SmartStayX',
       serverSelectionTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
+      socketTimeoutMS: 120000,
       connectTimeoutMS: 10000,
       maxPoolSize: 10,
       retryWrites: true,
