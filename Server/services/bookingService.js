@@ -201,7 +201,7 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
 
   // 8) Offer discount
   let offerDiscountPercent = 0;
-  if (offerId) {
+  if (offerId && mongoose.Types.ObjectId.isValid(offerId)) {
     const offer = await Offer.findOne({
       _id: offerId,
       room: roomData._id,

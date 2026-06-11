@@ -10,6 +10,8 @@ const emptyForm = {
   hotelId: "", roomId: "", image: null, isActive: true,
 };
 
+const safeUrl = (url) => url && (typeof url === 'string') && (url.startsWith('http') || url.startsWith('blob:')) ? url : null;
+
 const ManageOffers = () => {
   const { axios, getToken, user, fetchOffers } = useAppContext();
   const [offers, setOffers] = useState([]);
@@ -23,7 +25,7 @@ const ManageOffers = () => {
 
   useEffect(() => {
     return () => {
-      if (preview?.startsWith("blob:")) URL.revokeObjectURL(preview);
+      if (preview && typeof preview === 'string' && preview.startsWith("blob:")) URL.revokeObjectURL(preview);
     };
   }, [preview]);
 
@@ -158,7 +160,6 @@ const ManageOffers = () => {
       image: null,
       isActive: offer.isActive,
     });
-    const safeUrl = (url) => url && (url.startsWith('http') || url.startsWith('blob:')) ? url : null;
     setPreview(safeUrl(offer.image));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -291,13 +292,13 @@ const ManageOffers = () => {
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   setForm({ ...form, image: file || null });
-                  setPreview(file ? URL.createObjectURL(file) : null);
+                  setPreview(file ? safeUrl(URL.createObjectURL(file)) : null);
                 }}
               />
               <span className="text-xs text-white/40">Click to upload (optional)</span>
             </label>
-            {preview && (
-              <img src={preview} alt="preview" className="mt-3 rounded-xl w-full max-h-48 object-cover" />
+            {preview && safeUrl(preview) && (
+              <img src={safeUrl(preview)} alt="preview" className="mt-3 rounded-xl w-full max-h-48 object-cover" />
             )}
           </div>
 
