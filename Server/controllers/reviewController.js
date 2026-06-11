@@ -1,6 +1,7 @@
 import Booking from "../models/Booking.js";
 import Review from "../models/Review.js";
 import Room from "../models/Room.js";
+import Hotel from "../models/Hotel.js";
 import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 
 const allowedSatisfaction = new Set([
@@ -117,6 +118,60 @@ export const createOrUpdateRoomReview = async (req, res) => {
     if (error?.code === 11000) {
       return res.json({ success: false, message: "You already reviewed this room" });
     }
+    return res.json({ success: false, message: error.message });
+  }
+};
+
+export const getOwnerReviews = async (req, res) => {
+  try {
+    const ownerId = req.user?._id;
+    if (!ownerId) {
+      return res.json({ success: false, message: "Not authenticated" });
+    }
+
+    const ownedHotels = await Hotel.find({ owner: ownerId }).select("_id name");
+    if (!ownedHotels.length) {
+      return res.json({ success: true, reviews: [], hotels: [] });
+    }
+
+    const ownedHotelIds = ownedHotels.map((h) => h._id);
+
+    const reviews = await Review.find({ hotel: { $in: ownedHotelIds } })
+      .populate("user", "name username image")
+      .populate("room", "roomType roomNumber")
+      .populate("hotel", "name")
+      .sort({ createdAt: -1 });
+
+    return res.json({ success: true, reviews, hotels: ownedHotels });
+  } catch (error) {
+    return res.json({ success: false, message: error.message });
+  }
+};
+
+export const toggleReviewVisibility = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    const ownerId = req.user?._id;
+
+    if (!ownerId) {
+      return res.json({ success: false, message: "Not authenticated" });
+    }
+
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.json({ success: false, message: "Review not found" });
+    }
+
+    const hotel = await Hotel.findById(review.hotel);
+    if (!hotel || String(hotel.owner) !== String(ownerId)) {
+      return res.json({ success: false, message: "Not authorized to modify this review" });
+    }
+
+    review.isVisible = !review.isVisible;
+    await review.save();
+
+    return res.json({ success: true, message: "Review visibility updated", isVisible: review.isVisible });
+  } catch (error) {
     return res.json({ success: false, message: error.message });
   }
 };

@@ -3,11 +3,12 @@ import { motion } from "framer-motion";
 import { Search, ArrowUpDown, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 
 const statusConfig = {
-  upcoming: { label: "Upcoming", color: "bg-[#4F46E5]/10 text-[#4F46E5] border-[#4F46E5]/20" },
+  pending: { label: "Pending", color: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20" },
   confirmed: { label: "Confirmed", color: "bg-[#4F46E5]/10 text-[#4F46E5] border-[#4F46E5]/20" },
-  "checked-in": { label: "Checked-in", color: "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20" },
-  completed: { label: "Completed", color: "bg-[#D4A85F]/10 text-[#D4A85F] border-[#D4A85F]/20" },
+  checked_in: { label: "Checked-in", color: "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20" },
+  checked_out: { label: "Completed", color: "bg-[#D4A85F]/10 text-[#D4A85F] border-[#D4A85F]/20" },
   cancelled: { label: "Cancelled", color: "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20" },
+  expired: { label: "Expired", color: "bg-[#6B7280]/10 text-[#6B7280] border-[#6B7280]/20" },
 };
 
 const paymentConfig = {
@@ -16,10 +17,12 @@ const paymentConfig = {
 };
 
 const ALLOWED_TRANSITIONS = {
-  upcoming: ["checked-in", "cancelled"],
-  "checked-in": ["completed", "cancelled"],
-  completed: [],
+  pending: ["confirmed", "cancelled"],
+  confirmed: ["checked_in", "cancelled"],
+  checked_in: ["checked_out", "cancelled"],
+  checked_out: [],
   cancelled: [],
+  expired: [],
 };
 
 const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency, onStatusChange, updatingStatusId }) => {
@@ -121,7 +124,7 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency, on
             </thead>
             <tbody>
               {paginated.map((item) => {
-                const st = statusConfig[item.status] || statusConfig.upcoming;
+                const st = statusConfig[item.status] || statusConfig.pending;
                 const pm = item.isPaid ? paymentConfig.paid : paymentConfig.pending;
                 const guestName = item.user?.name || item.user?.username || "Guest";
                 const initial = guestName.charAt(0).toUpperCase();

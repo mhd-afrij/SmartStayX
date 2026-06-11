@@ -6,11 +6,12 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const statusColor = {
-  confirmed: "bg-[#4F46E5]",
-  "checked-in": "bg-[#22C55E]",
-  completed: "bg-[#D4A85F]",
-  cancelled: "bg-[#EF4444]/50",
   pending: "bg-[#F59E0B]",
+  confirmed: "bg-[#4F46E5]",
+  checked_in: "bg-[#22C55E]",
+  checked_out: "bg-[#D4A85F]",
+  cancelled: "bg-[#EF4444]/50",
+  expired: "bg-[#6B7280]/50",
 };
 
 const CalendarView = ({ bookings = [] }) => {

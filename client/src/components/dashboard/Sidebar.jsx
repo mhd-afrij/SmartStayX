@@ -117,25 +117,6 @@ const Sidebar = () => {
         </nav>
 
         {/* Status card */}
-        <div className="px-3 mt-4">
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                className="rounded-xl border border-[#D4A85F]/20 bg-gradient-to-br from-[#D4A85F]/10 to-[#D4A85F]/5 p-4"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse" />
-                  <span className="text-xs text-white/50 font-medium">All Systems</span>
-                </div>
-                <p className="text-xs text-white/40">Premium Plan</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
         {/* Collapse toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}

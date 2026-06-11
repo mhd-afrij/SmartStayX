@@ -1,13 +1,20 @@
 import Testimonial from "../models/Testimonial.js";
 import Review from "../models/Review.js";
+import Hotel from "../models/Hotel.js";
 import { DEFAULT_TESTIMONIALS } from "../configs/runtimeDefaults.js";
 
-const ensureOwner = (req, res) => {
-  if (req.user?.role !== "hotelOwner") {
-    res.json({ success: false, message: "Only hotel owners can manage testimonials" });
-    return false;
+const ensureOwner = async (req, res) => {
+  if (req.user?.role === "hotelOwner") return true;
+
+  const hasHotel = await Hotel.exists({ owner: req.user?._id });
+  if (hasHotel) {
+    await req.user.constructor.findByIdAndUpdate(req.user._id, { role: "hotelOwner" });
+    req.user.role = "hotelOwner";
+    return true;
   }
-  return true;
+
+  res.json({ success: false, message: "Only hotel owners can manage testimonials" });
+  return false;
 };
 
 export const getVisibleTestimonials = async (_req, res) => {
@@ -49,7 +56,7 @@ export const getVisibleTestimonials = async (_req, res) => {
 
 export const getOwnerTestimonials = async (req, res) => {
   try {
-    if (!ensureOwner(req, res)) return;
+    if (!(await ensureOwner(req, res))) return;
 
     let testimonials = await Testimonial.find({}).sort({ createdAt: -1 });
 
@@ -73,7 +80,7 @@ export const getOwnerTestimonials = async (req, res) => {
 
 export const updateTestimonial = async (req, res) => {
   try {
-    if (!ensureOwner(req, res)) return;
+    if (!(await ensureOwner(req, res))) return;
 
     const { id } = req.params;
     const { name, address, rating, review } = req.body;
@@ -100,7 +107,7 @@ export const updateTestimonial = async (req, res) => {
 
 export const updateTestimonialVisibility = async (req, res) => {
   try {
-    if (!ensureOwner(req, res)) return;
+    if (!(await ensureOwner(req, res))) return;
 
     const { id } = req.params;
     const { isVisible } = req.body;

@@ -81,6 +81,14 @@ class BookingService {
   ownerUpdatePayment(bookingId, isPaid, token) {
     return this.#request("post", API_ENDPOINTS.bookings.ownerUpdatePayment, { bookingId, isPaid }, token);
   }
+
+  requestRefund(bookingId, token) {
+    return this.#request("post", API_ENDPOINTS.bookings.refundRequest, { bookingId }, token);
+  }
+
+  handleRefund(bookingId, action, token) {
+    return this.#request("post", API_ENDPOINTS.bookings.handleRefund, { bookingId, action }, token);
+  }
 }
 
 export default new BookingService();

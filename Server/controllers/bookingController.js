@@ -3,6 +3,7 @@ import Booking from "../models/Booking.js";
 import Room from "../models/Room.js";
 import Hotel from "../models/Hotel.js";
 import User from "../models/User.js";
+import Review from "../models/Review.js";
 import { CLERK_API_BASE_URL } from "../configs/runtimeDefaults.js";
 import bookingService from "../services/bookingService.js";
 import WebhookLog from "../models/WebhookLog.js";
@@ -10,7 +11,7 @@ import { constructEvent, getStripe } from "../utils/stripeUtil.js";
 import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 import { BOOKING_ERRORS, BOOKING_SUCCESS } from "../constants/messages.js";
 import bookingConfig from "../configs/bookingConfig.js";
-import { notifyNewBooking, notifyPaymentReceived, notifyCancellation } from "../utils/notificationHelper.js";
+import { notifyNewBooking, notifyPaymentReceived, notifyCancellation, notifyRefundRequest } from "../utils/notificationHelper.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -147,6 +148,81 @@ export const cancelBooking = async (req, res) => {
     return res.json({ success: true, message: BOOKING_SUCCESS.CANCELLED, booking });
   } catch (error) {
     return res.json({ success: false, message: BOOKING_ERRORS.FAILED_CANCEL });
+  }
+};
+
+export const requestRefund = async (req, res) => {
+  try {
+    const user = req.user;
+    const { bookingId } = req.body;
+
+    if (typeof bookingId !== 'string') {
+      return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_REQUIRED });
+    }
+
+    const booking = await Booking.findOne({ _id: bookingId, user: user._id }).populate("room hotel");
+    if (!booking) {
+      return res.json({ success: false, message: BOOKING_ERRORS.NOT_FOUND });
+    }
+
+    if (!booking.isPaid) {
+      return res.json({ success: false, message: "Only paid bookings can request a refund" });
+    }
+
+    if (booking.refundStatus === "pending") {
+      return res.json({ success: false, message: "A refund request is already pending for this booking" });
+    }
+
+    if (booking.refundStatus === "approved" || booking.refundStatus === "refunded") {
+      return res.json({ success: false, message: "This booking has already been refunded" });
+    }
+
+    booking.refundStatus = "pending";
+    await booking.save();
+
+    notifyRefundRequest(booking, user);
+
+    return res.json({ success: true, message: BOOKING_SUCCESS.REFUND_REQUESTED, booking });
+  } catch (error) {
+    return res.json({ success: false, message: error.message });
+  }
+};
+
+export const handleRefund = async (req, res) => {
+  try {
+    const ownerId = req.user._id;
+    const { bookingId, action } = req.body;
+
+    if (typeof bookingId !== 'string') {
+      return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_REQUIRED });
+    }
+
+    if (!["approved", "denied"].includes(action)) {
+      return res.json({ success: false, message: "action must be 'approved' or 'denied'" });
+    }
+
+    const booking = await Booking.findById(bookingId).populate("hotel");
+    if (!booking) {
+      return res.json({ success: false, message: BOOKING_ERRORS.NOT_FOUND });
+    }
+
+    if (String(booking.hotel.owner) !== String(ownerId)) {
+      return res.json({ success: false, message: "Not authorized to handle this refund" });
+    }
+
+    if (booking.refundStatus !== "pending") {
+      return res.json({ success: false, message: "No pending refund request for this booking" });
+    }
+
+    booking.refundStatus = action;
+    if (action === "approved") {
+      booking.isPaid = false;
+    }
+    await booking.save();
+
+    return res.json({ success: true, message: BOOKING_SUCCESS.REFUND_HANDLED, booking });
+  } catch (error) {
+    return res.json({ success: false, message: error.message });
   }
 };
 
@@ -546,7 +622,7 @@ export const getHotelBookings = async (req, res) => {
           totalRooms: 0,
           occupancyPercent: 0,
           revenue: { today: 0, week: 0, month: 0 },
-          avgRating: null,
+        avgRating,
           upcomingBookings: 0,
           cancelledBookings: 0,
           lastMinuteBookings: 0,
@@ -675,13 +751,13 @@ export const getHotelBookings = async (req, res) => {
       .populate("room hotel user")
       .sort({ createdAt: -1 });
 
-    // Occupancy: unique rooms currently occupied
+    // Occupancy: unique rooms currently occupied (checked-in or confirmed with active dates)
     const occupiedRoomIds = new Set(
       rawBookings
         .filter(
           (b) =>
             b?.room?._id &&
-            b.status !== BOOKING_STATUS.CANCELLED &&
+            ![BOOKING_STATUS.CANCELLED, BOOKING_STATUS.CHECKED_OUT, BOOKING_STATUS.EXPIRED].includes(b.status) &&
             new Date(b.checkInDate) <= now &&
             new Date(b.checkOutDate) >= now,
         )
@@ -757,12 +833,23 @@ export const getHotelBookings = async (req, res) => {
     const trends = Array.from({ length: trendDays }).map((_, idx) => {
       const day = new Date();
       day.setDate(now.getDate() - (6 - idx));
+      const dateStr = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, "0")}-${String(day.getDate()).padStart(2, "0")}`;
       const label = `${day.getMonth() + 1}/${day.getDate()}`;
-      const bookingsCount = filteredBookings.filter(
-        (b) => new Date(b.createdAt).toDateString() === day.toDateString(),
-      ).length;
-      return { label, bookings: bookingsCount };
+      const dayStart = new Date(day.toDateString());
+      const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+      const dayBookings = filteredBookings.filter(
+        (b) => new Date(b.createdAt) >= dayStart && new Date(b.createdAt) < dayEnd,
+      );
+      const revenue = dayBookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+      return { date: dateStr, label, bookings: dayBookings.length, revenue };
     });
+
+    // Average rating from reviews for the matched hotels
+    const [ratingResult] = await Review.aggregate([
+      { $match: hotelMatch },
+      { $group: { _id: null, avgRating: { $avg: "$rating" }, count: { $sum: 1 } } },
+    ]);
+    const avgRating = ratingResult ? Number(ratingResult.avgRating.toFixed(1)) : null;
 
     res.json({
       success: true,

@@ -4,17 +4,21 @@ import { motion } from "framer-motion";
 import { CalendarCheck } from "lucide-react";
 
 const COLORS = {
-  upcoming: "#4F46E5",
-  "checked-in": "#22C55E",
-  completed: "#D4A85F",
+  pending: "#F59E0B",
+  confirmed: "#4F46E5",
+  checked_in: "#22C55E",
+  checked_out: "#D4A85F",
   cancelled: "#EF4444",
+  expired: "#6B7280",
 };
 
 const LABELS = {
-  upcoming: "Upcoming",
-  "checked-in": "Checked-in",
-  completed: "Completed",
+  pending: "Pending",
+  confirmed: "Confirmed",
+  checked_in: "Checked-in",
+  checked_out: "Completed",
   cancelled: "Cancelled",
+  expired: "Expired",
 };
 
 const renderActiveShape = (props) => {
@@ -51,10 +55,12 @@ const BookingDonut = ({ bookings = [] }) => {
 
   // Bucket bookings by lifecycle status.
   const counts = {
-    upcoming: bookings.filter((b) => b.status === "upcoming" || b.status === "confirmed").length,
-    "checked-in": bookings.filter((b) => b.status === "checked-in" || b.status === "checkedin").length,
-    completed: bookings.filter((b) => b.status === "completed").length,
+    pending: bookings.filter((b) => b.status === "pending").length,
+    confirmed: bookings.filter((b) => b.status === "confirmed").length,
+    checked_in: bookings.filter((b) => b.status === "checked_in").length,
+    checked_out: bookings.filter((b) => b.status === "checked_out").length,
     cancelled: bookings.filter((b) => b.status === "cancelled").length,
+    expired: bookings.filter((b) => b.status === "expired").length,
   };
 
   const data = Object.entries(counts)

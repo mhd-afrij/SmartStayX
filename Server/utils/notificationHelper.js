@@ -42,3 +42,15 @@ export const notifyCancellation = async (booking) => {
     room: booking.room,
   });
 };
+
+export const notifyRefundRequest = async (booking, user) => {
+  if (!booking?.hotel) return;
+  await createNotification({
+    hotel: booking.hotel,
+    type: "refund_request",
+    title: "Refund Requested",
+    message: `${user?.name || "A guest"} has requested a refund of $${booking.totalPrice || 0}.`,
+    booking: booking._id,
+    room: booking.room,
+  });
+};

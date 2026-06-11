@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import { CreditCard, Search, ChevronDown, Building2, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { CreditCard, Search, ChevronDown, Building2, Trash2, CheckCircle, XCircle, RotateCcw } from "lucide-react";
 import ConfirmModal from "../../components/dashboard/ConfirmModal";
 import Pagination from "../../components/dashboard/shared/Pagination";
 
@@ -20,6 +20,7 @@ const PaymentManagement = () => {
   const [selectedHotelId, setSelectedHotelId] = useState("all");
   const [updatingId, setUpdatingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [refundingId, setRefundingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
@@ -106,6 +107,27 @@ const PaymentManagement = () => {
       toast.error(error.response?.data?.message || "Failed to delete booking");
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleRefund = async (bookingId, action) => {
+    setRefundingId(bookingId);
+    try {
+      const { data } = await axios.post(
+        "/api/bookings/handle-refund",
+        { bookingId, action },
+        { headers: { Authorization: `Bearer ${await getToken()}` } }
+      );
+      if (data.success) {
+        toast.success(`Refund ${action} successfully`);
+        await loadPayments(selectedHotelId);
+      } else {
+        toast.error(data.message || "Failed to process refund");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to process refund");
+    } finally {
+      setRefundingId(null);
     }
   };
 
@@ -198,7 +220,7 @@ const PaymentManagement = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/[0.06]">
-                    {["Guest", "Hotel", "Room", "Total", "Method", "Status", "Actions"].map((h) => (
+                    {["Guest", "Hotel", "Room", "Total", "Method", "Status", "Refund", "Actions"].map((h) => (
                       <th key={h} className="py-3 px-4 text-left text-xs font-medium text-white/40 uppercase tracking-wider">
                         {h}
                       </th>
@@ -238,10 +260,41 @@ const PaymentManagement = () => {
                         </span>
                       </td>
                       <td className="py-3 px-4">
+                        {item.refundStatus === "pending" ? (
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleRefund(item._id, "approved")}
+                              disabled={refundingId === item._id}
+                              className="p-1 rounded border border-[#22C55E]/20 text-[#22C55E]/70 hover:text-[#22C55E] hover:bg-[#22C55E]/10 transition disabled:opacity-40"
+                              title="Approve Refund"
+                            >
+                              <CheckCircle className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleRefund(item._id, "denied")}
+                              disabled={refundingId === item._id}
+                              className="p-1 rounded border border-[#EF4444]/20 text-[#EF4444]/70 hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition disabled:opacity-40"
+                              title="Deny Refund"
+                            >
+                              <XCircle className="w-3.5 h-3.5" />
+                            </button>
+                            <span className="text-[10px] text-yellow-400 ml-1">Pending</span>
+                          </div>
+                        ) : item.refundStatus === "approved" ? (
+                          <span className="text-[10px] text-green-400">Approved</span>
+                        ) : item.refundStatus === "denied" ? (
+                          <span className="text-[10px] text-red-400">Denied</span>
+                        ) : item.refundStatus === "refunded" ? (
+                          <span className="text-[10px] text-blue-400">Refunded</span>
+                        ) : (
+                          <span className="text-[10px] text-white/30">—</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4">
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => updatePayment(item._id, true)}
-                            disabled={updatingId === item._id || deletingId === item._id || item.status === "cancelled"}
+                            disabled={updatingId === item._id || deletingId === item._id || item.status === "cancelled" || refundingId === item._id}
                             className="p-1.5 rounded-lg border border-white/[0.06] text-[#22C55E]/50 hover:text-[#22C55E] hover:border-[#22C55E]/20 hover:bg-[#22C55E]/10 transition-all disabled:opacity-40"
                             title="Mark Paid"
                           >
@@ -249,7 +302,7 @@ const PaymentManagement = () => {
                           </button>
                           <button
                             onClick={() => updatePayment(item._id, false)}
-                            disabled={updatingId === item._id || deletingId === item._id || item.status === "cancelled"}
+                            disabled={updatingId === item._id || deletingId === item._id || item.status === "cancelled" || refundingId === item._id}
                             className="p-1.5 rounded-lg border border-white/[0.06] text-[#F59E0B]/50 hover:text-[#F59E0B] hover:border-[#F59E0B]/20 hover:bg-[#F59E0B]/10 transition-all disabled:opacity-40"
                             title="Mark Unpaid"
                           >
@@ -257,7 +310,7 @@ const PaymentManagement = () => {
                           </button>
                           <button
                             onClick={() => requestConfirm(item._id, "Delete Booking", "Delete this booking record? This action cannot be undone.")}
-                            disabled={updatingId === item._id || deletingId === item._id}
+                            disabled={updatingId === item._id || deletingId === item._id || refundingId === item._id}
                             className="p-1.5 rounded-lg border border-white/[0.06] text-white/30 hover:text-[#EF4444] hover:border-[#EF4444]/20 hover:bg-[#EF4444]/10 transition-all disabled:opacity-40"
                             title="Delete"
                           >

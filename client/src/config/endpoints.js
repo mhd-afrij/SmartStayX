@@ -26,6 +26,8 @@ const API_ENDPOINTS = {
     ownerUpdatePayment: "/api/bookings/owner/update-payment",
     ownerDelete: (bookingId) => `/api/bookings/owner/${bookingId}`,
     checkAvailability: "/api/bookings/check-availability",
+    refundRequest: "/api/bookings/refund-request",
+    handleRefund: "/api/bookings/handle-refund",
   },
   hotels: {
     base: "/api/hotels",

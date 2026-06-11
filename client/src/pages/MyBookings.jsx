@@ -9,11 +9,12 @@ import { BOOKING_STATUS } from '../constants/bookingStatuses'
 import { FALLBACK_VALUES } from '../constants/pricingConfig'
 
 const MyBookings = () => {
-    const { getToken, formatPrice, translate, user } = useAppContext();
+    const { getToken, formatPrice, translate, user, axios } = useAppContext();
     const [bookings, setBookings] = useState([])
     const [loading, setLoading] = useState(true)
     const [payingId, setPayingId] = useState(null)
     const [cancelingId, setCancelingId] = useState(null)
+    const [refundingId, setRefundingId] = useState(null)
     const [serviceModal, setServiceModal] = useState({ open: false, roomId: null, hotelId: null })
 
     const confirmedBookings = bookings.filter((b) => b.status === "confirmed");
@@ -115,6 +116,29 @@ const MyBookings = () => {
             toast.error(error.response?.data?.message || translate('cancelFailed'));
         } finally {
             setCancelingId(null);
+        }
+    };
+
+    const handleRefundRequest = async (bookingId) => {
+        if (!bookingId) return;
+        setRefundingId(bookingId);
+        try {
+            const token = await getToken();
+            const { data } = await axios.post(
+                '/api/bookings/refund-request',
+                { bookingId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            if (data.success) {
+                toast.success(data.message || "Refund request submitted");
+                await fetchBookings();
+            } else {
+                toast.error(data.message || "Failed to request refund");
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to request refund");
+        } finally {
+            setRefundingId(null);
         }
     };
 
@@ -259,6 +283,30 @@ const MyBookings = () => {
                                                 >
                                                     {translate('requestService')}
                                                 </button>
+                                            )}
+                                            {booking.isPaid && booking.refundStatus === "none" && (
+                                                <button
+                                                    onClick={() => handleRefundRequest(booking._id)}
+                                                    disabled={refundingId === booking._id}
+                                                    className="text-xs px-4 py-2 rounded-full border border-orange-500/30 text-orange-400 hover:bg-orange-500/10 transition disabled:opacity-60"
+                                                >
+                                                    {refundingId === booking._id ? "Requesting..." : "Request Refund"}
+                                                </button>
+                                            )}
+                                            {booking.refundStatus === "pending" && (
+                                                <span className="text-[10px] text-yellow-400 px-2 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-center">
+                                                    Refund Pending
+                                                </span>
+                                            )}
+                                            {booking.refundStatus === "approved" && (
+                                                <span className="text-[10px] text-green-400 px-2 py-1 rounded-full border border-green-500/30 bg-green-500/10 text-center">
+                                                    Refund Approved
+                                                </span>
+                                            )}
+                                            {booking.refundStatus === "denied" && (
+                                                <span className="text-[10px] text-red-400 px-2 py-1 rounded-full border border-red-500/30 bg-red-500/10 text-center">
+                                                    Refund Denied
+                                                </span>
                                             )}
                                         </div>
                                     </div>

@@ -39,4 +39,15 @@ export const BOOKING_SUCCESS = {
   MODIFIED: 'Booking modified successfully',
   PAYMENT_UPDATED: 'Payment updated successfully',
   BOOKING_DELETED: 'Booking deleted successfully',
+  REFUND_REQUESTED: 'Refund request submitted. The property owner will review it shortly.',
+  REFUND_HANDLED: 'Refund status updated successfully.',
+}
+
+export const REFUND_ERRORS = {
+  NOT_PAID: 'Only paid bookings can request a refund',
+  ALREADY_REQUESTED: 'A refund request is already pending for this booking',
+  ALREADY_REFUNDED: 'This booking has already been refunded',
+  NOT_FOUND: 'Booking not found',
+  NOT_AUTHORIZED: 'Not authorized to handle this refund',
+  NOT_REQUESTED: 'No refund request exists for this booking',
 }
