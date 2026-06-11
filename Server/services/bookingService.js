@@ -129,7 +129,10 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
   let multiplier = 1;
   let adjustments = [];
 
-  const hotelId = roomData.hotel?._id || roomData.hotel;
+  const hotelId = String(roomData.hotel?._id || roomData.hotel || '');
+  if (!mongoose.Types.ObjectId.isValid(hotelId) && hotelId.length !== 24) {
+    throw Object.assign(new Error('Invalid hotel reference'), { status: 400 });
+  }
   const hotelRules = await getHotelPricingRules(hotelId);
 
   // 1) Weekend surcharge
@@ -268,7 +271,8 @@ const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, 
 
     const pricing = await calculateBookingPricing({ roomData, checkInDate, checkOutDate, guests, offerId, userId });
 
-    const hotelRules = await getHotelPricingRules(roomData.hotel?._id);
+    const hotelId = String(roomData.hotel?._id || '');
+    const hotelRules = await getHotelPricingRules(hotelId);
     const effectiveHoldMinutes = holdMinutes || hotelRules.holdMinutes || bookingConfig.holdMinutes;
 
     const now = new Date();
@@ -279,7 +283,7 @@ const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, 
     const [booking] = await Booking.create([{
       user: userId,
       room: roomId,
-      hotel: roomData.hotel._id,
+      hotel: hotelId,
       guests: pricing.guests,
       checkInDate,
       checkOutDate,
