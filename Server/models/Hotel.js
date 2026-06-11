@@ -18,6 +18,9 @@ const hotelSchema = new mongoose.Schema(
       seasonalOverrides: [{ type: Object }],
       lengthOfStayDiscounts: [{ type: Object }],
       lastMinuteDiscount: { type: Number, default: null },
+      earlyBirdWindowDays: { type: Number, default: null },
+      earlyBirdDiscount: { type: Number, default: null },
+      repeatGuestDiscount: { type: Number, default: null },
     },
   },
   { timestamps: true }

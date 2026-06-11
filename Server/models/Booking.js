@@ -17,7 +17,7 @@ const bookingSchema = new mongoose.Schema(
     guests: { type: Number, required: true },
     status: {
       type: String,
-      enum: ["pending", "confirmed", "cancelled", "expired"],
+      enum: ["pending", "confirmed", "checked_in", "checked_out", "cancelled", "expired"],
       default: "pending",
     },
     holdExpiresAt: { type: Date },

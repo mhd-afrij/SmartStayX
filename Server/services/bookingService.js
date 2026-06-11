@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Booking from '../models/Booking.js';
 import Room from '../models/Room.js';
+import Hotel from '../models/Hotel.js';
 import Offer from '../models/Offer.js';
 import { BOOKING_STATUS } from '../constants/bookingStatuses.js';
 import bookingConfig from '../configs/bookingConfig.js';
@@ -40,7 +41,6 @@ const checkAvailability = async ({ room, checkInDate, checkOutDate, excludeBooki
 
 const getHotelPricingRules = async (hotelId) => {
   try {
-    const Hotel = (await import('../models/Hotel.js')).default;
     const hotel = await Hotel.findById(hotelId).select('pricingRules currency').lean();
     return hotel?.pricingRules || {};
   } catch {
@@ -90,17 +90,44 @@ const getLastMinuteDiscount = (checkIn, hotelRules) => {
   return 0;
 };
 
+const getEarlyBirdDiscount = (checkIn, hotelRules) => {
+  const now = Date.now();
+  const daysTillCheckin = (checkIn.getTime() - now) / (1000 * 3600 * 24);
+  const window = hotelRules.earlyBirdWindowDays ?? bookingConfig.earlyBirdWindowDays;
+  if (daysTillCheckin >= window) {
+    return hotelRules.earlyBirdDiscount ?? bookingConfig.earlyBirdDiscount;
+  }
+  return 0;
+};
+
+const getRepeatGuestDiscount = async (userId, hotelRules) => {
+  if (!userId) return 0;
+  try {
+    const pastCount = await Booking.countDocuments({
+      user: userId,
+      status: { $in: [BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.CHECKED_IN, BOOKING_STATUS.CHECKED_OUT] },
+    });
+    if (pastCount > 0) {
+      return hotelRules.repeatGuestDiscount ?? bookingConfig.repeatGuestDiscount;
+    }
+  } catch {
+    // Silently fail — discount is a bonus, not a blocker
+  }
+  return 0;
+};
+
 // -----------------------------------------------------------------------
 // Pricing calculation (all rules applied)
 // -----------------------------------------------------------------------
 
-const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, guests, offerId }) => {
+const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, guests, offerId, userId }) => {
   const window = normalizeBookingWindow(checkInDate, checkOutDate);
   if (!window) throw Object.assign(new Error('Invalid booking dates'), { status: 400 });
 
   const { checkIn, nights } = window;
   const basePrice = Number(roomData.pricePerNight) || 0;
   let multiplier = 1;
+  let adjustments = [];
 
   const hotelId = roomData.hotel?._id || roomData.hotel;
   const hotelRules = await getHotelPricingRules(hotelId);
@@ -108,7 +135,10 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
   // 1) Weekend surcharge
   const weekendCharge = hotelRules.weekendSurcharge ?? bookingConfig.weekendSurcharge;
   const dayOfWeek = checkIn.getDay();
-  if (dayOfWeek === 5 || dayOfWeek === 6) multiplier += weekendCharge;
+  if (dayOfWeek === 5 || dayOfWeek === 6) {
+    multiplier += weekendCharge;
+    adjustments.push({ type: 'weekendSurcharge', label: 'Weekend Premium', value: weekendCharge });
+  }
 
   // 2) High-occupancy surcharge
   const [totalRooms, activeBookings] = await Promise.all([
@@ -125,24 +155,48 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
   const occSurcharge = hotelRules.highOccupancySurcharge ?? bookingConfig.highOccupancySurcharge;
   if (totalRooms > 0 && activeBookings / totalRooms > occThreshold) {
     multiplier += occSurcharge;
+    adjustments.push({ type: 'highOccupancy', label: 'High Demand', value: occSurcharge });
   }
 
   // 3) Seasonal multiplier
   const seasonalMult = getSeasonalMultiplier(checkIn, hotelRules);
-  multiplier *= seasonalMult;
+  if (seasonalMult !== 1) {
+    multiplier *= seasonalMult;
+    adjustments.push({ type: 'seasonal', label: 'Seasonal Rate', value: seasonalMult, isMultiplicative: true });
+  }
 
-  // 4) Last-minute discount (applied as negative multiplier)
+  // 4) Last-minute discount
   const lastMinuteDisc = getLastMinuteDiscount(checkIn, hotelRules);
-  multiplier -= lastMinuteDisc;
+  if (lastMinuteDisc > 0) {
+    multiplier -= lastMinuteDisc;
+    adjustments.push({ type: 'lastMinute', label: 'Last-Minute Savings', value: -lastMinuteDisc });
+  }
 
   // 5) Length-of-stay discount
   const losDisc = getLosDiscount(nights, hotelRules);
-  multiplier -= losDisc;
+  if (losDisc > 0) {
+    multiplier -= losDisc;
+    adjustments.push({ type: 'lengthOfStay', label: `Longer Stay Savings (${nights} nights)`, value: -losDisc });
+  }
+
+  // 6) Early-bird discount
+  const earlyBirdDisc = getEarlyBirdDiscount(checkIn, hotelRules);
+  if (earlyBirdDisc > 0) {
+    multiplier -= earlyBirdDisc;
+    adjustments.push({ type: 'earlyBird', label: 'Early Bird Savings', value: -earlyBirdDisc });
+  }
+
+  // 7) Repeat guest discount
+  const repeatDisc = await getRepeatGuestDiscount(userId, hotelRules);
+  if (repeatDisc > 0) {
+    multiplier -= repeatDisc;
+    adjustments.push({ type: 'repeatGuest', label: 'Returning Guest Reward', value: -repeatDisc });
+  }
 
   const finalMultiplier = Math.max(0.5, Number(multiplier.toFixed(2)));
   let dynamicPrice = Number((basePrice * finalMultiplier).toFixed(2));
 
-  // 6) Offer discount
+  // 8) Offer discount
   let offerDiscountPercent = 0;
   if (offerId) {
     const offer = await Offer.findOne({
@@ -155,10 +209,13 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
     if (offer) {
       offerDiscountPercent = offer.discountPercent;
       dynamicPrice = Number((dynamicPrice * (1 - offerDiscountPercent / 100)).toFixed(2));
+      adjustments.push({ type: 'offer', label: `Offer (${offerDiscountPercent}% off)`, value: -(offerDiscountPercent / 100) });
     }
   }
 
   const totalPrice = Number((dynamicPrice * nights).toFixed(2));
+  const baseTotal = Number((basePrice * nights).toFixed(2));
+  const totalSavings = Number(((baseTotal - totalPrice) / baseTotal * 100).toFixed(1));
 
   return {
     guests: Math.max(1, Number(guests) || 1),
@@ -167,6 +224,9 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
     dynamicPricePerNight: dynamicPrice,
     priceMultiplier: finalMultiplier,
     totalPrice,
+    baseTotal,
+    totalSavingsPercent: totalSavings,
+    adjustments,
     offerDiscountPercent,
     originalPricePerNight: offerDiscountPercent > 0
       ? Number((basePrice * finalMultiplier).toFixed(2))
@@ -206,7 +266,7 @@ const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, 
     const roomData = await Room.findById(roomId).populate('hotel').session(session);
     if (!roomData) throw Object.assign(new Error('Room not found'), { status: 404 });
 
-    const pricing = await calculateBookingPricing({ roomData, checkInDate, checkOutDate, guests, offerId });
+    const pricing = await calculateBookingPricing({ roomData, checkInDate, checkOutDate, guests, offerId, userId });
 
     const hotelRules = await getHotelPricingRules(roomData.hotel?._id);
     const effectiveHoldMinutes = holdMinutes || hotelRules.holdMinutes || bookingConfig.holdMinutes;

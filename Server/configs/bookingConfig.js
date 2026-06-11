@@ -50,6 +50,17 @@ const bookingConfig = {
   get lockMaxRetries() {
     return parseInt(process.env.BOOKING_LOCK_MAX_RETRIES) || 15
   },
+
+  // ── Smart Guest Discounts ──────────────────────────────────────────
+  get earlyBirdWindowDays() {
+    return parseInt(process.env.BOOKING_EARLY_BIRD_DAYS) || 30
+  },
+  get earlyBirdDiscount() {
+    return parseFloat(process.env.BOOKING_EARLY_BIRD_DISCOUNT) || 0.10
+  },
+  get repeatGuestDiscount() {
+    return parseFloat(process.env.BOOKING_REPEAT_GUEST_DISCOUNT) || 0.05
+  },
 }
 
 const defaultSeasonalRules = [

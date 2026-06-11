@@ -58,12 +58,18 @@ export const calculatePrice = async (req, res, next) => {
     if (!roomData) {
       return res.json({ success: false, message: BOOKING_ERRORS.ROOM_NOT_FOUND });
     }
+
+    // Detect logged-in user (route is public, but Clerk auth is available)
+    const auth = typeof req.auth === "function" ? req.auth() : req.auth;
+    const userId = auth?.userId || undefined;
+
     const pricing = await bookingService.calculateBookingPricing({
       roomData,
       checkInDate,
       checkOutDate,
       guests: guests || 1,
       offerId: offerId || undefined,
+      userId,
     });
     res.json({ success: true, pricing });
   } catch (error) {
@@ -200,6 +206,7 @@ export const modifyBooking = async (req, res) => {
       checkInDate: nextCheckInDate,
       checkOutDate: nextCheckOutDate,
       guests: nextGuests,
+      userId: user,
     });
 
     if (!pricing) {
