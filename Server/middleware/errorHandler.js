@@ -1,5 +1,6 @@
 import logger from '../utils/logger.js'
 
+// Global error handler — logs via Winston and returns sanitized JSON to the client.
 const errorHandler = (err, req, res, next) => {
   logger.error('Unhandled error: %o', err)
   const status = err.status || 500

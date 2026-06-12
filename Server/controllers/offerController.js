@@ -3,7 +3,7 @@ import Offer from "../models/Offer.js";
 import Room from "../models/Room.js";
 import Hotel from "../models/Hotel.js";
 
-// Offer CRUD operations for hotel owners and guests.
+// Offer CRUD — owners manage offers for their rooms; public lists active offers.
 const getAuthUserId = (req) => {
   const auth = typeof req.auth === "function" ? req.auth() : req.auth;
   return auth?.userId;
@@ -54,7 +54,7 @@ export const createOffer = async (req, res) => {
 
 export const getOffers = async (_req, res) => {
   try {
-    // Return currently active public offers.
+    // Return active, non-expired offers for the public homepage.
     const now = new Date();
     const offers = await Offer.find({
       isActive: true,
@@ -72,7 +72,7 @@ export const getOffers = async (_req, res) => {
 
 export const getOwnerOffers = async (req, res) => {
   try {
-    // Return only offers that belong to the current owner.
+    // Return offers scoped to hotels owned by the current user.
     const ownerId = getAuthUserId(req);
     const hotels = await Hotel.find({ owner: ownerId });
     const hotelIds = hotels.map((h) => h._id.toString());
@@ -137,7 +137,7 @@ export const updateOffer = async (req, res) => {
 
 export const deleteOffer = async (req, res) => {
   try {
-    // Remove an owner offer.
+    // Remove an offer owned by the current user.
     const ownerId = getAuthUserId(req);
     const { id } = req.params;
 

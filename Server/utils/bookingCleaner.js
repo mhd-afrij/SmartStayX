@@ -2,6 +2,8 @@ import Booking from '../models/Booking.js'
 import logger from './logger.js'
 import bookingConfig from '../configs/bookingConfig.js'
 
+// Periodic background job that expires pending bookings past their hold window.
+
 let intervalId = null
 
 export const startBookingCleaner = (options = {}) => {

@@ -1,5 +1,6 @@
 import { config } from '../config/ConfigManager'
 
+// Client-side pricing config mirror — reads from ConfigManager for frontend display.
 export const PRICING_CONFIG = {
   get weekendSurcharge() {
     return parseFloat(config.get('pricing.weekendSurcharge')) || 0.15

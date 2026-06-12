@@ -1,6 +1,7 @@
 import Hotel from "../models/Hotel.js";
 import SupportConversation from "../models/SupportConversation.js";
 
+// Support conversation handler — guest/agent messaging with access control.
 const canAccessConversation = async (conversation, userId) => {
   if (!conversation || !userId) return false;
   if (String(conversation.guest) === String(userId)) return true;

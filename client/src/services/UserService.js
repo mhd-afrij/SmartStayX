@@ -1,5 +1,6 @@
 import ApiService from "./ApiService";
 
+// User API service — extends ApiService for profile, recent searches, and preferences.
 class UserService extends ApiService {
   constructor() {
     super("user");

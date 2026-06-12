@@ -70,7 +70,7 @@ const CalendarView = ({ bookings = [] }) => {
           {dayBookings.slice(0, 3).map((b) => (
             <div
               key={b._id}
-              title={`${b.user?.username || "Guest"} - ${b.status}`}
+              title={`${b.guestDisplayName || b.user?.name || b.user?.username || "Guest"} - ${b.status}`}
               className={`h-1.5 rounded-full ${statusColor[b.status] || "bg-white/20"}`}
             />
           ))}

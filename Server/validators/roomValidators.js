@@ -3,6 +3,11 @@ import { z } from 'zod';
 export const getRoomsQuery = z.object({
   page: z.preprocess((v) => (v === undefined ? undefined : Number(v)), z.number().int().positive().optional()),
   limit: z.preprocess((v) => (v === undefined ? undefined : Number(v)), z.number().int().positive().optional()),
+  roomType: z.string().optional(),
+  minPrice: z.preprocess((v) => (v === undefined || v === '' ? undefined : Number(v)), z.number().nonnegative().optional()),
+  maxPrice: z.preprocess((v) => (v === undefined || v === '' ? undefined : Number(v)), z.number().nonnegative().optional()),
+  destination: z.string().optional(),
+  minRating: z.preprocess((v) => (v === undefined || v === '' ? undefined : Number(v)), z.number().min(0).max(5).optional()),
 });
 
 export const createRoomBody = z.object({

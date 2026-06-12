@@ -4,7 +4,7 @@ import SupportConversation from "../models/SupportConversation.js";
 import { OPENAI_BASE_URL } from "../configs/runtimeDefaults.js";
 import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 
-// Chat intent detection and response generation.
+// Chat intent detection and response generation — rule-based + LLM fallback.
 const detectIntent = (message = "") => {
   const text = message.toLowerCase();
   if (/\b(booking|reservation)\b[\s\S]{0,50}\b(status|confirm)\b|\bstatus\b[\s\S]{0,50}\b(booking|reservation)\b/.test(text)) return "booking_status";
@@ -16,7 +16,7 @@ const detectIntent = (message = "") => {
 };
 
 const callLlmFallback = async ({ userMessage, contextText }) => {
-  // Use an LLM fallback only for general questions.
+  // LLM fallback for general intents — queries OpenAI-compatible API.
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return null;
 
@@ -36,7 +36,7 @@ const callLlmFallback = async ({ userMessage, contextText }) => {
         messages: [
           {
             role: "system",
-            content: "You are SmartStayX assistant. Keep responses short, practical, and booking-focused. Never invent booking IDs.",
+            content: "You are SmartStayX assistant — a full-stack hotel booking platform. Tech: React 19, Vite, Tailwind, Framer Motion (frontend); Node.js, Express, MongoDB/Mongoose, Redis/ioredis (backend); Clerk (auth), Stripe (payments), Cloudinary (media), OpenAI (AI), Google Places API. Features: hotel/room browsing & filtering, dynamic pricing (seasonal, weekend, length-of-stay, early-bird, last-minute, repeat-guest discounts), AI trip planner, recommendations, multi-currency (USD/EUR/GBP/AED/SGD/LKR), multi-language support, hotel owner dashboard, distributed booking locks. Keep responses short, practical, and booking-focused. Never invent booking IDs.",
           },
           { role: "system", content: `Context: ${contextText}` },
           { role: "user", content: userMessage },
@@ -53,7 +53,7 @@ const callLlmFallback = async ({ userMessage, contextText }) => {
 };
 
 const buildContext = async (userId) => {
-  // Gather recent and upcoming booking context for the user.
+  // Gather upcoming and recent bookings to provide context-aware replies.
   const upcoming = await Booking.find({
     user: userId,
     status: { $in: [BOOKING_STATUS.PENDING, BOOKING_STATUS.CONFIRMED] },
@@ -72,7 +72,7 @@ const buildContext = async (userId) => {
 };
 
 const getRuleReply = ({ intent, context }) => {
-  // Return a deterministic reply for booking-related intents.
+  // Deterministic replies for booking intents — no LLM needed here.
   const nextBooking = context.upcoming[0];
 
   if (intent === "booking_status") {
@@ -103,7 +103,7 @@ const getRuleReply = ({ intent, context }) => {
 
 export const sendChatMessage = async (req, res) => {
   try {
-    // Process a user message, save the exchange, and return the reply.
+    // Process user message: detect intent, build context, generate reply, persist.
     const userId = req.user?._id;
     const { message, conversationId } = req.body;
 
@@ -161,7 +161,7 @@ export const sendChatMessage = async (req, res) => {
 
 export const getChatHistory = async (req, res) => {
   try {
-    // Return the latest saved chat logs for the current user.
+    // Return the 30 most-recent chat logs for the current user.
     const logs = await ChatLog.find({ user: req.user._id })
       .sort({ createdAt: -1 })
       .limit(30)

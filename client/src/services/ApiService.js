@@ -3,6 +3,7 @@ import { toast } from "react-hot-toast";
 import { config } from "../config/ConfigManager";
 import API_ENDPOINTS, { getEndpoint } from "../config/endpoints";
 
+// Generic API client — wraps axios with retry logic, auth headers, and error toast handling.
 class ApiService {
   #baseUrl;
   #endpoint;

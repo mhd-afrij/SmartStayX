@@ -1,5 +1,6 @@
 import ApiService from "./ApiService";
 
+// Offer API service — extends ApiService for offer CRUD with active-offer filtering.
 class OfferService extends ApiService {
   constructor() {
     super("offers");

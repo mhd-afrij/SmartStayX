@@ -8,6 +8,7 @@ import { clerkMiddleware } from '@clerk/express'
 
 import connectDB from './configs/db.js'
 import connectCloudinary from './configs/cloudinary.js'
+import { initRedis } from './utils/redisClient.js'
 import errorHandler from './middleware/errorHandler.js'
 import clerkWebhooks from './controllers/clerkWebhooks.js'
 import { stripeWebhook } from './controllers/bookingController.js'
@@ -144,6 +145,7 @@ const startServer = async () => {
     connectCloudinary()
     const cleanupInterval = Number(process.env.BOOKING_HOLD_CLEANUP_INTERVAL_MINUTES) || 1
     startBookingCleaner({ intervalMinutes: cleanupInterval })
+    await initRedis()
     roomService.warmCache()
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`)

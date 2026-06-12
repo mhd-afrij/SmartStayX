@@ -3,6 +3,7 @@ import Review from "../models/Review.js";
 import Hotel from "../models/Hotel.js";
 import { DEFAULT_TESTIMONIALS } from "../configs/runtimeDefaults.js";
 
+// Testimonial management — combines manual testimonials with positive reviews for display.
 const ensureOwner = async (req, res) => {
   if (req.user?.role === "hotelOwner") return true;
 

@@ -14,7 +14,7 @@ import bookingConfig from "../configs/bookingConfig.js";
 import { notifyNewBooking, notifyPaymentReceived, notifyCancellation, notifyRefundRequest } from "../utils/notificationHelper.js";
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Helpers — Clerk display name resolver
 // ---------------------------------------------------------------------------
 
 const fetchClerkDisplayName = async (userId) => {
@@ -36,7 +36,7 @@ const fetchClerkDisplayName = async (userId) => {
 };
 
 // ---------------------------------------------------------------------------
-// Public booking actions
+// Public booking actions — availability, pricing, creation
 // ---------------------------------------------------------------------------
 
 export const checkAvailabilityAPI = async (req, res, next) => {
@@ -82,7 +82,8 @@ export const createBooking = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const { room, checkInDate, checkOutDate, guests, offerId } = req.body;
-    const result = await bookingService.createBooking({ userId, room, checkInDate, checkOutDate, guests, offerId });
+    const guestDisplayName = req.user?.name || 'Guest';
+    const result = await bookingService.createBooking({ userId, room, checkInDate, checkOutDate, guests, offerId, guestDisplayName });
     notifyNewBooking(result.booking);
     res.json({
       success: true,
@@ -98,7 +99,7 @@ export const createBooking = async (req, res, next) => {
 };
 
 // ---------------------------------------------------------------------------
-// User booking management
+// User booking management — cancel, refund, modify
 // ---------------------------------------------------------------------------
 
 export const getUserBookings = async (req, res) => {
@@ -312,7 +313,7 @@ export const modifyBooking = async (req, res) => {
 };
 
 // ---------------------------------------------------------------------------
-// Payment actions
+// Payment actions — manual pay, payment method selection
 // ---------------------------------------------------------------------------
 
 export const payBooking = async (req, res) => {
@@ -364,7 +365,7 @@ export const setPaymentMethod = async (req, res) => {
 };
 
 // ---------------------------------------------------------------------------
-// Stripe
+// Stripe — checkout session, session confirmation, webhooks
 // ---------------------------------------------------------------------------
 
 export const createCheckoutSession = async (req, res, next) => {
@@ -495,7 +496,7 @@ export const stripeWebhook = async (req, res, next) => {
 };
 
 // ---------------------------------------------------------------------------
-// Owner Booking Management
+// Owner Booking Management — delete, update payment/status
 // ---------------------------------------------------------------------------
 
 export const deleteOwnerBooking = async (req, res) => {
@@ -600,7 +601,7 @@ export const updateOwnerBookingStatus = async (req, res) => {
 };
 
 // ---------------------------------------------------------------------------
-// Owner Dashboard
+// Owner Dashboard — aggregated metrics, booking list, trends, ratings
 // ---------------------------------------------------------------------------
 
 export const getHotelBookings = async (req, res) => {
@@ -659,7 +660,8 @@ export const getHotelBookings = async (req, res) => {
     const weekAgo = new Date(now.getTime() - trendDays * 24 * 60 * 60 * 1000);
     const monthAgo = new Date(now.getTime() - revenueDays * 24 * 60 * 60 * 1000);
 
-    // Aggregation: compute metrics in one pass
+    // Single-pass MongoDB aggregation: total bookings, revenue, active stays,
+    // revenue by period, upcoming/cancelled/last-minute counts.
     const [aggResult] = await Booking.aggregate([
       { $match: hotelMatch },
       {
@@ -751,7 +753,7 @@ export const getHotelBookings = async (req, res) => {
       .populate("room hotel user")
       .sort({ createdAt: -1 });
 
-    // Occupancy: unique rooms currently occupied (checked-in or confirmed with active dates)
+    // Calculate occupancy — count unique room IDs that have active bookings spanning today.
     const occupiedRoomIds = new Set(
       rawBookings
         .filter(
@@ -766,7 +768,8 @@ export const getHotelBookings = async (req, res) => {
     const occupiedRooms = occupiedRoomIds.size;
     const occupancyPercent = totalRooms ? Math.round((occupiedRooms / totalRooms) * 100) : 0;
 
-    // Resolve guest display name with Clerk fallback
+    // Resolve guest display name — checks local DB first, falls back to Clerk API,
+    // and backfills the local user record if a name is found remotely.
     const resolveGuestName = (booking) => {
       if (!booking?.user) return "Guest";
 

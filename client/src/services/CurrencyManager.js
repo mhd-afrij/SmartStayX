@@ -1,5 +1,6 @@
 import { config } from "../config";
 
+// Currency conversion and formatting — supports AED, SGD, USD, GBP, LKR with Intl formatting.
 class CurrencyManager {
   static CURRENCY_OPTIONS = [
     { code: "AED", symbol: "AED", label: "Dirham (AED)", rate: 3.67 },

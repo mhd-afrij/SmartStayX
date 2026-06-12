@@ -1,5 +1,6 @@
 import { config } from "../config";
 
+// Translation service — static dictionary for 6 languages (ar, en, ms, zh, ta, si).
 class TranslationService {
   static LANGUAGE_OPTIONS = [
     { code: "ar", label: "Arabic" },

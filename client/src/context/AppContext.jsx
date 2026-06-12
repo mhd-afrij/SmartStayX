@@ -3,7 +3,9 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import { toast } from "react-hot-toast";
-import React from "react";  
+import React from "react";
+
+// Global app state: auth, language/currency preferences, room/offer data, owner dashboard.
 
 const CURRENCY_OPTIONS = [
   { code: "USD", symbol: "$", label: "US Dollar (USD)", rate: 1 },
@@ -502,10 +504,10 @@ const normalizeCurrencyCode = (value) => {
 // Setting default base URL for axios
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL || "";
 
-// Creating AppContext
+// React context and provider for global app state.
 export const AppContext = createContext();
 
-// AppProvider component
+// AppProvider — wraps children with global state: auth, currency, language, rooms, offers, dashboard.
 export const AppProvider = ({ children }) => {
   const envCurrency = normalizeCurrencyCode(import.meta.env.VITE_CURRENCY || "USD");
   const navigate = useNavigate();
@@ -546,11 +548,13 @@ export const AppProvider = ({ children }) => {
     CURRENCY_OPTIONS.find((item) => item.code === selectedCurrency) || CURRENCY_OPTIONS[0];
   const currency = currencyConfig.symbol;
 
+  // Convert USD base price to the selected currency using static exchange rates.
   const convertPrice = (amount) => {
     const base = Number(amount || 0);
     return Number((base * currencyConfig.rate).toFixed(2));
   };
 
+  // Format price with locale-aware currency formatting via Intl.NumberFormat.
   const formatPrice = (amount, options = {}) => {
     const locale = selectedLanguage === "en" ? "en-US" : `${selectedLanguage}-${selectedLanguage.toUpperCase()}`;
     const converted = convertPrice(amount);
@@ -562,12 +566,13 @@ export const AppProvider = ({ children }) => {
     }).format(converted);
   };
 
+  // Look up a translation key in the current language, fallback to English.
   const translate = (key) => TRANSLATIONS[selectedLanguage]?.[key] || TRANSLATIONS.en[key] || key;
 
-  // Fetch rooms data
+  // Fetch all available rooms for the homepage and rooms page.
   const fetchRooms = async () => {
     try {
-      const { data } = await axios.get("/api/rooms");
+      const { data } = await axios.get("/api/rooms", { params: { limit: 100 } });
       if (data.success) {
         setRooms(data.rooms);
       } else {
@@ -591,7 +596,7 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Fetch user data
+  // Fetch user data and resolve owner role (with retry logic).
   const fetchUser = async (retryCount = 0) => {
     try {
       const { data } = await axios.get("/api/user", {
@@ -693,7 +698,7 @@ export const AppProvider = ({ children }) => {
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
-// Custom hook to use AppContext
+// Custom hook — ensures AppContext is used inside AppProvider.
 export const useAppContext = () => {
   const context = useContext(AppContext);
   if (!context) {

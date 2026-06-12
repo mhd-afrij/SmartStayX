@@ -5,6 +5,8 @@ import logger from '../utils/logger.js';
 import getRedis from '../utils/redisClient.js';
 import { BOOKING_STATUS } from '../constants/bookingStatuses.js';
 
+// Room listing, owner room retrieval, availability toggle, trending aggregation.
+// All public endpoints are cached in Redis (TTL: 60s for listings, 5min for trending).
 const CACHE_TTL = 60;
 const TRENDING_CACHE_KEY = 'rooms:trending';
 const TRENDING_CACHE_TTL = 300; // 5 min
@@ -104,7 +106,7 @@ const toggleAvailability = async ({ roomId, userId }) => {
   return room;
 };
 
-// ── Trending rooms (most booked in last 30 days) ──
+// ── Trending rooms — aggregate booking count in the last 30 days, sorted desc ──
 const getTrendingRooms = async ({ limit = 10 } = {}) => {
   const redis = getRedis();
   if (redis) {
@@ -171,7 +173,7 @@ const getTrendingRooms = async ({ limit = 10 } = {}) => {
   return trending;
 };
 
-// ── Cache warming: pre-populate first page on startup ──
+// ── Cache warming — pre-populate first page and trending on server start ──
 const warmCache = async () => {
   const redis = getRedis();
   if (!redis) return;

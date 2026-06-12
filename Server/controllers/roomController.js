@@ -3,7 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 import Room from "../models/Room.js";
 import roomService from "../services/roomService.js";
 
-// Room creation, listing, and owner operations.
+// Room CRUD, listing, trending — both public and owner-scoped.
 const getAuthUserId = (req) => {
   const auth = typeof req.auth === "function" ? req.auth() : req.auth;
   return auth?.userId;
@@ -15,7 +15,7 @@ const isRoomOwnedByUser = async (room, userId) => {
   return ownerHotelIds.includes(room.hotel._id.toString());
 };
 
-// Create a room for an owned hotel.
+// Create a room for an owned hotel with Cloudinary image upload.
 export const createRoom = async (req, res) => {
   try {
     const { roomType, pricePerNight, amenities, hotelId } = req.body;
@@ -56,11 +56,20 @@ export const createRoom = async (req, res) => {
   }
 };
 
-// Public room listing endpoint.
+// Public room listing with pagination (delegates to roomService with caching).
 export const getRooms = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, roomType, minPrice, maxPrice, destination, minRating } = req.query;
     const filter = {};
+    if (roomType) filter.roomType = roomType;
+    if (minPrice || maxPrice) {
+      filter.pricePerNight = {};
+      if (minPrice) filter.pricePerNight.$gte = Number(minPrice);
+      if (maxPrice) filter.pricePerNight.$lte = Number(maxPrice);
+    }
+    if (destination) {
+      filter.hotelCity = { $regex: destination.trim(), $options: 'i' };
+    }
     const data = await roomService.getRooms({ page, limit, filter });
     res.json({ success: true, ...data });
   } catch (error) {
@@ -68,7 +77,7 @@ export const getRooms = async (req, res, next) => {
   }
 };
 
-// Rooms managed by the current owner.
+// Rooms managed by the current owner for dashboard display.
 export const getOwnerRooms = async (req, res) => {
   try {
     const userId = getAuthUserId(req);
@@ -81,7 +90,7 @@ export const getOwnerRooms = async (req, res) => {
   }
 };
 
-// Toggle availability for a room.
+// Toggle room availability (owner only, invalidates Redis cache).
 export const toggleRoomAvailability = async (req, res) => {
   try {
     const { roomId } = req.body;

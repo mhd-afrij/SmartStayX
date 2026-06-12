@@ -138,7 +138,7 @@ const AllRooms = () => {
 
   const matchRoomType = (room) => {
     if (selectedFilters.roomType.length === 0) return true;
-    return selectedFilters.roomType.includes(room.type);
+    return selectedFilters.roomType.includes(room.roomType);
   };
 
   const matchesPriceRange = (room) => {
@@ -162,7 +162,8 @@ const AllRooms = () => {
   const filterDestination = (room) => {
     const destination = searchParams.get("destination");
     if (!destination) return true;
-    return room.hotel?.city?.toLowerCase().includes(destination.toLowerCase());
+    const city = (room.hotelCity || room.hotel?.city || '').toLowerCase();
+    return city.includes(destination.toLowerCase());
   };
 
   const handleSortChange = (sortOption) => setSelectedSort(sortOption);

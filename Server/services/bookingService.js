@@ -8,7 +8,7 @@ import bookingConfig from '../configs/bookingConfig.js';
 import { acquireLock, releaseLock, extendLock } from '../utils/redisClient.js';
 
 // -----------------------------------------------------------------------
-// Helpers
+// Helpers — date normalization, availability check, pricing rules
 // -----------------------------------------------------------------------
 
 const normalizeBookingWindow = (checkInDate, checkOutDate) => {
@@ -117,7 +117,9 @@ const getRepeatGuestDiscount = async (userId, hotelRules) => {
 };
 
 // -----------------------------------------------------------------------
-// Pricing calculation (all rules applied)
+// Pricing calculation — applies all dynamic pricing rules:
+// weekend surcharge, high-occupancy, seasonal, last-minute,
+// length-of-stay, early-bird, repeat-guest, and offer discounts.
 // -----------------------------------------------------------------------
 
 const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, guests, offerId, userId }) => {
@@ -135,7 +137,7 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
   }
   const hotelRules = await getHotelPricingRules(hotelId);
 
-  // 1) Weekend surcharge
+  // 1) Weekend surcharge — Fri/Sat check-in adds a premium
   const weekendCharge = hotelRules.weekendSurcharge ?? bookingConfig.weekendSurcharge;
   const dayOfWeek = checkIn.getDay();
   if (dayOfWeek === 5 || dayOfWeek === 6) {
@@ -143,7 +145,7 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
     adjustments.push({ type: 'weekendSurcharge', label: 'Weekend Premium', value: weekendCharge });
   }
 
-  // 2) High-occupancy surcharge
+  // 2) High-occupancy surcharge — applies when rooms are mostly booked
   const [totalRooms, activeBookings] = await Promise.all([
     Room.countDocuments({ hotel: hotelId }),
     Booking.countDocuments({
@@ -161,35 +163,35 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
     adjustments.push({ type: 'highOccupancy', label: 'High Demand', value: occSurcharge });
   }
 
-  // 3) Seasonal multiplier
+  // 3) Seasonal multiplier — peak seasons (holidays, summer) boost rate
   const seasonalMult = getSeasonalMultiplier(checkIn, hotelRules);
   if (seasonalMult !== 1) {
     multiplier *= seasonalMult;
     adjustments.push({ type: 'seasonal', label: 'Seasonal Rate', value: seasonalMult, isMultiplicative: true });
   }
 
-  // 4) Last-minute discount
+  // 4) Last-minute discount — incentive for bookings within the window
   const lastMinuteDisc = getLastMinuteDiscount(checkIn, hotelRules);
   if (lastMinuteDisc > 0) {
     multiplier -= lastMinuteDisc;
     adjustments.push({ type: 'lastMinute', label: 'Last-Minute Savings', value: -lastMinuteDisc });
   }
 
-  // 5) Length-of-stay discount
+  // 5) Length-of-stay discount — weekly/monthly tiers
   const losDisc = getLosDiscount(nights, hotelRules);
   if (losDisc > 0) {
     multiplier -= losDisc;
     adjustments.push({ type: 'lengthOfStay', label: `Longer Stay Savings (${nights} nights)`, value: -losDisc });
   }
 
-  // 6) Early-bird discount
+  // 6) Early-bird discount — booking far in advance
   const earlyBirdDisc = getEarlyBirdDiscount(checkIn, hotelRules);
   if (earlyBirdDisc > 0) {
     multiplier -= earlyBirdDisc;
     adjustments.push({ type: 'earlyBird', label: 'Early Bird Savings', value: -earlyBirdDisc });
   }
 
-  // 7) Repeat guest discount
+  // 7) Repeat guest discount — loyalty incentive for returning customers
   const repeatDisc = await getRepeatGuestDiscount(userId, hotelRules);
   if (repeatDisc > 0) {
     multiplier -= repeatDisc;
@@ -199,7 +201,7 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
   const finalMultiplier = Math.max(0.5, Number(multiplier.toFixed(2)));
   let dynamicPrice = Number((basePrice * finalMultiplier).toFixed(2));
 
-  // 8) Offer discount
+  // 8) Offer discount — promotional percentage off after all dynamic adjustments
   let offerDiscountPercent = 0;
   if (offerId && mongoose.Types.ObjectId.isValid(offerId)) {
     const offer = await Offer.findOne({
@@ -238,10 +240,10 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
 };
 
 // -----------------------------------------------------------------------
-// Booking creation with distributed lock
+// Booking creation with distributed lock (Redis) and MongoDB transaction
 // -----------------------------------------------------------------------
 
-const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, holdMinutes, offerId }) => {
+const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, holdMinutes, offerId, guestDisplayName }) => {
   if (typeof room !== 'string' || !mongoose.Types.ObjectId.isValid(room)) {
     throw Object.assign(new Error('Invalid room id'), { status: 400 });
   }
@@ -291,7 +293,7 @@ const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, 
       basePricePerNight: pricing.basePricePerNight,
       dynamicPricePerNight: pricing.dynamicPricePerNight,
       priceMultiplier: pricing.priceMultiplier,
-      guestDisplayName: 'Guest',
+      guestDisplayName: guestDisplayName || 'Guest',
       guestEmail: '',
       totalPrice: pricing.totalPrice,
       holdExpiresAt,
@@ -304,7 +306,7 @@ const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, 
 
     await session.commitTransaction();
 
-    // Extend lock so it covers the full hold duration
+    // Extend lock so it covers the full hold duration while payment is pending
     if (lock) await extendLock(lock.lockKey, lock.lockValue, holdMs);
 
     return { booking, pricing, idempotencyKey, holdExpiresAt };

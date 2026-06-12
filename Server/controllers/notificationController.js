@@ -1,6 +1,7 @@
 import Notification from "../models/Notification.js";
 import Hotel from "../models/Hotel.js";
 
+// Notification listing, mark-as-read, and mark-all-as-read for hotel owners.
 export const getNotifications = async (req, res) => {
   try {
     const auth = typeof req.auth === "function" ? req.auth() : req.auth;

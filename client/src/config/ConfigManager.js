@@ -1,3 +1,4 @@
+// Singleton config manager — loads env-derived defaults for API, features, UI, pricing, and business settings.
 class ConfigManager {
   static #instance = null;
   #config = {};

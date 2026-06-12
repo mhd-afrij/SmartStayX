@@ -1,4 +1,4 @@
-// Guest profile and preference management.
+// Guest profile retrieval, recent-search storage, and preference management.
 export const getUserData = async (req, res) => {
   try {
     const role = req.user.role;

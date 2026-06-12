@@ -1,5 +1,6 @@
 import Notification from "../models/Notification.js";
 
+// Notification factory — creates in-app notifications for owners on key booking events.
 export const createNotification = async ({ hotel, type, title, message, booking, room }) => {
   try {
     await Notification.create({ hotel, type, title, message, booking, room });

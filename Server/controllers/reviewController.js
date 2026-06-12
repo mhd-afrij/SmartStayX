@@ -4,6 +4,7 @@ import Room from "../models/Room.js";
 import Hotel from "../models/Hotel.js";
 import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 
+// Review CRUD, owner moderation, and satisfaction breakdown aggregation.
 const allowedSatisfaction = new Set([
   "very_satisfied",
   "satisfied",

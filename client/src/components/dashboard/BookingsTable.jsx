@@ -38,7 +38,7 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency, on
       const q = search.toLowerCase();
       list = list.filter(
         (b) =>
-          (b.user?.name || b.user?.username || "").toLowerCase().includes(q) ||
+          (b.guestDisplayName || b.user?.name || b.user?.username || "").toLowerCase().includes(q) ||
           (b.room?.roomType || "").toLowerCase().includes(q) ||
           (b.status || "").toLowerCase().includes(q)
       );
@@ -126,7 +126,7 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency, on
               {paginated.map((item) => {
                 const st = statusConfig[item.status] || statusConfig.pending;
                 const pm = item.isPaid ? paymentConfig.paid : paymentConfig.pending;
-                const guestName = item.user?.name || item.user?.username || "Guest";
+                const guestName = item.guestDisplayName || item.user?.name || item.user?.username || "Guest";
                 const initial = guestName.charAt(0).toUpperCase();
                 return (
                   <tr

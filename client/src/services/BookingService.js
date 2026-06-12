@@ -3,6 +3,7 @@ import { toast } from "react-hot-toast";
 import API_ENDPOINTS from "../config/endpoints";
 import { config } from "../config/ConfigManager";
 
+// Booking API service — user and owner booking CRUD, Stripe checkout, refunds.
 class BookingService {
   get #baseUrl() {
     return config.get("api.baseUrl") || "";

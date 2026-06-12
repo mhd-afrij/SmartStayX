@@ -1,6 +1,7 @@
 import TripItinerary from "../models/TripItinerary.js";
 import getRedis from "../utils/redisClient.js";
 
+// Google Places API integration: attractions, restaurants, routes, and trip itineraries.
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const CACHE_TTL = 300;
 

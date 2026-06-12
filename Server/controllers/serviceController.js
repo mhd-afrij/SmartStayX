@@ -5,6 +5,7 @@ import Booking from "../models/Booking.js";
 import Hotel from "../models/Hotel.js";
 import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 
+// Service request management: guest requests, staff assignment, owner oversight.
 const ROLE_MAP = {
   Housekeeping: "Housekeeping",
   Maintenance: "Maintenance",

@@ -3,6 +3,8 @@ import Room from "../models/Room.js";
 import Review from "../models/Review.js";
 import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 
+// Hybrid recommendation engine — collaborative filtering + content-based scoring for logged-in users.
+
 const toSet = (arr = []) => new Set(arr.filter(Boolean).map((v) => String(v).toLowerCase()));
 
 export const getUserRecommendations = async (req, res) => {
@@ -66,6 +68,8 @@ export const getUserRecommendations = async (req, res) => {
     const ratingMap = {};
     ratingAgg.forEach((r) => { ratingMap[r._id.toString()] = r; });
 
+    // Score each room using a hybrid approach: content-based (city, amenities, price)
+    // + collaborative filtering (users-also-booked) + review rating boost.
     const scored = rooms.map((room) => {
       let score = 0;
       const city = String(room.hotel?.city || "").toLowerCase();

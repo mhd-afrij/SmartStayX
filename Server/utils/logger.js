@@ -1,5 +1,6 @@
 import { createLogger, transports, format } from 'winston'
 
+// Winston logger with JSON format, timestamps, and console transport.
 const logger = createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: format.combine(

@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import { Webhook } from "svix";
 import { PLACEHOLDER_IMAGE_URL } from "../configs/runtimeDefaults.js";
 
+// Clerk webhook handler — syncs user.created / user.updated / user.deleted to local DB.
 const clerkWebhooks = async (req, res) => {
   try {
     const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;

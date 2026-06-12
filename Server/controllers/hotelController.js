@@ -7,11 +7,11 @@ import ServiceRequest from "../models/ServiceRequest.js";
 import Staff from "../models/Staff.js";
 import { v2 as cloudinary } from "cloudinary";
 
-// Hotel management and owner operations.
+// Hotel CRUD, search, and owner operations — includes cascading delete.
 const escapeRegex = (value = "") =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-// Register a new hotel for the current owner.
+// Register a new hotel and promote user to hotelOwner role.
 export const registerHotel = async (req, res) => {
   try {
     const { name, address, contact, city, description } = req.body;
@@ -73,7 +73,7 @@ export const getAllHotels = async (_req, res) => {
   }
 };
 
-// Update hotel details for the current owner.
+// Update hotel details with optional Cloudinary image upload.
 export const updateOwnerHotel = async (req, res) => {
   try {
     const ownerId = String(req.user?._id || "");

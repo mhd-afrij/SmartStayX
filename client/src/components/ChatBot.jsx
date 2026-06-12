@@ -34,6 +34,12 @@ const ChatBot = () => {
     contact: "For support, please visit our contact page or email us at support@smartstayX.com",
     experience: "Check out our 'Experience' page to discover amazing activities and adventures at your destination!",
     account: "You can manage your account settings, view bookings, and update your profile from your user dashboard.",
+
+    about: "SmartStayX is a full-stack hotel booking and property management platform. It allows users to discover, compare, and book hotels, while hotel owners can list and manage their properties. The platform features an AI-powered trip planner, dynamic pricing, multi-currency/multi-language support, and a recommendation engine.",
+    tech: "Tech stack: • Frontend: React 19 + Vite, Tailwind CSS, Framer Motion • Backend: Node.js + Express • Database: MongoDB (Mongoose) • Cache: Redis (ioredis) • Auth: Clerk • Payments: Stripe • Media: Cloudinary • AI: OpenAI API • Maps: Google Places API • Validation: Zod",
+    features: "Key features: • Hotel & room browsing with filters • Secure booking with Stripe payments • Dynamic pricing (seasonal, weekend, length-of-stay, early-bird, last-minute, repeat-guest discounts) • AI trip planner & recommendations • Multi-currency (USD, EUR, GBP, AED, SGD, LKR) & multi-language (English, Arabic, Chinese, Tamil, Sinhala, etc.) support • Hotel owner dashboard • Distributed booking locks via Redis • Responsive design with Framer Motion animations",
+    setup: "To run locally: 1. Clone the repo 2. Run `npm install` in both `Server/` and `client/` directories 3. Set up environment variables in `Server/.env` (MongoDB URI, Clerk keys, Stripe keys, Cloudinary keys, OpenAI key) 4. Start Redis server 5. Run `npm run dev` in `Server/` for the backend and `client/` for the frontend 6. The app runs on `localhost:5173` with the API on `localhost:3000`",
+    structure: "Project structure: • `Server/` — Express API, MongoDB models, controllers, services, middleware, validators • `client/` — React frontend with Vite, components, pages, context, services, routes • Key directories: `Server/models/` (Mongoose schemas), `Server/controllers/` (route handlers), `Server/services/` (business logic), `client/src/pages/` (app pages), `client/src/components/` (reusable UI components)",
   };
 
   const getResponse = (userMessage) => {
@@ -53,16 +59,26 @@ const ChatBot = () => {
       return botResponses.location;
     } else if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('rate')) {
       return botResponses.price;
-    } else if (lowerMessage.includes('owner') || lowerMessage.includes('hotel') || lowerMessage.includes('register')) {
+    } else if (lowerMessage.includes('owner') || lowerMessage.includes('register')) {
       return botResponses.owner;
     } else if (lowerMessage.includes('contact') || lowerMessage.includes('support') || lowerMessage.includes('help')) {
       return botResponses.contact;
     } else if (lowerMessage.includes('experience') || lowerMessage.includes('activity') || lowerMessage.includes('adventure')) {
       return botResponses.experience;
-    } else if (lowerMessage.includes('account') || lowerMessage.includes('profile') || lowerMessage.includes('booking')) {
+    } else if (lowerMessage.includes('account') || lowerMessage.includes('profile')) {
       return botResponses.account;
+    } else if (lowerMessage.includes('about') || lowerMessage.includes('what is') || lowerMessage.includes('this project') || lowerMessage.includes('tell me about')) {
+      return botResponses.about;
+    } else if (lowerMessage.includes('tech') || lowerMessage.includes('stack') || lowerMessage.includes('technology') || lowerMessage.includes('built with') || lowerMessage.includes('framework')) {
+      return botResponses.tech;
+    } else if (lowerMessage.includes('feature') || lowerMessage.includes('what can') || lowerMessage.includes('capabilities') || lowerMessage.includes('functionality')) {
+      return botResponses.features;
+    } else if (lowerMessage.includes('setup') || lowerMessage.includes('install') || lowerMessage.includes('run') || lowerMessage.includes('local') || lowerMessage.includes('deploy') || lowerMessage.includes('start')) {
+      return botResponses.setup;
+    } else if (lowerMessage.includes('structure') || lowerMessage.includes('folder') || lowerMessage.includes('architecture') || lowerMessage.includes('organized') || lowerMessage.includes('directory')) {
+      return botResponses.structure;
     } else {
-      return "I'm here to help! You can ask me about booking rooms, cancellations, payments, amenities, locations, prices, hotel registration, or anything else about SmartStayX. What would you like to know?";
+      return "I can help with booking, payments, cancellations, amenities, pricing, hotel owner registration, and project info. Ask me about the tech stack, features, setup guide, or project structure!";
     }
   };
 
@@ -96,9 +112,11 @@ const ChatBot = () => {
 
   const quickQuestions = [
     'How to book a room?',
-    'Can I cancel my booking?',
-    'What are the amenities?',
-    'I want to register as a hotel owner',
+    'What is this project?',
+    'What tech stack is used?',
+    'Tell me about the features',
+    'How to run locally?',
+    'What is the project structure?',
   ];
 
   const handleQuickQuestion = (question) => {

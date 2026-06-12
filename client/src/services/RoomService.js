@@ -1,5 +1,6 @@
 import ApiService from "./ApiService";
 
+// Room API service — extends ApiService for room CRUD with hotel-based filtering.
 class RoomService extends ApiService {
   constructor() {
     super("rooms");

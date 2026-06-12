@@ -1,9 +1,17 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { assets, cities } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
-import heroImage from "../assets/heroimage.jpg";
+
+const heroImages = [
+  "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920",
+  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920",
+  "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1920",
+  "https://images.unsplash.com/photo-1540541338287-41700207dee6?w=1920",
+  "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1920",
+  "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1920",
+];
 
 const motionItem = {
   hidden: { opacity: 0, y: 30 },
@@ -22,6 +30,16 @@ const Hero = () => {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState("2");
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const nextImage = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % heroImages.length);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(nextImage, 6000);
+    return () => clearInterval(timer);
+  }, [nextImage]);
 
   const handleSearch = (event) => {
     event.preventDefault();
@@ -42,18 +60,48 @@ const Hero = () => {
 
   return (
     <section className="luxury-shell relative isolate min-h-screen overflow-hidden pt-28 pb-12 flex items-center md:pt-32 md:pb-16">
-      {/* Background hero image */}
-      <motion.div
-        aria-hidden="true"
-        className="absolute inset-0 slow-zoom"
-        initial={{ scale: 1 }}
-        animate={{ scale: 1.08 }}
-        transition={{ duration: 18, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
-      >
-        <img src={heroImage} alt="Luxury resort skyline" className="h-full w-full object-cover" />
-      </motion.div>
+      {/* Rotating gallery background */}
+      <div className="absolute inset-0">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIndex}
+            aria-hidden="true"
+            className="absolute inset-0"
+            initial={{ opacity: 0, scale: 1.15 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 1.4, ease: "easeInOut" }}
+          >
+            <motion.div
+              className="h-full w-full"
+              initial={{ scale: 1 }}
+              animate={{ scale: 1.08 }}
+              transition={{ duration: 12, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
+            >
+              <img
+                src={heroImages[currentIndex]}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,17,31,0.3)_0%,rgba(7,17,31,0.62)_45%,rgba(7,17,31,0.92)_100%)]" />
+      {/* Image counter dots */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2.5">
+        {heroImages.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentIndex(i)}
+            className={`h-1.5 rounded-full transition-all duration-500 ${
+              i === currentIndex ? "w-8 bg-[#D4A85F]" : "w-1.5 bg-white/40 hover:bg-white/70"
+            }`}
+          />
+        ))}
+      </div>
+
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,17,31,0.25)_0%,rgba(7,17,31,0.55)_40%,rgba(7,17,31,0.92)_100%)]" />
 
       {/* Hero copy and booking form */}
       <div className="relative z-10 mx-auto grid w-full max-w-7xl gap-10 px-6 md:px-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 lg:px-12">

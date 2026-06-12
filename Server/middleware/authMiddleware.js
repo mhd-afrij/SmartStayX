@@ -1,8 +1,9 @@
 import User from '../models/User.js'
-import { PLACEHOLDER_IMAGE_URL } from '../configs/runtimeDefaults.js'
+import { CLERK_API_BASE_URL, PLACEHOLDER_IMAGE_URL } from '../configs/runtimeDefaults.js'
 import mongoose from 'mongoose'
 import bookingConfig from '../configs/bookingConfig.js'
 
+// Auth middleware — resolves Clerk JWT to a local User document, creating or updating as needed.
 export const protect = async (req, res, next) => {
   try {
     if (mongoose.connection.readyState !== 1) {
@@ -49,17 +50,51 @@ export const protect = async (req, res, next) => {
       claims?.name ||
       [firstName, lastName].filter(Boolean).join(' ') ||
       usernameClaim ||
-      'Guest'
+      ''
 
     let user = await User.findById(userId)
 
+    // Fetch user profile from Clerk API when session claims lack name data.
+    const fetchClerkUser = async () => {
+      const clerkSecret = process.env.CLERK_SECRET_KEY
+      if (!clerkSecret) return null
+      try {
+        const response = await fetch(`${CLERK_API_BASE_URL}/users/${userId}`, {
+          headers: { Authorization: `Bearer ${clerkSecret}` },
+        })
+        if (!response.ok) return null
+        return await response.json()
+      } catch {
+        return null
+      }
+    }
+
+    const resolveName = async () => {
+      if (fullName) return fullName
+      if (usernameClaim) return usernameClaim
+      const clerkData = await fetchClerkUser()
+      if (clerkData) {
+        const clerkName = [clerkData.first_name, clerkData.last_name].filter(Boolean).join(' ').trim()
+        if (clerkName) return clerkName
+        if (clerkData.username) return clerkData.username
+      }
+      return 'Guest'
+    }
+
+    const resolvedName = await resolveName()
+    const resolvedUsername = usernameClaim || resolvedName
+
+    let needsUpdate = false
+
     if (user) {
       const updates = {}
-      if ((!user.name || user.name === 'Guest') && fullName && fullName !== 'Guest') {
-        updates.name = fullName
+      if (!user.name || user.name === 'Guest') {
+        updates.name = resolvedName
+        needsUpdate = true
       }
-      if ((!user.username || user.username === 'Guest') && usernameClaim) {
-        updates.username = usernameClaim
+      if ((!user.username || user.username === 'Guest') && resolvedUsername && resolvedUsername !== 'Guest') {
+        updates.username = resolvedUsername
+        needsUpdate = true
       }
       if (
         (!user.email || String(user.email).endsWith(bookingConfig.placeholderEmailDomain)) &&
@@ -67,11 +102,13 @@ export const protect = async (req, res, next) => {
         !String(email).endsWith(bookingConfig.placeholderEmailDomain)
       ) {
         updates.email = email
+        needsUpdate = true
       }
       if ((!user.image || user.image === PLACEHOLDER_IMAGE_URL) && imageClaim) {
         updates.image = imageClaim
+        needsUpdate = true
       }
-      if (Object.keys(updates).length > 0) {
+      if (needsUpdate) {
         user = await User.findByIdAndUpdate(userId, { $set: updates }, { new: true })
       }
     }
@@ -82,8 +119,8 @@ export const protect = async (req, res, next) => {
         {
           $setOnInsert: {
             _id: userId,
-            name: fullName,
-            username: usernameClaim || fullName,
+            name: resolvedName,
+            username: resolvedUsername,
             email,
             image: imageClaim || PLACEHOLDER_IMAGE_URL,
             recentSearchedCities: [],

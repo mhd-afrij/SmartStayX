@@ -234,10 +234,10 @@ const PaymentManagement = () => {
                         <div className="flex items-center gap-2">
                           <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#D4A85F]/20 to-[#D4A85F]/5 border border-white/[0.06] flex items-center justify-center">
                             <span className="text-[10px] font-medium text-white/60">
-                              {(item.user?.name || item.user?.username || "G").charAt(0).toUpperCase()}
+                              {(item.guestDisplayName || item.user?.name || item.user?.username || "G").charAt(0).toUpperCase()}
                             </span>
                           </div>
-                          <span className="text-white/80">{item.user?.name || item.user?.username || "Guest"}</span>
+                          <span className="text-white/80">{item.guestDisplayName || item.user?.name || item.user?.username || "Guest"}</span>
                         </div>
                       </td>
                       <td className="py-3 px-4 text-white/60">{item.hotel?.name || "Hotel"}</td>
