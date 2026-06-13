@@ -1,3 +1,4 @@
+// recommendationRoutes.js — AI-powered room and destination recommendation routes
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import { getUserRecommendations } from "../controllers/recommendationController.js";

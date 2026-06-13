@@ -1,3 +1,4 @@
+// SupportConversation.js — Support conversation schema with messages and status
 import mongoose from "mongoose";
 
 const supportMessageSchema = new mongoose.Schema(

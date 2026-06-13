@@ -1,3 +1,4 @@
+// StarRating — Visual star rating display (1-5 stars) using filled/outlined icons
 import React from 'react'
 import { assets } from '../assets/assets'
 

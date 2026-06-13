@@ -1,3 +1,4 @@
+// notificationHelper.js — Notification dispatch helper (email, push, in-app)
 import Notification from "../models/Notification.js";
 
 // Notification factory — creates in-app notifications for owners on key booking events.

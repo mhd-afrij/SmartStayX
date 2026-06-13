@@ -1,3 +1,4 @@
+// CalendarView — Monthly calendar grid showing booking dates and availability
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";

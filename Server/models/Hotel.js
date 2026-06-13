@@ -1,3 +1,4 @@
+// Hotel.js — Hotel schema: details, location, images, and owner reference
 import mongoose from "mongoose";
 
 const hotelSchema = new mongoose.Schema(

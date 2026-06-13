@@ -1,3 +1,4 @@
+// ManageOffers — Owner panel for creating and managing promotional offers and discounts
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppContext } from "../../context/AppContext";

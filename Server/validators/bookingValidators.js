@@ -1,3 +1,4 @@
+// bookingValidators.js — Zod schemas for booking request validation
 import { z } from 'zod';
 
 export const checkAvailabilityBody = z.object({

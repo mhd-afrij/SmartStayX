@@ -1,3 +1,4 @@
+// ServiceManagement — Owner panel for managing guest room service requests
 import { useEffect, useState, useMemo, useCallback } from "react"
 import { motion } from "framer-motion"
 import { useAppContext } from "../../context/AppContext"

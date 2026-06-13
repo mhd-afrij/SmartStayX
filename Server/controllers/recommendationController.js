@@ -1,3 +1,4 @@
+// recommendationController.js — ML-powered room and destination recommendation engine
 import Booking from "../models/Booking.js";
 import Room from "../models/Room.js";
 import Review from "../models/Review.js";

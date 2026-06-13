@@ -1,3 +1,4 @@
+// bookingRoutes.js — Booking CRUD, availability, checkout, and payment routes
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import validateRequest from "../middleware/validateRequest.js";

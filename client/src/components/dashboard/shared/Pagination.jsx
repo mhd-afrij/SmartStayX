@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+// Pagination — Reusable pagination component with prev/next buttons and page numbers
 const Pagination = ({ page, pages, onPage }) => {
   if (pages <= 1) return null;
 

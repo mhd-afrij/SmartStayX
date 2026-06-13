@@ -1,3 +1,4 @@
+// About — About us page with brand story, mission, and company information
 import React from 'react';
 import { assets } from '../assets/assets';
 

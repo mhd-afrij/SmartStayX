@@ -1,3 +1,4 @@
+// sanitize.js — Input sanitization helper for preventing XSS
 import mongoose from 'mongoose';
 
 // Input sanitization helpers — validate ObjectIds and reject unexpected types.

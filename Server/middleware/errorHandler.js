@@ -1,3 +1,4 @@
+// errorHandler.js — Global Express error handler with structured error responses
 import logger from '../utils/logger.js'
 
 // Global error handler — logs via Winston and returns sanitized JSON to the client.

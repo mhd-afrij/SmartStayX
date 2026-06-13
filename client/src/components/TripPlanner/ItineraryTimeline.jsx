@@ -1,3 +1,4 @@
+// ItineraryTimeline — Visual day-by-day itinerary timeline with draggable entries
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAppContext } from '../../context/AppContext'

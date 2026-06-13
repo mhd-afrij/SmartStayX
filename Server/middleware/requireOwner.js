@@ -1,3 +1,4 @@
+// requireOwner.js — Authorization middleware ensuring user is a hotel owner
 const requireOwner = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({ success: false, message: 'Not authenticated' })

@@ -1,3 +1,4 @@
+// Testimonial — Guest testimonials section with quote cards and star ratings
 import React from 'react'
 import { motion } from 'framer-motion'
 import Title from './Title'

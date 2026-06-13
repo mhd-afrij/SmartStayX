@@ -1,3 +1,4 @@
+// offerController.js — Offer CRUD and eligibility logic
 import { v2 as cloudinary } from "cloudinary";
 import Offer from "../models/Offer.js";
 import Room from "../models/Room.js";

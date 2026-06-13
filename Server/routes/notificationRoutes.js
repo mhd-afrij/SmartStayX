@@ -1,3 +1,4 @@
+// notificationRoutes.js — Notification delivery and preference routes
 import express from "express";
 import rateLimit from "express-rate-limit";
 import { protect } from "../middleware/authMiddleware.js";

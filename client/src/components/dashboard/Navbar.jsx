@@ -1,3 +1,4 @@
+// DashboardNavbar — Owner dashboard top navigation bar with user menu and alerts
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";

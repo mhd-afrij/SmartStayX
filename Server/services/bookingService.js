@@ -1,3 +1,4 @@
+// bookingService.js — Business logic for pricing, availability, and booking operations
 import mongoose from 'mongoose';
 import Booking from '../models/Booking.js';
 import Room from '../models/Room.js';

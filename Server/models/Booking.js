@@ -1,3 +1,4 @@
+// Booking.js — Booking schema: dates, pricing, payment, status, and guest info
 import mongoose from "mongoose";
 
 const bookingSchema = new mongoose.Schema(

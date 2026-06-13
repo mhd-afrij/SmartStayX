@@ -1,3 +1,4 @@
+// testimonialController.js — Testimonial CRUD and visibility management
 import Testimonial from "../models/Testimonial.js";
 import Review from "../models/Review.js";
 import Hotel from "../models/Hotel.js";

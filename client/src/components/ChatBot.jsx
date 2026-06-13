@@ -1,3 +1,4 @@
+// ChatBot — Customer support chatbot with quick replies and contextual answers
 import React, { useState, useRef, useEffect } from 'react';
 
 const ChatBot = () => {

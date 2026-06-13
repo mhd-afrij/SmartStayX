@@ -1,3 +1,4 @@
+// db.js — MongoDB/Mongoose connection setup and event handlers
 import mongoose from 'mongoose'
 
 const connectDB = async () => {

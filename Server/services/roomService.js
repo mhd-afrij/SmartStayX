@@ -1,3 +1,4 @@
+// roomService.js — Business logic for room search, filtering, and recommendation
 import Room from '../models/Room.js';
 import Booking from '../models/Booking.js';
 import Hotel from '../models/Hotel.js';

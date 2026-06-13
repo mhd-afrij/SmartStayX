@@ -1,3 +1,4 @@
+// bookingController.js — Booking lifecycle: availability, pricing, checkout, payment, cancellation
 import mongoose from "mongoose";
 import Booking from "../models/Booking.js";
 import Room from "../models/Room.js";
@@ -623,7 +624,7 @@ export const getHotelBookings = async (req, res) => {
           totalRooms: 0,
           occupancyPercent: 0,
           revenue: { today: 0, week: 0, month: 0 },
-        avgRating,
+          avgRating: 0,
           upcomingBookings: 0,
           cancelledBookings: 0,
           lastMinuteBookings: 0,

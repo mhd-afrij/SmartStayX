@@ -1,4 +1,5 @@
-﻿import { useCallback, useEffect, useMemo, useState } from "react"
+﻿// TestimonialsManagement — Owner panel for managing guest testimonials and visibility
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useAppContext } from "../../context/AppContext"
 import { toast } from "react-hot-toast"
 import { Eye, EyeOff, Award } from "lucide-react"

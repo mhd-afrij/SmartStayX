@@ -1,3 +1,4 @@
+// Hero — Landing page hero with search bar, background image, and booking CTA
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";

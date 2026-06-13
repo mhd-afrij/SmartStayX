@@ -1,3 +1,4 @@
+// RoomDetails — Detailed room view with gallery, facilities, reviews, and booking flow
 import { useEffect, useState, useRef, useMemo } from "react";
 import { assets, facilityIcons, roomCommonData } from "../assets/assets";
 import { useParams, Link } from "react-router-dom";

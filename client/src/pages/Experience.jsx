@@ -1,3 +1,4 @@
+// Experience — Guest experiences and activities showcase with image grid
 import React from 'react';
 import { motion } from 'framer-motion';
 import { assets } from '../assets/assets';

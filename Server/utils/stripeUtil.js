@@ -1,3 +1,4 @@
+// stripeUtil.js — Stripe SDK wrapper for payment processing
 import Stripe from 'stripe'
 
 // Stripe utility — lazy-init Stripe client and webhook event construction.

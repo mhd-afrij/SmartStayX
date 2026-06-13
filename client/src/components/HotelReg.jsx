@@ -1,3 +1,4 @@
+// HotelReg — Hotel registration form modal for new property owners
 import { useState } from 'react'
 import { assets, cities } from '../assets/assets'
 import { useAppContext } from '../../src/context/AppContext';

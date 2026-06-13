@@ -1,3 +1,4 @@
+// messages.js — Shared response messages and error strings
 export const BOOKING_ERRORS = {
   NOT_FOUND: 'Booking not found',
   NOT_AUTHORIZED: 'Not authenticated',

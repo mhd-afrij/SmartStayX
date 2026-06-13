@@ -1,3 +1,4 @@
+// reviewRoutes.js — Guest review CRUD and moderation routes
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import {

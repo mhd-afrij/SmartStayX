@@ -1,22 +1,21 @@
+// StaffManagement — Owner panel for managing hotel staff accounts and permissions
 import { useEffect, useState, useCallback } from "react"
 import { motion } from "framer-motion"
 import { useAppContext } from "../../context/AppContext"
 import { toast } from "react-hot-toast"
 import { Users, Plus, Pencil, Trash2, ToggleLeft, ToggleRight } from "lucide-react"
 import ConfirmModal from "../../components/dashboard/ConfirmModal"
-import HotelSelector from "../../components/dashboard/shared/HotelSelector"
 
 const ROLES = ["Housekeeping", "Maintenance", "Room Service", "Front Desk"]
 
 const StaffManagement = () => {
-  const { user, getToken, axios } = useAppContext()
+  const { user, getToken, axios, selectedHotelId, setSelectedHotelId } = useAppContext()
   const [staff, setStaff] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ name: "", role: "Housekeeping" })
   const [hotels, setHotels] = useState([])
-  const [pageHotelId, setPageHotelId] = useState("")
   const [confirmState, setConfirmState] = useState({ open: false, id: null, title: "", message: "" })
 
   const requestConfirm = (id, title, message) => {
@@ -38,21 +37,20 @@ const StaffManagement = () => {
       if (data.success) {
         const list = data.hotels || []
         setHotels(list)
-        if (list.length === 1) {
-          setPageHotelId(list[0]._id)
+        if (list.length === 1 && selectedHotelId === "all") {
+          setSelectedHotelId(list[0]._id)
         }
       }
     } catch (error) {
       toast.error(error.message || "Failed to load hotels")
     }
-  }, [axios, getToken])
+  }, [axios, getToken, selectedHotelId, setSelectedHotelId])
 
   const fetchStaff = useCallback(async () => {
     try {
       setLoading(true)
       const token = await getToken()
-      const hotelParam = pageHotelId || "all"
-      const { data } = await axios.get(`/api/services/staff?hotelId=${hotelParam}`, {
+      const { data } = await axios.get(`/api/services/staff?hotelId=${selectedHotelId || "all"}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (data.success) {
@@ -65,7 +63,7 @@ const StaffManagement = () => {
     } finally {
       setLoading(false)
     }
-  }, [axios, getToken, pageHotelId])
+  }, [axios, getToken, selectedHotelId])
 
   useEffect(() => {
     fetchOwnerHotels()
@@ -89,7 +87,7 @@ const StaffManagement = () => {
 
   const handleSave = async () => {
     if (!form.name.trim()) return toast.error("Name is required")
-    if (!pageHotelId) return toast.error("Please select a specific hotel before adding staff")
+    if (!selectedHotelId || selectedHotelId === "all") return toast.error("Please select a specific hotel before adding staff")
     try {
       const token = await getToken()
       if (editing) {
@@ -102,7 +100,7 @@ const StaffManagement = () => {
           return toast.error(data.message)
         }
       } else {
-        const { data } = await axios.post("/api/services/add-staff", { ...form, hotelId: pageHotelId }, {
+        const { data } = await axios.post("/api/services/add-staff", { ...form, hotelId: selectedHotelId }, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (data.success) {
@@ -174,19 +172,11 @@ const StaffManagement = () => {
           <p className="text-sm text-white/40 mt-1">Add, edit, remove, and toggle availability for your service staff.</p>
         </div>
         <div className="flex items-center gap-3">
-          {hotels.length > 1 && (
-            <HotelSelector
-              hotels={hotels}
-              value={pageHotelId}
-              onChange={setPageHotelId}
-              placeholder="Select hotel"
-            />
-          )}
           <button
             onClick={openAdd}
-            disabled={!pageHotelId}
+            disabled={!selectedHotelId || selectedHotelId === "all"}
             className="gold-button px-5 py-2.5 text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            title={!pageHotelId ? "Select a hotel first" : ""}
+            title={!selectedHotelId || selectedHotelId === "all" ? "Select a specific hotel from the top bar first" : ""}
           >
             <Plus className="w-4 h-4" /> Add Staff
           </button>
@@ -279,7 +269,12 @@ const StaffManagement = () => {
                     <td colSpan={5} className="py-16 text-center">
                       <Users className="w-10 h-10 mx-auto text-white/20 mb-3" />
                       <p className="text-white/40">No staff yet.</p>
-                      <button onClick={openAdd} className="gold-button mt-4 px-5 py-2 text-sm">
+                      <button
+                        onClick={openAdd}
+                        disabled={!selectedHotelId || selectedHotelId === "all"}
+                        className="gold-button mt-4 px-5 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={!selectedHotelId || selectedHotelId === "all" ? "Select a specific hotel from the top bar first" : ""}
+                      >
                         Add your first staff member
                       </button>
                     </td>

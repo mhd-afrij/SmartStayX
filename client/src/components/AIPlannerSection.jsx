@@ -1,3 +1,4 @@
+// AIPlannerSection — AI-powered trip planner UI with destination preview and prompt input
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Title from './Title';

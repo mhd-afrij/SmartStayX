@@ -1,3 +1,4 @@
+// ExperienceShowcase — Experiences and local activities showcase section
 import React from 'react';
 import { motion } from 'framer-motion';
 import Title from './Title';

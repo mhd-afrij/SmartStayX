@@ -216,14 +216,16 @@ const Dashboard = () => {
 
       {dashboardData.bookings.length > 0 && (
         <div className="grid gap-4 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 min-w-0">
             <ErrorBoundary>
               <RevenueChart revenueData={dashboardData.trends} />
             </ErrorBoundary>
           </div>
-          <ErrorBoundary>
-            <BookingDonut bookings={dashboardData.bookings} />
-          </ErrorBoundary>
+          <div className="min-w-0">
+            <ErrorBoundary>
+              <BookingDonut bookings={dashboardData.bookings} />
+            </ErrorBoundary>
+          </div>
         </div>
       )}
 

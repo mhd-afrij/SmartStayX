@@ -1,3 +1,4 @@
+// Room.js — Room schema: type, pricing, amenities, images, and availability
 import mongoose from "mongoose";
 
 const roomSchema = new mongoose.Schema(

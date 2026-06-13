@@ -1,3 +1,4 @@
+// reviewController.js — Guest review CRUD and moderation logic
 import Booking from "../models/Booking.js";
 import Review from "../models/Review.js";
 import Room from "../models/Room.js";

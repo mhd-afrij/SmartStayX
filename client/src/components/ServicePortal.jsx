@@ -1,3 +1,4 @@
+// ServicePortal — Room service request portal modal (housekeeping, maintenance, etc.)
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { toast } from 'react-hot-toast';

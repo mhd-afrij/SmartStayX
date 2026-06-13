@@ -1,3 +1,4 @@
+// BackToTop — Floating button that appears on scroll to return to page top
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 

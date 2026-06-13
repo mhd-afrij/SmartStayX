@@ -1,3 +1,4 @@
+// clerkWebhooks.js — Clerk webhook handler for user lifecycle events
 import User from "../models/User.js";
 import { Webhook } from "svix";
 import { PLACEHOLDER_IMAGE_URL } from "../configs/runtimeDefaults.js";

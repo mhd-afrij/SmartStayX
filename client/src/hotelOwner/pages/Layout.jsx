@@ -1,3 +1,4 @@
+// OwnerLayout — Dashboard layout wrapper with sidebar, navbar, and nested route outlet
 import { useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';

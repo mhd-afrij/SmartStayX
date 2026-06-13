@@ -1,3 +1,4 @@
+// Review.js — Review schema: rating, content, room, and guest reference
 import mongoose from "mongoose";
 
 const reviewSchema = new mongoose.Schema(

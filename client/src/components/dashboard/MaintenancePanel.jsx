@@ -1,3 +1,4 @@
+// MaintenancePanel — Room maintenance management with toggle availability and issue reporting
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {

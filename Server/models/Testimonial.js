@@ -1,3 +1,4 @@
+// Testimonial.js — Testimonial schema: content, author, rating, and visibility
 import mongoose from "mongoose";
 
 const testimonialSchema = new mongoose.Schema(

@@ -1,3 +1,4 @@
+// testimonialRoutes.js — Testimonial CRUD and visibility management routes
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import { getVisibleTestimonials, getOwnerTestimonials, updateTestimonial, updateTestimonialVisibility } from "../controllers/testimonialController.js";

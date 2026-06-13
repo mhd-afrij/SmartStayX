@@ -1,3 +1,4 @@
+// AllRooms — Browse all available rooms with filtering, sorting, and pagination
 import React, { useContext, useState, useMemo, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";

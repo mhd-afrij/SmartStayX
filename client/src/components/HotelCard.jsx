@@ -1,3 +1,4 @@
+// HotelCard — Reusable hotel/room card with image, rating, location, and price
 import React from "react";
 import { motion } from "framer-motion";
 import { assets } from "../assets/assets";

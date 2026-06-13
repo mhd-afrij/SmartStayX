@@ -1,3 +1,4 @@
+// bookingCleaner.js — Periodic cleanup job for expired booking holds
 import Booking from '../models/Booking.js'
 import logger from './logger.js'
 import bookingConfig from '../configs/bookingConfig.js'

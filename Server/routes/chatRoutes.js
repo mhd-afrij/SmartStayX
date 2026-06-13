@@ -1,3 +1,4 @@
+// chatRoutes.js — Chat/messaging API routes
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import { sendChatMessage, getChatHistory } from "../controllers/chatController.js";

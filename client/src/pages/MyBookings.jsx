@@ -1,3 +1,4 @@
+// MyBookings — User's booking history, status tracking, and management actions
 import { useEffect, useState } from 'react'
 import Title from '../components/Title'
 import { assets, placeholderImage } from '../assets/assets'

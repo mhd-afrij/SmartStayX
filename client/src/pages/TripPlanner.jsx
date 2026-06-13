@@ -1,3 +1,4 @@
+// TripPlanner — AI-powered trip planning assistant for itinerary creation
 import React from "react";
 import { useAppContext } from "../context/AppContext";
 

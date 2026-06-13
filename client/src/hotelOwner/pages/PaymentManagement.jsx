@@ -1,3 +1,4 @@
+// PaymentManagement — Owner panel for viewing and managing guest payments and transactions
 import { useEffect, useMemo, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";

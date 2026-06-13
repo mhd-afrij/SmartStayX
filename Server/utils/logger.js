@@ -1,3 +1,4 @@
+// logger.js — Structured logging utility with levels and formatting
 import { createLogger, transports, format } from 'winston'
 
 // Winston logger with JSON format, timestamps, and console transport.

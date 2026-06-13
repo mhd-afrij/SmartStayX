@@ -1,3 +1,4 @@
+// User.js — User schema: profile, auth, preferences, and search history
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(

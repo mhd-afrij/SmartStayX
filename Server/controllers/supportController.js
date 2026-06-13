@@ -1,3 +1,4 @@
+// supportController.js — Customer support ticket and conversation handling
 import Hotel from "../models/Hotel.js";
 import SupportConversation from "../models/SupportConversation.js";
 

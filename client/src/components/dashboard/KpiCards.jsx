@@ -1,3 +1,4 @@
+// KpiCards — Key performance indicator cards: revenue, occupancy, bookings, etc.
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {

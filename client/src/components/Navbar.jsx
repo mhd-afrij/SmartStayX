@@ -1,3 +1,4 @@
+// Navbar — Main site navigation bar with links, auth state, and mobile menu
 import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";

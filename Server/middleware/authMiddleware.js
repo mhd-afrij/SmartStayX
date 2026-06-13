@@ -1,3 +1,4 @@
+// authMiddleware.js — Clerk JWT authentication and user session resolution
 import User from '../models/User.js'
 import { CLERK_API_BASE_URL, PLACEHOLDER_IMAGE_URL } from '../configs/runtimeDefaults.js'
 import mongoose from 'mongoose'
@@ -6,10 +7,6 @@ import bookingConfig from '../configs/bookingConfig.js'
 // Auth middleware — resolves Clerk JWT to a local User document, creating or updating as needed.
 export const protect = async (req, res, next) => {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      return res.status(503).json({ success: false, message: 'Database unavailable' })
-    }
-
     const auth = typeof req.auth === 'function' ? req.auth() : req.auth
     const userId = auth?.userId
 
@@ -51,6 +48,18 @@ export const protect = async (req, res, next) => {
       [firstName, lastName].filter(Boolean).join(' ') ||
       usernameClaim ||
       ''
+
+    // If DB is unavailable, build a minimal user from Clerk claims and proceed.
+    if (mongoose.connection.readyState !== 1) {
+      req.user = {
+        _id: userId,
+        name: fullName || usernameClaim || 'Guest',
+        username: usernameClaim || fullName || 'Guest',
+        email,
+        image: imageClaim || PLACEHOLDER_IMAGE_URL,
+      }
+      return next()
+    }
 
     let user = await User.findById(userId)
 

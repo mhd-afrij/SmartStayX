@@ -1,3 +1,4 @@
+// DestinationsGrid — Grid of trip planner destination cards with images and descriptions
 import { motion } from 'framer-motion'
 import destinationsData from '../../data/tripPlanner/destinationsData'
 

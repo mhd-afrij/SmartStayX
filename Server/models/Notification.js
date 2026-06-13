@@ -1,3 +1,4 @@
+// Notification.js — Notification schema: type, message, read status, and user target
 import mongoose from "mongoose";
 
 const notificationSchema = new mongoose.Schema(

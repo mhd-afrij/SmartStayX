@@ -1,3 +1,4 @@
+// hotelController.js — Hotel CRUD operations and owner hotel management
 import Hotel from "../models/Hotel.js";
 import User from "../models/User.js";
 import Room from "../models/Room.js";

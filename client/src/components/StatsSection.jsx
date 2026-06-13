@@ -1,3 +1,4 @@
+// StatsSection — Animated statistics and achievement metrics section
 import React from 'react';
 import { motion } from 'framer-motion';
 

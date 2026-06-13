@@ -1,3 +1,4 @@
+// BookingsTable — Searchable, sortable table of bookings with status management
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, ArrowUpDown, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";

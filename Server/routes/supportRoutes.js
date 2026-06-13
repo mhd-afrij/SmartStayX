@@ -1,3 +1,4 @@
+// supportRoutes.js — Customer support conversation routes
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import { createSupportConversation, getMySupportConversations, getConversationMessages, sendSupportMessage, updateConversationStatus } from "../controllers/supportController.js";

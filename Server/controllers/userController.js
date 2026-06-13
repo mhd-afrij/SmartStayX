@@ -1,3 +1,4 @@
+// userController.js — User profile, search history, and preferences
 // Guest profile retrieval, recent-search storage, and preference management.
 export const getUserData = async (req, res) => {
   try {

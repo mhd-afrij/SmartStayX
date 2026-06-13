@@ -1,3 +1,4 @@
+// redisClient.js — Redis client setup for caching and booking locks
 import Redis from 'ioredis'
 import logger from '../utils/logger.js'
 import bookingConfig from '../configs/bookingConfig.js'

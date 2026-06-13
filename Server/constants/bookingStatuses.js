@@ -1,3 +1,4 @@
+// bookingStatuses.js — Enum-like constants for booking lifecycle statuses
 export const BOOKING_STATUS = {
   PENDING: 'pending',
   CONFIRMED: 'confirmed',

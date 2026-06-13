@@ -1,3 +1,4 @@
+// Staff.js — Staff schema: role, permissions, hotel association, and credentials
 import mongoose from "mongoose";
 
 const staffSchema = new mongoose.Schema(

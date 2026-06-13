@@ -1,3 +1,4 @@
+// BookingModal — Multi-step booking modal: date selection, review, payment checkout
 import { useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";

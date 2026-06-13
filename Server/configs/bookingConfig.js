@@ -1,3 +1,4 @@
+// bookingConfig.js — Booking business rules: hold times, last-minute window, surcharges
 // Booking configuration — all dynamic pricing rules, hold/window settings,
 // seasonal rules, and discount tiers. Values are read from env vars when available.
 const bookingConfig = {

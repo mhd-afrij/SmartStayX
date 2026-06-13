@@ -1,3 +1,4 @@
+// SocialWall — Social media showcase wall with embedded posts and feeds
 import React from 'react';
 import { motion } from 'framer-motion';
 import Title from './Title';

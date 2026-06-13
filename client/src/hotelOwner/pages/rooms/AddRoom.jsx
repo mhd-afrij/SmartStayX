@@ -1,3 +1,4 @@
+// AddRoom — Owner panel for adding new rooms with images, pricing, and amenities
 import { useState, useEffect } from "react";
 import { useAppContext } from "../../../context/AppContext";
 import toast from "react-hot-toast";

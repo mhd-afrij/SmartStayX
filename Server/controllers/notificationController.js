@@ -1,3 +1,4 @@
+// notificationController.js — Notification sending and user preference management
 import Notification from "../models/Notification.js";
 import Hotel from "../models/Hotel.js";
 

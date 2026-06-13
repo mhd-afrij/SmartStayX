@@ -1,3 +1,4 @@
+// HeroWelcome — Dashboard welcome banner with hotel info, quick stats, and CTAs
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, PlusCircle, FileText } from "lucide-react";

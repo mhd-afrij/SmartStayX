@@ -1,5 +1,6 @@
 import { Building2 } from "lucide-react";
 
+// HotelSelector — Dropdown for selecting a hotel property in the owner dashboard
 const HotelSelector = ({
   hotels = [],
   value,

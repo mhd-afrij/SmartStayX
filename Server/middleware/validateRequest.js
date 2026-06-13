@@ -1,3 +1,4 @@
+// validateRequest.js — Zod schema validation middleware for request bodies
 const syncObject = (target, source) => {
   if (!target || typeof target !== 'object') return
   Object.keys(target).forEach((key) => {

@@ -1,3 +1,4 @@
+// ReviewsManagement — Owner panel for moderating guest reviews and visibility
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Star, Eye, EyeOff } from "lucide-react";

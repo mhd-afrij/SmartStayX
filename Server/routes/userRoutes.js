@@ -1,3 +1,4 @@
+// userRoutes.js — User profile, search history, and preferences routes
 import express from "express";
 import { getUserData, storeRecentSearchedCities, upsertGuestProfile } from "../controllers/userController.js";
 import { protect } from "../middleware/authMiddleware.js";

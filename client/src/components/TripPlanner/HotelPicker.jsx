@@ -1,3 +1,4 @@
+// HotelPicker — Hotel selection dropdown for trip planner itinerary creation
 import { useState, useEffect } from 'react'
 import { useAppContext } from '../../context/AppContext'
 

@@ -1,3 +1,4 @@
+// chatController.js — Chat message handling and conversation management
 import Booking from "../models/Booking.js";
 import ChatLog from "../models/ChatLog.js";
 import SupportConversation from "../models/SupportConversation.js";

@@ -1,3 +1,4 @@
+// runtimeDefaults.js — Runtime environment defaults and placeholder values
 export const CLERK_API_BASE_URL = process.env.CLERK_API_BASE_URL || 'https://api.clerk.com/v1'
 
 export const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1'

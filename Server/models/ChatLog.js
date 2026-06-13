@@ -1,3 +1,4 @@
+// ChatLog.js — Chat message schema with sender, content, and timestamps
 import mongoose from "mongoose";
 
 const chatLogSchema = new mongoose.Schema(

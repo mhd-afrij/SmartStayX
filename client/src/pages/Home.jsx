@@ -1,3 +1,4 @@
+// Home — Main landing page composing hero, stats, featured destinations, offers, testimonials, and more
 import React, { useEffect } from 'react'
 import Hero from '../components/Hero'
 import StatsSection from '../components/StatsSection'

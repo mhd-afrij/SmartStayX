@@ -1,3 +1,4 @@
+// HotelManagement — Owner panel for creating and updating hotel property details
 import { useEffect, useState } from "react";
 import { assets, cities } from "../../assets/assets";
 import { useAppContext } from "../../context/AppContext";

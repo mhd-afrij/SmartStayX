@@ -1,3 +1,4 @@
+// Offer.js — Offer schema: discount, validity, eligibility, and room association
 import mongoose from "mongoose";
 
 const offerSchema = new mongoose.Schema(

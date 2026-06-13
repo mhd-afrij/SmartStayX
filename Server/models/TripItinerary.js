@@ -1,3 +1,4 @@
+// TripItinerary.js — Trip itinerary schema: destinations, hotels, and daily plans
 import mongoose from "mongoose";
 
 const itineraryItemSchema = new mongoose.Schema(

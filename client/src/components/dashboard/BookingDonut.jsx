@@ -1,3 +1,4 @@
+// BookingDonut — Pie/donut chart showing booking status distribution (pending, confirmed, etc.)
 import { useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Sector } from "recharts";
 import { motion } from "framer-motion";
@@ -73,6 +74,27 @@ const BookingDonut = ({ bookings = [] }) => {
     }));
 
   const total = data.reduce((s, d) => s + d.value, 0);
+
+  if (data.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="relative rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl overflow-hidden p-6"
+      >
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-8 h-8 rounded-lg bg-[#D4A85F]/10 border border-[#D4A85F]/20 flex items-center justify-center">
+            <CalendarCheck className="w-4 h-4 text-[#D4A85F]" />
+          </div>
+          <div>
+            <h3 className="text-sm font-medium text-white">Booking Summary</h3>
+            <p className="text-xs text-white/40">No booking data available</p>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

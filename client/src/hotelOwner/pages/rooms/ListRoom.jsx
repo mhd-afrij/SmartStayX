@@ -1,3 +1,4 @@
+// ListRoom — Owner panel for viewing, editing, and deleting existing rooms
 import { useEffect, useState } from 'react';
 import { useAppContext } from '../../../context/AppContext';
 import toast from 'react-hot-toast';

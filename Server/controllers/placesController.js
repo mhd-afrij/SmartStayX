@@ -1,3 +1,4 @@
+// placesController.js — Nearby places search via external APIs
 import TripItinerary from "../models/TripItinerary.js";
 import getRedis from "../utils/redisClient.js";
 

@@ -1,3 +1,4 @@
+// roomValidators.js — Zod schemas for room request validation
 import { z } from 'zod';
 
 export const getRoomsQuery = z.object({

@@ -1,3 +1,4 @@
+// WebhookLog.js — Webhook event log schema for auditing and debugging
 import mongoose from 'mongoose';
 
 const webhookLogSchema = new mongoose.Schema(

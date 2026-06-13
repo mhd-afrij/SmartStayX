@@ -1,3 +1,4 @@
+// FeaturedDestination — Curated hotel collection with horizontal scroll carousel
 import React, { useRef } from "react";
 import { motion } from "framer-motion";
 import HotelCard from "./HotelCard";

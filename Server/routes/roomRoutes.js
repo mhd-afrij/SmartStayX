@@ -1,3 +1,4 @@
+// roomRoutes.js — Room CRUD, availability toggle, and search routes
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import upload from "../middleware/uploadMiddleware.js";

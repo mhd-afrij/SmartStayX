@@ -1,3 +1,4 @@
+// ErrorBoundary — React error boundary that catches render errors with fallback UI
 import React from 'react';
 
 class ErrorBoundary extends React.Component {

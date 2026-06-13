@@ -1,3 +1,4 @@
+// BlogPreviews — Blog article preview cards with image, title, and excerpt
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';

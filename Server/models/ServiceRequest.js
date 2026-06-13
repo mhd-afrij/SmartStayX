@@ -1,3 +1,4 @@
+// ServiceRequest.js — Service request schema: type, description, status, and assignment
 import mongoose from "mongoose";
 
 const serviceRequestSchema = new mongoose.Schema(

@@ -1,3 +1,4 @@
+// DashboardSidebar — Owner dashboard sidebar navigation with collapsible menu items
 import { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";

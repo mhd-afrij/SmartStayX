@@ -1,3 +1,4 @@
+// placesRoutes.js — Nearby places and attractions lookup routes
 import express from "express";
 import { getAttractions, getRestaurants } from "../controllers/placesController.js";
 

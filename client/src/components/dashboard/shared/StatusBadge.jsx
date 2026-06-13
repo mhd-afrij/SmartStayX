@@ -1,3 +1,4 @@
+// StatusBadge — Colored badge component for displaying booking/service status
 const STATUS_MAP = {
   pending: { label: "Pending", color: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20" },
   confirmed: { label: "Confirmed", color: "bg-[#4F46E5]/10 text-[#4F46E5] border-[#4F46E5]/20" },

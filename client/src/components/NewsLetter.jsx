@@ -1,3 +1,4 @@
+// NewsLetter — Email newsletter subscription section with form input
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'

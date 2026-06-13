@@ -1,3 +1,4 @@
+// ReviewSection — Guest reviews section with rating, filter, and submission
 import { useState, useEffect, useCallback } from "react";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";

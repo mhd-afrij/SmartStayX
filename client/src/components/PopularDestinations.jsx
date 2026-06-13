@@ -1,3 +1,4 @@
+// PopularDestinations — Popular travel destinations grid with images and links
 import React from 'react';
 import { motion } from 'framer-motion';
 import { assets } from '../assets/assets';
