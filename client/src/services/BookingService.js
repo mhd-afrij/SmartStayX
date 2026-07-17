@@ -5,7 +5,7 @@ import API_ENDPOINTS from "../config/endpoints";
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "";
 const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT) || 30000;
 
-// Booking API service — user and owner booking CRUD, Stripe checkout, refunds.
+// Booking API service — user and owner booking CRUD, Stripe checkout.
 class BookingService {
   get #baseUrl() {
     return API_BASE_URL;
@@ -85,13 +85,6 @@ class BookingService {
     return this.#request("post", API_ENDPOINTS.bookings.ownerUpdatePayment, { bookingId, isPaid }, token);
   }
 
-  requestRefund(bookingId, token) {
-    return this.#request("post", API_ENDPOINTS.bookings.refundRequest, { bookingId }, token);
-  }
-
-  handleRefund(bookingId, action, token) {
-    return this.#request("post", API_ENDPOINTS.bookings.handleRefund, { bookingId, action }, token);
-  }
 }
 
 export default new BookingService();

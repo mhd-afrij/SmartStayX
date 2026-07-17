@@ -42,7 +42,5 @@ export const BOOKING_SUCCESS = {
   MODIFIED: 'Booking modified successfully',
   PAYMENT_UPDATED: 'Payment updated successfully',
   BOOKING_DELETED: 'Booking deleted successfully',
-  REFUND_REQUESTED: 'Refund request submitted. The property owner will review it shortly.',
-  REFUND_HANDLED: 'Refund status updated successfully.',
 }
 

@@ -49,7 +49,6 @@ export const getReservations = async (req, res) => {
       status: b.status,
       paymentMethod: b.paymentMethod,
       isPaid: b.isPaid,
-      refundStatus: b.refundStatus,
       guests: b.guests,
       createdAt: b.createdAt,
     }));

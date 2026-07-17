@@ -16,8 +16,6 @@ vi.mock('../../config/endpoints', () => ({
       hotel: (id) => `/api/bookings/hotel?hotelId=${id}`,
       ownerDelete: (id) => `/api/bookings/owner/${id}`,
       ownerUpdatePayment: '/api/bookings/owner/update-payment',
-      refundRequest: '/api/bookings/refund-request',
-      handleRefund: '/api/bookings/handle-refund',
     },
   },
 }));
@@ -137,32 +135,6 @@ describe('BookingService Integration — full lifecycle', () => {
     );
   });
 
-  it('refund flow: request -> owner handles', async () => {
-    mockAxios.post
-      .mockResolvedValueOnce({ data: { success: true, message: 'Refund request submitted', booking: { refundStatus: 'pending' } } })
-      .mockResolvedValueOnce({ data: { success: true, message: 'Refund status updated successfully', booking: { refundStatus: 'approved' } } });
-
-    const BookingService = (await import('../../services/BookingService')).default;
-
-    const requestResult = await BookingService.requestRefund('b-1', 'token-user');
-    expect(requestResult.message).toContain('Refund request');
-    expect(mockAxios.post).toHaveBeenNthCalledWith(
-      1,
-      `${mockApiBase}/api/bookings/refund-request`,
-      { bookingId: 'b-1' },
-      expect.objectContaining({ headers: { Authorization: 'Bearer token-user' } }),
-    );
-
-    const handleResult = await BookingService.handleRefund('b-1', 'approved', 'token-owner');
-    expect(handleResult.message).toContain('Refund status');
-    expect(mockAxios.post).toHaveBeenNthCalledWith(
-      2,
-      `${mockApiBase}/api/bookings/handle-refund`,
-      { bookingId: 'b-1', action: 'approved' },
-      expect.objectContaining({ headers: { Authorization: 'Bearer token-owner' } }),
-    );
-  });
-
   it('modify booking flow', async () => {
     mockAxios.post
       .mockResolvedValueOnce({ data: { success: true, booking: { _id: 'b-1', status: 'pending' } } })
@@ -240,8 +212,6 @@ describe('BookingService Integration — full lifecycle', () => {
       () => BookingService.fetchHotelBookings('h1', token),
       () => BookingService.ownerDeleteBooking('b1', token),
       () => BookingService.ownerUpdatePayment('b1', true, token),
-      () => BookingService.requestRefund('b1', token),
-      () => BookingService.handleRefund('b1', 'approved', token),
     ];
 
     const results = await Promise.allSettled(methods.map((fn) => fn()));

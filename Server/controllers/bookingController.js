@@ -12,7 +12,7 @@ import { constructEvent, getStripe } from "../utils/stripeUtil.js";
 import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 import { BOOKING_ERRORS, BOOKING_SUCCESS } from "../constants/messages.js";
 import bookingConfig from "../configs/bookingConfig.js";
-import { notifyNewBooking, notifyPaymentReceived, notifyCancellation, notifyRefundRequest } from "../utils/notificationHelper.js";
+import { notifyNewBooking, notifyPaymentReceived, notifyCancellation } from "../utils/notificationHelper.js";
 import { ok, badRequest, unauthorized, notFound, serverError } from "../utils/apiResponse.js";
 
 // ---------------------------------------------------------------------------
@@ -100,7 +100,7 @@ export const createBooking = async (req, res, next) => {
 };
 
 // ---------------------------------------------------------------------------
-// User booking management — cancel, refund, modify
+// User booking management — cancel, modify
 // ---------------------------------------------------------------------------
 
 export const getUserBookings = async (req, res, next) => {
@@ -148,81 +148,6 @@ export const cancelBooking = async (req, res, next) => {
     notifyCancellation(booking);
 
     return ok(res, { message: BOOKING_SUCCESS.CANCELLED, booking });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const requestRefund = async (req, res, next) => {
-  try {
-    const user = req.user;
-    const { bookingId } = req.body;
-
-    if (typeof bookingId !== 'string') {
-      return badRequest(res, BOOKING_ERRORS.BOOKING_ID_REQUIRED);
-    }
-
-    const booking = await Booking.findOne({ _id: bookingId, user: user._id }).populate("room hotel");
-    if (!booking) {
-      return notFound(res, BOOKING_ERRORS.NOT_FOUND);
-    }
-
-    if (!booking.isPaid) {
-      return badRequest(res, "Only paid bookings can request a refund");
-    }
-
-    if (booking.refundStatus === "pending") {
-      return badRequest(res, "A refund request is already pending for this booking");
-    }
-
-    if (booking.refundStatus === "approved" || booking.refundStatus === "refunded") {
-      return badRequest(res, "This booking has already been refunded");
-    }
-
-    booking.refundStatus = "pending";
-    await booking.save();
-
-    notifyRefundRequest(booking, user);
-
-    return ok(res, { message: BOOKING_SUCCESS.REFUND_REQUESTED, booking });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const handleRefund = async (req, res, next) => {
-  try {
-    const ownerId = req.user._id;
-    const { bookingId, action } = req.body;
-
-    if (typeof bookingId !== 'string') {
-      return badRequest(res, BOOKING_ERRORS.BOOKING_ID_REQUIRED);
-    }
-
-    if (!["approved", "denied"].includes(action)) {
-      return badRequest(res, "action must be 'approved' or 'denied'");
-    }
-
-    const booking = await Booking.findById(bookingId).populate("hotel");
-    if (!booking) {
-      return notFound(res, BOOKING_ERRORS.NOT_FOUND);
-    }
-
-    if (String(booking.hotel.owner) !== String(ownerId)) {
-      return unauthorized(res, "Not authorized to handle this refund");
-    }
-
-    if (booking.refundStatus !== "pending") {
-      return badRequest(res, "No pending refund request for this booking");
-    }
-
-    booking.refundStatus = action;
-    if (action === "approved") {
-      booking.isPaid = false;
-    }
-    await booking.save();
-
-    return ok(res, { message: BOOKING_SUCCESS.REFUND_HANDLED, booking });
   } catch (error) {
     next(error);
   }

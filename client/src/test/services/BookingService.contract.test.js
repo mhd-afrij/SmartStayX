@@ -35,8 +35,6 @@ vi.mock('../../config/endpoints', () => ({
       ownerDelete: (id) => `/api/bookings/owner/${id}`,
       ownerUpdatePayment: '/api/bookings/owner/update-payment',
       hotel: (id) => `/api/bookings/hotel?hotelId=${id}`,
-      refundRequest: '/api/bookings/refund-request',
-      handleRefund: '/api/bookings/handle-refund',
     },
   },
 }));

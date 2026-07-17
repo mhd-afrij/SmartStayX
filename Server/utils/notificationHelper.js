@@ -51,20 +51,6 @@ export const notifyCancellation = async (booking) => {
   });
 };
 
-// Notifies owner when a guest requests a refund
-export const notifyRefundRequest = async (booking, user) => {
-  if (!booking?.hotel) return;
-  const roomNum = booking.roomNumber || "";
-  await createNotification({
-    hotel: booking.hotel,
-    type: "refund_request",
-    title: "Refund Requested",
-    message: `${user?.name || "A guest"} requested refund of $${booking.totalPrice || 0}${roomNum ? ` for Room ${roomNum}` : ""}.`,
-    booking: booking._id,
-    room: booking.room,
-  });
-};
-
 // Notifies owner when a room is assigned/changed on a booking
 export const notifyRoomAssigned = async (booking) => {
   if (!booking?.hotel) return;
