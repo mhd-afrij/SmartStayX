@@ -4,17 +4,21 @@ import { Link } from "react-router-dom";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import { Tag, Plus, Edit3, Trash2, ChevronDown, X } from "lucide-react";
+import { Tag, Plus, Edit3, Trash2, ChevronDown, X, Search } from "lucide-react";
+import ConfirmModal from "../../components/dashboard/ConfirmModal";
 
+// emptyForm — Default empty offer form state
 const emptyForm = {
   title: "", description: "", discountPercent: "", expiryDate: "",
   hotelId: "", roomId: "", image: null, isActive: true,
 };
 
+// safeUrl — Returns URL if it's a valid http/blob string, otherwise null
 const safeUrl = (url) => url && (typeof url === 'string') && (url.startsWith('http') || url.startsWith('blob:')) ? url : null;
 
+// ManageOffers — Owner panel for creating, editing, and deleting promotional offers linked to rooms
 const ManageOffers = () => {
-  const { axios, getToken, user, fetchOffers } = useAppContext();
+  const { axios, getToken, user, fetchOffers, currency } = useAppContext();
   const [offers, setOffers] = useState([]);
   const [hotels, setHotels] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -23,6 +27,9 @@ const ManageOffers = () => {
   const [preview, setPreview] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState({ open: false, id: null });
+  const [deletingId, setDeletingId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     return () => {
@@ -30,6 +37,7 @@ const ManageOffers = () => {
     };
   }, [preview]);
 
+  // loadRooms — Fetches owner's rooms for offer linking
   const loadRooms = async () => {
     try {
       const { data } = await axios.get("/api/rooms/Owner", {
@@ -41,6 +49,7 @@ const ManageOffers = () => {
     }
   };
 
+  // loadHotels — Fetches owner's hotels for offer hotel selection
   const loadHotels = async () => {
     try {
       const { data } = await axios.get("/api/hotels/owner", {
@@ -52,6 +61,7 @@ const ManageOffers = () => {
     }
   };
 
+  // loadOffers — Fetches all offers created by the owner
   const loadOffers = async () => {
     try {
       const { data } = await axios.get("/api/offers/owner", {
@@ -77,21 +87,22 @@ const ManageOffers = () => {
         (room) => room.hotel?._id === form.hotelId || room.hotel === form.hotelId
       );
       setFilteredRooms(filtered);
-      setForm((prev) => ({ ...prev, roomId: "" }));
     } else {
       setFilteredRooms([]);
     }
   }, [form.hotelId, rooms]);
 
+  // resetForm — Clears the offer form and exits editing mode
   const resetForm = () => {
     setForm(emptyForm);
     setPreview(null);
     setEditingId(null);
   };
 
+  // handleSubmit — Creates or updates an offer with title, discount, expiry, hotel, and room
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.title || !form.description || !form.discountPercent || !form.expiryDate || !form.hotelId || !form.roomId) {
+    if (!form.title || !form.description || form.discountPercent === "" || !form.expiryDate || !form.hotelId || !form.roomId) {
       toast.error("Please complete all fields including hotel and room selection");
       return;
     }
@@ -131,7 +142,17 @@ const ManageOffers = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  // handleDelete — Sets confirm modal for offer deletion
+  const handleDelete = (id) => {
+    setConfirmDelete({ open: true, id });
+  };
+
+  // handleDeleteConfirmed — Performs the actual offer deletion after confirmation
+  const handleDeleteConfirmed = async () => {
+    const id = confirmDelete.id;
+    if (!id) return;
+    setDeletingId(id);
+    setConfirmDelete({ open: false, id: null });
     try {
       const { data } = await axios.delete(`/api/offers/${id}`, {
         headers: { Authorization: `Bearer ${await getToken()}` },
@@ -145,9 +166,12 @@ const ManageOffers = () => {
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete offer");
+    } finally {
+      setDeletingId(null);
     }
   };
 
+  // handleEdit — Populates the form with offer data for editing
   const handleEdit = (offer) => {
     setEditingId(offer._id);
     const hotelId = offer.hotel?._id || offer.hotel;
@@ -166,8 +190,10 @@ const ManageOffers = () => {
   };
 
   const sortedOffers = useMemo(
-    () => offers.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-    [offers]
+    () => offers
+      .filter((o) => !searchTerm || o.title.toLowerCase().includes(searchTerm.toLowerCase()) || o.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
+    [offers, searchTerm]
   );
 
   return (
@@ -240,7 +266,7 @@ const ManageOffers = () => {
               <select
                 className="w-full appearance-none pl-3 pr-8 py-2.5 text-sm rounded-xl border border-white/[0.06] bg-white/[0.04] text-white/70 outline-none focus:border-[#D4A85F]/30 transition-colors cursor-pointer"
                 value={form.hotelId}
-                onChange={(e) => setForm({ ...form, hotelId: e.target.value })}
+                onChange={(e) => setForm({ ...form, hotelId: e.target.value, roomId: "" })}
               >
                 <option value="" className="bg-[#0B1220]">Choose a hotel</option>
                 {hotels.map((hotel) => (
@@ -267,7 +293,7 @@ const ManageOffers = () => {
                 </option>
                 {filteredRooms.map((room) => (
                   <option key={room._id} value={room._id} className="bg-[#0B1220]">
-                    {room.roomType} — ${room.pricePerNight}/night
+                    {room.roomType} — {currency}{room.pricePerNight}/night
                   </option>
                 ))}
               </select>
@@ -321,6 +347,16 @@ const ManageOffers = () => {
         </form>
 
         <div className="space-y-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
+            <input
+              type="text"
+              placeholder="Search offers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-white/[0.06] bg-white/[0.04] text-white/70 placeholder:text-white/30 outline-none focus:border-[#D4A85F]/30 transition-colors"
+            />
+          </div>
           {sortedOffers.length === 0 && (
             <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl p-8 text-center">
               <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#D4A85F]/20 to-[#D4A85F]/5 border border-[#D4A85F]/20 flex items-center justify-center">
@@ -376,7 +412,7 @@ const ManageOffers = () => {
                 </button>
                 <button
                   className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-white/[0.06] text-white/50 hover:text-[#EF4444] hover:border-[#EF4444]/20 hover:bg-[#EF4444]/10 transition-all"
-                  onClick={() => handleDelete(offer._id)}
+                  disabled={deletingId === offer._id} onClick={() => handleDelete(offer._id)}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   Delete
@@ -386,6 +422,14 @@ const ManageOffers = () => {
           ))}
         </div>
       </div>
+      <ConfirmModal
+        open={confirmDelete.open}
+        title="Delete Offer"
+        message="Are you sure you want to delete this offer? This action cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={handleDeleteConfirmed}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+      />
     </motion.div>
   );
 };

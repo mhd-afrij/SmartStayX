@@ -1,14 +1,13 @@
-// Footer — Site-wide footer with links, social icons, and brand information
 import React from 'react';
-import { assets } from '../assets/assets';
+import { Camera, MessageCircle, AtSign, Briefcase, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { assets } from '../assets/assets';
 
 const Footer = () => {
   return (
     <footer className="bg-[#07111f] border-t border-white/8 pt-12 pb-8 px-6 md:px-16 lg:px-24 xl:px-32">
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-wrap justify-between gap-12 md:gap-6">
-          {/* Left section with logo and social links */}
           <div className="max-w-[300px]">
             <img src={assets.logo} alt="logo" className="mb-4 h-8 md:h-10" />
             <p className="text-sm text-white/55 leading-relaxed">
@@ -16,21 +15,20 @@ const Footer = () => {
             </p>
             <div className="flex items-center gap-4 mt-6">
               <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-xl transition-transform hover:-translate-y-1">
-                <img src={assets.instagramIcon} alt="instagram" className="w-5 opacity-70" />
+                <Camera className="w-5 h-5 text-white/70" />
               </a>
               <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-xl transition-transform hover:-translate-y-1">
-                <img src={assets.facebookIcon} alt="facebook" className="w-5 opacity-70" />
+                <MessageCircle className="w-5 h-5 text-white/70" />
               </a>
               <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-xl transition-transform hover:-translate-y-1">
-                <img src={assets.twitterIcon} alt="twitter" className="w-5 opacity-70" />
+                <AtSign className="w-5 h-5 text-white/70" />
               </a>
               <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-xl transition-transform hover:-translate-y-1">
-                <img src={assets.linkendinIcon} alt="linkedin" className="w-5 opacity-70" />
+                <Briefcase className="w-5 h-5 text-white/70" />
               </a>
             </div>
           </div>
 
-          {/* Company Links Section */}
           <div>
             <p className="font-space text-xs uppercase tracking-[0.28em] text-white/50 mb-4">COMPANY</p>
             <ul className="flex flex-col gap-3 text-sm text-white/60">
@@ -42,7 +40,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Support Links Section */}
           <div>
             <p className="font-space text-xs uppercase tracking-[0.28em] text-white/50 mb-4">SUPPORT</p>
             <ul className="flex flex-col gap-3 text-sm text-white/60">
@@ -54,7 +51,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Stay Updated Section */}
           <div className="max-w-[300px]">
             <p className="font-space text-xs uppercase tracking-[0.28em] text-white/50 mb-4">STAY UPDATED</p>
             <p className="text-sm text-white/55 mb-4">
@@ -67,16 +63,14 @@ const Footer = () => {
                 placeholder="Your email"
               />
               <button className="gold-button h-10 w-10 flex-shrink-0 rounded-l-none p-0">
-                <img src={assets.arrowIcon} alt="arrow" className="w-3.5" />
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
         </div>
 
-        {/* Divider */}
         <div className="luxury-divider mt-12 mb-6" />
 
-        {/* Bottom Section with Copyright and Links */}
         <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
           <p className="text-xs text-white/40">© {new Date().getFullYear()} SmartStayX. All rights reserved.</p>
           <ul className="flex items-center gap-6 text-xs text-white/40">

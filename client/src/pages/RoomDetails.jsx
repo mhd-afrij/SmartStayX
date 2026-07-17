@@ -1,12 +1,59 @@
 // RoomDetails — Detailed room view with gallery, facilities, reviews, and booking flow
 import { useEffect, useState, useRef, useMemo } from "react";
-import { assets, facilityIcons, roomCommonData } from "../assets/assets";
+import { assets, roomCommonData } from "../assets/assets";
 import { useParams, Link } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
+import {
+  Bath,
+  BedDouble,
+  Building2,
+  CheckCircle2,
+  Coffee,
+  ConciergeBell,
+  MapPin,
+  Phone,
+  Sofa,
+  Sparkles,
+  Star,
+  Tv2,
+  Wifi,
+  Waves,
+  Wine,
+  ShieldCheck,
+  Mountain,
+  Heart,
+} from "lucide-react";
 import toast from "react-hot-toast";
-import StarRating from "../components/StarRating";
 import ReviewSection from "../components/ReviewSection";
-import { Tag } from "lucide-react";
+
+const amenityIconsMap = {
+  "King Bed": BedDouble,
+  "Ocean View": Waves,
+  "Living Room": Sofa,
+  Jacuzzi: Bath,
+  AC: Sparkles,
+  "Mini Bar": Wine,
+  WiFi: Wifi,
+  "Free Wifi": Wifi,
+  "Free WiFi": Wifi,
+  "Free Breakfast": Coffee,
+  "Room Service": ConciergeBell,
+  "Mountain View": Mountain,
+  "Pool Access": Waves,
+  TV: Tv2,
+  Balcony: Building2,
+};
+
+const roomFactIconsMap = {
+  "Clean & Safe Stay": ShieldCheck,
+  "Enhanced Cleaning": Sparkles,
+  "Excellent Location": MapPin,
+  "Smooth Check-In": CheckCircle2,
+};
+
+const getAmenityIcon = (label) => amenityIconsMap[label] || amenityIconsMap[label?.replace(/\s+/g, " ")?.trim()] || Sparkles;
+
+const getRoomFactIcon = (label) => roomFactIconsMap[label] || ShieldCheck;
 
 const calcNights = (checkIn, checkOut) => {
   if (!checkIn || !checkOut) return 0;
@@ -205,10 +252,15 @@ const RoomDetails = () => {
           toast.error("Please login to book this room.");
           return;
         }
+        const token = await getToken();
+        if (!token) {
+          toast.error("Session expired. Please login again.");
+          return;
+        }
         const payload = { room: room._id, checkInDate, checkOutDate, guests: Number(guests) };
         if (selectedOfferId) payload.offerId = selectedOfferId;
         const { data } = await axios.post("/api/bookings/book", payload, {
-          headers: { Authorization: `Bearer ${await getToken()}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (data.success) {
@@ -252,7 +304,6 @@ const RoomDetails = () => {
       <div className="absolute inset-0 mesh-glow opacity-40" />
 
       <div className="relative mx-auto max-w-[1200px] px-4 md:px-8 lg:px-10">
-        {/* Breadcrumb */}
         <div className="mb-6 flex flex-wrap items-center gap-2 text-xs text-white/40">
           <Link to="/" className="hover:text-[#D4A85F] transition-colors">Home</Link>
           <span>/</span>
@@ -262,7 +313,6 @@ const RoomDetails = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Gallery and info */}
           <div className="space-y-8 lg:col-span-8 min-w-0">
             <div className="space-y-3">
               <p className="luxury-kicker">Room</p>
@@ -275,16 +325,15 @@ const RoomDetails = () => {
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm text-white/60">
-                <StarRating />
+                <Star className="w-4 h-4 text-[#F5D08A] fill-[#F5D08A]" />
                 <span>200+ reviews</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-white/60">
-                <img src={assets.locationIcon} alt="location-icon" className="w-4 h-4 opacity-60" />
+                <MapPin className="w-4 h-4 text-white/60" />
                 <span>{room.hotel?.address}</span>
               </div>
             </div>
 
-            {/* Image gallery */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
               <div className="lg:col-span-2 rounded-[2rem] overflow-hidden bg-[#0d1728] aspect-[16/9] max-h-[360px] border border-white/10">
                 {mainImage ? (
@@ -309,25 +358,29 @@ const RoomDetails = () => {
               </div>
             </div>
 
-            {/* Amenities */}
             <section className="space-y-4">
               <h2 className="text-2xl md:text-3xl font-playfair text-white">Experience understated luxury</h2>
               <div className="flex flex-wrap gap-2">
                 {room.amenities?.map((item, index) => (
                   <div key={index} className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/5 border border-white/10">
-                    <img src={facilityIcons[item]} alt={item} className="w-4 h-4" />
+                    {(() => {
+                      const AmenityIcon = getAmenityIcon(item);
+                      return <AmenityIcon className="w-4 h-4 text-white/50" />;
+                    })()}
                     <p className="text-xs text-white/70">{item}</p>
                   </div>
                 ))}
               </div>
             </section>
 
-            {/* Room features */}
             <section className="space-y-4">
               {roomCommonData.map((spec, index) => (
                 <div key={index} className="flex items-start gap-3">
                   <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-                    <img src={spec.icon} alt={`${spec.title}-icon`} className="w-5 h-5 opacity-70" />
+                    {(() => {
+                      const FactIcon = getRoomFactIcon(spec.title);
+                      return <FactIcon className="w-5 h-5 text-white/50" />;
+                    })()}
                   </div>
                   <div>
                     <p className="text-base text-white font-medium">{spec.title}</p>
@@ -337,12 +390,10 @@ const RoomDetails = () => {
               ))}
             </section>
 
-            {/* Description */}
             <div className="border-y border-white/8 py-8 text-white/60">
               <p>Guests will be allocated on the ground floor according to availability. You get a comfortable two bedroom apartment with a true city feeling. The price quoted is for two guests; please mark the number of guests to get the exact price for groups.</p>
             </div>
 
-            {/* Host section */}
             <div className="luxury-card overflow-hidden p-6">
               <div className="flex flex-col md:flex-row md:items-center gap-4">
                 <img
@@ -354,7 +405,7 @@ const RoomDetails = () => {
                 <div>
                   <p className="text-lg text-white">Hosted by {room.hotel?.name}</p>
                   <div className="flex items-center gap-2 mt-1 text-sm text-white/60">
-                    <StarRating />
+                    <Star className="w-4 h-4 text-[#F5D08A] fill-[#F5D08A]" />
                     <span>200+ reviews</span>
                   </div>
                   {room.hotel?.address && (
@@ -374,9 +425,7 @@ const RoomDetails = () => {
                 <div className="mt-4 pt-4 border-t border-white/10 space-y-2 text-sm">
                   {room.hotel?.contact ? (
                     <div className="flex items-center gap-2 text-white/70">
-                      <svg className="w-4 h-4 text-[#D4A85F] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
+                      <Phone className="w-4 h-4 text-[#D4A85F] shrink-0" />
                       <a href={`tel:${room.hotel.contact}`} className="hover:text-[#D4A85F] transition-colors">{room.hotel.contact}</a>
                     </div>
                   ) : (
@@ -384,21 +433,31 @@ const RoomDetails = () => {
                   )}
                   {room.hotel?.address && (
                     <div className="flex items-center gap-2 text-white/70">
-                      <svg className="w-4 h-4 text-[#D4A85F] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
+                      <MapPin className="w-4 h-4 text-[#D4A85F] shrink-0" />
                       <span>{room.hotel?.address}</span>
                     </div>
                   )}
                 </div>
               )}
+
+              <Link
+                to={`/rooms?destination=${encodeURIComponent(room.hotel?.city || room.hotel?.address || '')}`}
+                className="mt-4 ghost-button px-6 py-2.5 text-sm w-full text-center block"
+              >
+                Browse all rooms in {room.hotel?.city || "this area"}
+              </Link>
+
+              <Link
+                to={`/itinerary?destination=${encodeURIComponent(room.hotel?.city || room.hotel?.address || '')}&hotel=${encodeURIComponent(room.hotel?.name || '')}`}
+                className="mt-3 gold-button px-6 py-2.5 text-sm w-full text-center block"
+              >
+                Plan a trip around this stay
+              </Link>
             </div>
 
             <ReviewSection roomId={id} />
           </div>
 
-          {/* Booking sidebar */}
           <aside className="space-y-4 lg:col-span-4 lg:sticky lg:top-24 h-fit">
             <div className="luxury-card overflow-hidden p-6">
               <div className="flex items-end justify-between gap-4">
@@ -471,7 +530,6 @@ const RoomDetails = () => {
                 </div>
               )}
 
-              {/* Room offers */}
               {roomOffers.length > 0 && !pricePreview?.offerDiscountPercent && (
                 <div className="mt-4 space-y-2">
                   <p className="text-xs font-medium text-white/50 uppercase tracking-wider flex items-center gap-1.5">

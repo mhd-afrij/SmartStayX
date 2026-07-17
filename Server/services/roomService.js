@@ -2,40 +2,34 @@
 import Room from '../models/Room.js';
 import Booking from '../models/Booking.js';
 import Hotel from '../models/Hotel.js';
-import logger from '../utils/logger.js';
-import getRedis from '../utils/redisClient.js';
 import { BOOKING_STATUS } from '../constants/bookingStatuses.js';
 
-// Room listing, owner room retrieval, availability toggle, trending aggregation.
-// All public endpoints are cached in Redis (TTL: 60s for listings, 5min for trending).
-const CACHE_TTL = 60;
-const TRENDING_CACHE_KEY = 'rooms:trending';
-const TRENDING_CACHE_TTL = 300; // 5 min
+const cityPrefix = (city) =>
+  city
+    .replace(/[^a-zA-Z0-9 ]/g, '')
+    .trim()
+    .split(/\s+/)
+    .map((w) => w.slice(0, 1).toUpperCase())
+    .join('')
+    .slice(0, 3) || 'CTY';
 
-const buildCacheKey = (page, limit, filter) =>
-  `rooms:page:${page}:limit:${limit}:f:${JSON.stringify(filter || {})}`;
+const typePrefix = (roomType) =>
+  roomType
+    .replace(/[^a-zA-Z0-9 ]/g, '')
+    .trim()
+    .split(/\s+/)
+    .map((w) => w.slice(0, 1).toUpperCase())
+    .join('')
+    .slice(0, 3) || 'STM';
 
+// Retrieves a paginated, filtered list of available rooms
 const getRooms = async ({ page = 1, limit = 10, filter = {} } = {}) => {
   const p = Math.max(1, Number(page) || 1);
   const l = Math.min(100, Math.max(1, Number(limit) || 10));
-  const cacheKey = buildCacheKey(p, l, filter);
-
-  const redis = getRedis();
-  if (redis) {
-    try {
-      const cached = await redis.get(cacheKey);
-      if (cached) {
-        logger.info('rooms: cache hit %s', cacheKey);
-        return JSON.parse(cached);
-      }
-    } catch (err) {
-      logger.warn('redis get failed: %o', err.message);
-    }
-  }
-
   const skip = (p - 1) * l;
   const query = { isAvailable: true, ...filter };
 
+  // Fetch rooms and total count in parallel
   const [rooms, total] = await Promise.all([
     Room.find(query).populate('hotel').sort({ createdAt: -1 }).skip(skip).limit(l),
     Room.countDocuments(query),
@@ -54,17 +48,10 @@ const getRooms = async ({ page = 1, limit = 10, filter = {} } = {}) => {
 
   const result = { rooms: hydratedRooms, page: p, limit: l, total };
 
-  if (redis) {
-    try {
-      await redis.set(cacheKey, JSON.stringify(result), 'EX', CACHE_TTL);
-    } catch (err) {
-      logger.warn('redis set failed: %o', err.message);
-    }
-  }
-
   return result;
 };
 
+// Retrieves all rooms belonging to hotels owned by the given user
 const getOwnerRooms = async ({ userId }) => {
   const hotels = await Hotel.find({ owner: userId }).select('_id');
   const hotelIds = hotels.map((h) => h._id);
@@ -83,6 +70,7 @@ const getOwnerRooms = async ({ userId }) => {
   });
 };
 
+// Toggles a room's isAvailable flag; only the owning Admin can perform this
 const toggleAvailability = async ({ roomId, userId }) => {
   if (typeof roomId !== 'string') throw Object.assign(new Error('Invalid room ID'), { status: 400 });
   const room = await Room.findById(roomId).populate('hotel');
@@ -91,34 +79,17 @@ const toggleAvailability = async ({ roomId, userId }) => {
     throw Object.assign(new Error('Not authorized'), { status: 403 });
   }
 
+  // Toggle the flag and persist
   room.isAvailable = !room.isAvailable;
   await room.save();
-
-  const redis = getRedis();
-  if (redis) {
-    try {
-      const keys = await redis.keys('rooms:page:*');
-      if (keys.length > 0) await redis.del(...keys);
-    } catch (err) {
-      logger.warn('redis cache invalidation failed: %o', err.message);
-    }
-  }
 
   return room;
 };
 
 // ── Trending rooms — aggregate booking count in the last 30 days, sorted desc ──
+// Returns the most-booked rooms in the last 30 days, sorted by booking count
 const getTrendingRooms = async ({ limit = 10 } = {}) => {
-  const redis = getRedis();
-  if (redis) {
-    try {
-      const cached = await redis.get(TRENDING_CACHE_KEY);
-      if (cached) return JSON.parse(cached);
-    } catch (err) {
-      logger.warn('redis trending get failed: %o', err.message);
-    }
-  }
-
+  // Aggregate booking counts per room over the last 30 days
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const trending = await Booking.aggregate([
     {
@@ -151,6 +122,7 @@ const getTrendingRooms = async ({ limit = 10 } = {}) => {
     {
       $project: {
         _id: '$room._id',
+        roomNumber: '$room.roomNumber',
         roomType: '$room.roomType',
         pricePerNight: '$room.pricePerNight',
         amenities: '$room.amenities',
@@ -163,29 +135,28 @@ const getTrendingRooms = async ({ limit = 10 } = {}) => {
     },
   ]);
 
-  if (redis) {
-    try {
-      await redis.set(TRENDING_CACHE_KEY, JSON.stringify(trending), 'EX', TRENDING_CACHE_TTL);
-    } catch (err) {
-      logger.warn('redis trending set failed: %o', err.message);
-    }
-  }
-
   return trending;
 };
 
-// ── Cache warming — pre-populate first page and trending on server start ──
-const warmCache = async () => {
-  const redis = getRedis();
-  if (!redis) return;
+// Suggests the next room number for a hotel based on city prefix and room type
+const suggestNextRoomNumber = async ({ hotelId, roomType }) => {
+  const hotel = await Hotel.findById(hotelId).select('city');
+  if (!hotel) throw Object.assign(new Error('Hotel not found'), { status: 404 });
 
-  try {
-    const firstPage = await getRooms({ page: 1, limit: 10 });
-    const trending = await getTrendingRooms({ limit: 10 });
-    logger.info('room cache warmed: %d rooms, %d trending', firstPage.rooms.length, trending.length);
-  } catch (err) {
-    logger.warn('cache warm failed: %o', err.message);
-  }
+  const cPrefix = cityPrefix(hotel.city);
+  const tPrefix = roomType ? typePrefix(roomType) : '';
+  const prefix = tPrefix ? `${cPrefix}-${tPrefix}` : cPrefix;
+  const regex = tPrefix ? `^${cPrefix}-${tPrefix}-\\d+$` : `^${cPrefix}-\\d+$`;
+  const rooms = await Room.find({ hotel: hotelId, roomNumber: { $regex: regex } }).select('roomNumber');
+  let maxNum = 0;
+  rooms.forEach((r) => {
+    const match = r.roomNumber.match(/(\d+)$/);
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (num > maxNum) maxNum = num;
+    }
+  });
+  return `${prefix}-${String(maxNum + 1).padStart(3, '0')}`;
 };
 
-export default { getRooms, getOwnerRooms, toggleAvailability, getTrendingRooms, warmCache };
+export default { getRooms, getOwnerRooms, toggleAvailability, getTrendingRooms, suggestNextRoomNumber };

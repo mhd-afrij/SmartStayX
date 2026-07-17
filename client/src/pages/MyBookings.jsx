@@ -1,30 +1,60 @@
 // MyBookings — User's booking history, status tracking, and management actions
 import { useEffect, useState } from 'react'
 import Title from '../components/Title'
-import { assets, placeholderImage } from '../assets/assets'
+import { placeholderImage } from '../assets/assets'
+import { MapPin, Users, Star } from 'lucide-react'
 import { useAppContext } from '../context/AppContext'
 import toast from 'react-hot-toast'
 import ServicePortal from '../components/ServicePortal'
 import BookingService from '../services/BookingService'
 import { BOOKING_STATUS } from '../constants/bookingStatuses'
-import { FALLBACK_VALUES } from '../constants/pricingConfig'
 
+const SATISFACTION_OPTIONS = [
+  { value: "very_satisfied", label: "Very Satisfied" },
+  { value: "satisfied", label: "Satisfied" },
+  { value: "neutral", label: "Neutral" },
+  { value: "dissatisfied", label: "Dissatisfied" },
+  { value: "very_dissatisfied", label: "Very Dissatisfied" },
+]
+
+const StarInput = ({ value, onChange }) => (
+  <div className="flex items-center gap-1">
+    {[1, 2, 3, 4, 5].map((star) => (
+      <button
+        key={star}
+        type="button"
+        onClick={() => onChange(star)}
+        className="p-0.5 transition-transform hover:scale-110"
+      >
+        <Star className={`w-6 h-6 ${star <= value ? "text-[#F5D08A]" : "text-white/20"}`} fill="currentColor" />
+      </button>
+    ))}
+  </div>
+)
+
+// MyBookings — Displays user bookings with payment, cancellation, refund, and service request actions
 const MyBookings = () => {
-    const { getToken, formatPrice, translate, user, axios } = useAppContext();
+    const { getToken, formatPrice, translate, user, axios, navigate } = useAppContext();
     const [bookings, setBookings] = useState([])
     const [loading, setLoading] = useState(true)
     const [payingId, setPayingId] = useState(null)
     const [cancelingId, setCancelingId] = useState(null)
     const [refundingId, setRefundingId] = useState(null)
     const [serviceModal, setServiceModal] = useState({ open: false, roomId: null, hotelId: null })
+    const [reviewModal, setReviewModal] = useState({ open: false, booking: null })
+    const [reviewForm, setReviewForm] = useState({ rating: 0, satisfaction: "", comment: "" })
+    const [reviewSubmitting, setReviewSubmitting] = useState(false)
 
+    // Derive latest confirmed booking for service eligibility
     const confirmedBookings = bookings.filter((b) => b.status === "confirmed");
     const latestConfirmed = confirmedBookings[confirmedBookings.length - 1];
 
+    // openServiceFor — Opens the service request modal for a booking room
     const openServiceFor = (roomId, hotelId) => {
         setServiceModal({ open: true, roomId, hotelId });
     };
 
+    // fetchBookings — Loads the current user's bookings from the API
     const fetchBookings = async ({ showLoader = false } = {}) => {
         try {
             if (showLoader) setLoading(true);
@@ -46,6 +76,7 @@ const MyBookings = () => {
         fetchBookings({ showLoader: true });
     }, []);
 
+    // On mount, check for Stripe redirect — confirm checkout session if success param is present
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const payment = params.get('payment');
@@ -80,6 +111,7 @@ const MyBookings = () => {
         confirmCheckout();
     }, []);
 
+    // handlePayNow — Initiates Stripe checkout session for an unpaid booking
     const handlePayNow = async (bookingId) => {
         if (!bookingId) return;
         setPayingId(bookingId);
@@ -100,6 +132,7 @@ const MyBookings = () => {
         }
     };
 
+    // handleCancelBooking — Cancels an unpaid booking before check-in
     const handleCancelBooking = async (bookingId) => {
         if (!bookingId) return;
         setCancelingId(bookingId);
@@ -120,6 +153,7 @@ const MyBookings = () => {
         }
     };
 
+    // handleRefundRequest — Submits a refund request for a paid booking
     const handleRefundRequest = async (bookingId) => {
         if (!bookingId) return;
         setRefundingId(bookingId);
@@ -141,23 +175,6 @@ const MyBookings = () => {
         } finally {
             setRefundingId(null);
         }
-    };
-
-    const getPricingBreakdown = (booking) => {
-        const checkIn = new Date(booking.checkInDate);
-        const checkOut = new Date(booking.checkOutDate);
-        const milliseconds = checkOut.getTime() - checkIn.getTime();
-        const fallbackNights = Math.max(1, Math.ceil(milliseconds / (1000 * 3600 * 24)));
-
-        const nights = booking.nights || fallbackNights;
-        const basePerNight = booking.basePricePerNight ?? booking.room?.pricePerNight ?? 0;
-        const dynamicPerNight = booking.dynamicPricePerNight ?? booking.totalPrice / nights;
-        const multiplier = booking.priceMultiplier ?? (basePerNight > 0 ? dynamicPerNight / basePerNight : 1);
-
-        const baseTotal = Number((basePerNight * nights).toFixed(2));
-        const surgeAmount = Number((booking.totalPrice - baseTotal).toFixed(2));
-
-        return { nights, basePerNight, dynamicPerNight, multiplier, surgeAmount };
     };
 
     if (loading) {
@@ -183,7 +200,6 @@ const MyBookings = () => {
             <div className="relative mx-auto max-w-6xl px-4 md:px-8 lg:px-10">
                 <div className="flex items-start justify-between gap-4">
                     <Title title={translate('myBookings')} subtitle={translate('myBookingsSubtitle')} />
-
                 </div>
 
                 {bookings.length === 0 && !loading && (
@@ -192,8 +208,6 @@ const MyBookings = () => {
 
                 <div className="mt-8 space-y-4">
                     {bookings.map((booking) => {
-                        const pricing = getPricingBreakdown(booking);
-                        const nightLabel = pricing.nights > 1 ? translate('nights') : translate('night');
                         return (
                             <div key={booking._id} className="luxury-card overflow-hidden p-5 md:p-6">
                                 <div className="flex flex-col md:flex-row md:items-start gap-5">
@@ -210,27 +224,22 @@ const MyBookings = () => {
                                     {/* Hotel details */}
                                     <div className="flex-1 min-w-0 space-y-2">
                                         <p className="font-playfair text-xl text-white">
-                                            {booking.hotel?.name || FALLBACK_VALUES.HOTEL_NAME}
+                                            {booking.hotel?.name || 'Hotel'}
                                             <span className="font-inter text-sm text-white/50 ml-2">
-                                                ({booking.room?.roomType || FALLBACK_VALUES.ROOM_TYPE})
+                                                ({booking.roomNumber || booking.room?.roomNumber ? `Room ${booking.roomNumber || booking.room?.roomNumber}` : ''}{booking.room?.roomType ? `${booking.roomNumber || booking.room?.roomNumber ? ' — ' : ''}${booking.room.roomType}` : 'Room'})
                                             </span>
                                         </p>
                                         <div className="flex items-center gap-1.5 text-sm text-white/50">
-                                            <img src={assets.locationIcon} alt="location-icon" className="w-4 h-4 opacity-60" />
-                                            <span>{booking.hotel?.address || FALLBACK_VALUES.ADDRESS}</span>
+                                            <MapPin className="w-4 h-4 opacity-60" />
+                                            <span>{booking.hotel?.address || 'Address unavailable'}</span>
                                         </div>
                                         <div className="flex items-center gap-1.5 text-sm text-white/50">
-                                            <img src={assets.guestsIcon} alt="guest-icon" className="w-4 h-4 opacity-60" />
+                                            <Users className="w-4 h-4 opacity-60" />
                                             <span>{translate('guests')}: {booking.guests}</span>
                                         </div>
                                         <p className="text-sm text-white mt-1">
                                             {translate('total')}: <span className="text-[#F5D08A] font-medium">{formatPrice(booking.totalPrice)}</span>
                                         </p>
-                                        <div className="text-xs text-white/40 leading-5">
-                                            <p>{translate('base')}: {formatPrice(pricing.basePerNight)} x {pricing.nights} {nightLabel}</p>
-                                            <p>{translate('dynamic')}: {formatPrice(pricing.dynamicPerNight)}/{translate('night')} ({pricing.multiplier.toFixed(2)}x)</p>
-                                            {pricing.surgeAmount > 0 && <p>{translate('surge')}: +{formatPrice(pricing.surgeAmount)}</p>}
-                                        </div>
                                     </div>
 
                                     {/* Dates */}
@@ -247,6 +256,11 @@ const MyBookings = () => {
 
                                     {/* Actions */}
                                     <div className="flex flex-col items-start gap-2 shrink-0">
+                                        {booking.status === BOOKING_STATUS.RESERVATION && (
+                                            <span className="text-[10px] text-[#F59E0B] px-2 py-0.5 rounded-full border border-[#F59E0B]/30 bg-[#F59E0B]/10 font-medium">
+                                                Reservation
+                                            </span>
+                                        )}
                                         {booking.status === BOOKING_STATUS.CANCELLED && (
                                             <p className="text-xs text-red-400 font-medium">{translate('bookingCancelled')}</p>
                                         )}
@@ -259,7 +273,15 @@ const MyBookings = () => {
                                         <p className="text-xs text-white/40">{translate('method')}: {booking.paymentMethod || "Pay At Hotel"}</p>
 
                                         <div className="flex flex-col gap-1.5 mt-2">
-                                            {!booking.isPaid && booking.status !== BOOKING_STATUS.CANCELLED && (
+                                            {booking.status === BOOKING_STATUS.RESERVATION && (
+                                                <button
+                                                    onClick={() => navigate(`/payment/${booking._id}`)}
+                                                    className="gold-button text-xs px-4 py-2"
+                                                >
+                                                    Pay Now
+                                                </button>
+                                            )}
+                                            {!booking.isPaid && booking.status !== BOOKING_STATUS.CANCELLED && booking.status !== BOOKING_STATUS.RESERVATION && (
                                                 <button
                                                     onClick={() => handlePayNow(booking._id)}
                                                     disabled={payingId === booking._id}
@@ -283,6 +305,25 @@ const MyBookings = () => {
                                                     className="text-xs px-4 py-2 rounded-full border border-[#D4A85F]/30 text-[#F5D08A] hover:bg-[#D4A85F]/10 transition"
                                                 >
                                                     {translate('requestService')}
+                                                </button>
+                                            )}
+                                            {booking.isPaid && booking.status === BOOKING_STATUS.CONFIRMED && (
+                                                <button
+                                                    onClick={() => {
+                                                        setReviewForm({ rating: 0, satisfaction: "", comment: "" })
+                                                        setReviewModal({ open: true, booking })
+                                                    }}
+                                                    className="text-xs px-4 py-2 rounded-full border border-[#D4A85F]/30 text-[#F5D08A] hover:bg-[#D4A85F]/10 transition"
+                                                >
+                                                    Write a Review
+                                                </button>
+                                            )}
+                                            {booking.isPaid && (
+                                                <button
+                                                    onClick={() => navigate(`/invoice/${booking._id}`)}
+                                                    className="text-xs px-4 py-2 rounded-full border border-white/20 text-white/60 hover:text-white hover:border-white/40 transition"
+                                                >
+                                                    View Invoice
                                                 </button>
                                             )}
                                             {booking.isPaid && booking.refundStatus === "none" && (
@@ -324,6 +365,81 @@ const MyBookings = () => {
                     hotelId={serviceModal.hotelId}
                     onClose={() => setServiceModal({ open: false, roomId: null, hotelId: null })}
                 />
+            )}
+
+            {reviewModal.open && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setReviewModal({ open: false, booking: null })}>
+                    <div className="luxury-card w-full max-w-lg p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-lg font-playfair text-white">Write a Review</h3>
+                        <form onSubmit={async (e) => {
+                            e.preventDefault()
+                            if (reviewForm.rating < 1) { toast.error("Please select a rating"); return }
+                            if (!reviewForm.satisfaction) { toast.error("Please select your satisfaction level"); return }
+                            setReviewSubmitting(true)
+                            try {
+                                const token = await getToken()
+                                const { data } = await axios.post(
+                                    `/api/reviews/room/${reviewModal.booking.room?._id}`,
+                                    {
+                                        rating: reviewForm.rating,
+                                        satisfaction: reviewForm.satisfaction,
+                                        comment: reviewForm.comment,
+                                    },
+                                    { headers: { Authorization: `Bearer ${token}` } }
+                                )
+                                if (data.success) {
+                                    toast.success("Review submitted successfully")
+                                    setReviewModal({ open: false, booking: null })
+                                } else {
+                                    toast.error(data.message || "Failed to submit review")
+                                }
+                            } catch (error) {
+                                toast.error(error.response?.data?.message || "Failed to submit review")
+                            } finally {
+                                setReviewSubmitting(false)
+                            }
+                        }} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-white/70 mb-2">Rating</label>
+                                <StarInput value={reviewForm.rating} onChange={(val) => setReviewForm((p) => ({ ...p, rating: val }))} />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-white/70 mb-2">Satisfaction</label>
+                                <select
+                                    value={reviewForm.satisfaction}
+                                    onChange={(e) => setReviewForm((p) => ({ ...p, satisfaction: e.target.value }))}
+                                    className="luxury-select text-sm w-full"
+                                >
+                                    <option value="" className="bg-[#0d1728]">Select satisfaction level</option>
+                                    {SATISFACTION_OPTIONS.map((opt) => (
+                                        <option key={opt.value} value={opt.value} className="bg-[#0d1728]">{opt.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-white/70 mb-2">
+                                    Comment <span className="text-white/30 font-normal">({500 - reviewForm.comment.length} characters left)</span>
+                                </label>
+                                <textarea
+                                    value={reviewForm.comment}
+                                    onChange={(e) => setReviewForm((p) => ({ ...p, comment: e.target.value }))}
+                                    maxLength={500}
+                                    rows={4}
+                                    placeholder="Share your experience about this room..."
+                                    className="luxury-input mt-1 resize-none"
+                                />
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <button type="submit" disabled={reviewSubmitting} className="gold-button px-8 py-2.5 text-sm uppercase tracking-[0.18em] disabled:opacity-70">
+                                    {reviewSubmitting ? "Submitting..." : "Submit Review"}
+                                </button>
+                                <button type="button" onClick={() => setReviewModal({ open: false, booking: null })} className="text-sm text-white/50 hover:text-white transition">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             )}
         </div>
     )

@@ -1,8 +1,8 @@
-// HeroWelcome — Dashboard welcome banner with hotel info, quick stats, and CTAs
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, PlusCircle, FileText } from "lucide-react";
 
+// HeroWelcome — Dashboard welcome banner with hotel info, quick stats, and CTAs
 const HeroWelcome = ({ hotel, user }) => {
   const navigate = useNavigate();
   return (
@@ -46,13 +46,16 @@ const HeroWelcome = ({ hotel, user }) => {
 
           {/* Action buttons */}
           <div className="flex items-center gap-3">
-            <button className="group flex items-center gap-2 px-4 py-2.5 text-xs font-medium rounded-xl border border-white/[0.06] text-white/60 hover:text-white hover:bg-white/[0.06] transition-all">
+            <button
+              onClick={() => navigate("/Owner/reservations")}
+              className="group flex items-center gap-2 px-4 py-2.5 text-xs font-medium rounded-xl border border-white/[0.06] text-white/60 hover:text-white hover:bg-white/[0.06] transition-all"
+            >
               <FileText className="w-4 h-4" />
               View Report
               <ArrowRight className="w-3 h-3 opacity-0 -ml-2 group-hover:opacity-100 group-hover:ml-0 transition-all" />
             </button>
             <button
-              onClick={() => navigate("/rooms")}
+              onClick={() => navigate("/Owner/reservations")}
               className="group flex items-center gap-2 px-4 py-2.5 text-xs font-medium rounded-xl bg-gradient-to-r from-[#D4A85F] to-[#F5D08A] text-[#0B1220] hover:shadow-lg hover:shadow-[#D4A85F]/20 transition-all"
             >
               <PlusCircle className="w-4 h-4" />

@@ -16,10 +16,7 @@ export { default as ExclusiveOffer } from './ExclusiveOffer.jsx'
 
 // Modals / Forms
 export { default as HotelReg } from './HotelReg.jsx'
-export { default as BookingModal } from './BookingModal.jsx'
-export { default as InvoiceBill } from './InvoiceBill.jsx'
 export { default as ServicePortal } from './ServicePortal.jsx'
-export { default as ChatBot } from './ChatBot.jsx'
 
 // Sections
 export { default as ExperienceShowcase } from './ExperienceShowcase.jsx'
@@ -28,7 +25,5 @@ export { default as AIPlannerSection } from './AIPlannerSection.jsx'
 
 // Dashboards and feature folders (re-export entire folder namespace)
 export * as Dashboard from './dashboard'
-export * as TripPlanner from './TripPlanner'
 
-// Fallback: export any remaining components from the top-level files for compatibility
-export { default as BookingModalLegacy } from './BookingModal.jsx'
+

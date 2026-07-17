@@ -67,10 +67,10 @@ describe('RoomDetails page', () => {
     expect(headings.length).toBeGreaterThanOrEqual(2);
 
     expect(screen.getByText('Deluxe')).toBeInTheDocument();
-    expect(screen.getByText('123 Test St')).toBeInTheDocument();
+    expect(screen.getAllByText('123 Test St').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Free WiFi')).toBeInTheDocument();
     expect(screen.getByText('Pool')).toBeInTheDocument();
-    expect(screen.getByText('$200.00')).toBeInTheDocument();
+    expect(screen.getAllByText('$200.00').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows breadcrumb, booking form, and host section', async () => {

@@ -29,7 +29,6 @@ Set these in `client/.env`:
 | `VITE_DEFAULT_CURRENCY` | Default currency (USD) |
 | `VITE_PLATFORM_EMAIL` | Platform contact email |
 | `VITE_OWNER_OVERRIDE_EMAIL` | Owner override email |
-| `VITE_SUPPORT_EMAIL` | Support email |
 
 ## Project Structure
 

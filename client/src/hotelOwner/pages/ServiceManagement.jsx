@@ -3,35 +3,49 @@ import { useEffect, useState, useMemo, useCallback } from "react"
 import { motion } from "framer-motion"
 import { useAppContext } from "../../context/AppContext"
 import { toast } from "react-hot-toast"
-import { ConciergeBell, CheckCircle, XCircle } from "lucide-react"
+import { ConciergeBell, CheckCircle, XCircle, Building2, ChevronDown } from "lucide-react"
 import ConfirmModal from "../../components/dashboard/ConfirmModal"
 
+// SERVICE_TYPES — Supported room service categories
 const SERVICE_TYPES = ["Housekeeping", "Maintenance", "Room Service", "Other"]
+// STATUS_OPTIONS — Possible service request lifecycle statuses
 const STATUS_OPTIONS = ["pending", "assigned", "completed", "cancelled"]
 
+// ServiceManagement — Owner panel for managing guest room service requests with status updates
 const ServiceManagement = () => {
-  const { user, getToken, axios, selectedHotelId } = useAppContext()
+  const { user, getToken, axios, dashboardData } = useAppContext()
   const [requests, setRequests] = useState([])
   const [loading, setLoading] = useState(true)
   const [processingId, setProcessingId] = useState(null)
   const [filterType, setFilterType] = useState("all")
   const [filterStatus, setFilterStatus] = useState("all")
+  const [filterHotel, setFilterHotel] = useState("all")
   const [confirmState, setConfirmState] = useState({ open: false, id: null, title: "", message: "", status: "" })
+  const [hotels, setHotels] = useState([])
 
+  useEffect(() => {
+    if (dashboardData?.allHotels) {
+      setHotels(dashboardData.allHotels)
+    }
+  }, [dashboardData])
+
+  // requestConfirm — Opens a confirmation modal before status change
   const requestConfirm = (id, title, message, status) => {
     setConfirmState({ open: true, id, title, message, status })
   }
 
+  // handleConfirmed — Executes the status update after modal confirmation
   const handleConfirmed = () => {
     const { id, status } = confirmState
     setConfirmState({ open: false, id: null, title: "", message: "", status: "" })
     if (id && status) executeStatusUpdate(id, status)
   }
 
+  // fetchRequests — Loads service request history for the selected hotel
   const fetchRequests = useCallback(async () => {
     try {
       const token = await getToken()
-      const { data } = await axios.get(`/api/services/history?hotelId=${selectedHotelId || "all"}`, {
+      const { data } = await axios.get(`/api/services/history?hotelId=${filterHotel || "all"}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (data.success) {
@@ -44,12 +58,13 @@ const ServiceManagement = () => {
     } finally {
       setLoading(false)
     }
-  }, [axios, getToken, selectedHotelId])
+  }, [axios, getToken, filterHotel])
 
   useEffect(() => {
     if (user) fetchRequests()
   }, [user, fetchRequests])
 
+  // executeStatusUpdate — Sends a status update for a service request
   const executeStatusUpdate = async (requestId, status) => {
     setProcessingId(requestId)
     try {
@@ -71,6 +86,7 @@ const ServiceManagement = () => {
     }
   }
 
+  // handleUpdateStatus — Opens a confirmation dialog before updating request status
   const handleUpdateStatus = (requestId, status) => {
     requestConfirm(requestId, "Update Status", `Mark this request as "${status}"?`, status)
   }
@@ -92,8 +108,10 @@ const ServiceManagement = () => {
     return { total, pending, assigned, completed, cancelled }
   }, [requests])
 
+  // formatDate — Formats a date value to a locale string or dash if empty
   const formatDate = (v) => (v ? new Date(v).toLocaleString() : "-")
 
+  // statusBadge — Returns Tailwind class string for a given status badge style
   const statusBadge = (status) => {
     const map = {
       pending: "bg-amber-900/30 text-amber-400 border-amber-700/30",
@@ -117,6 +135,26 @@ const ServiceManagement = () => {
       <div>
         <h1 className="text-xl font-bold text-white tracking-tight">Service Requests</h1>
         <p className="text-sm text-white/40 mt-1">View, filter, and manage all guest service requests across your properties.</p>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <div />
+        {hotels.length > 1 && (
+          <div className="relative">
+            <select
+              value={filterHotel}
+              onChange={(e) => setFilterHotel(e.target.value)}
+              className="appearance-none pl-9 pr-8 py-2 text-sm rounded-xl border border-white/[0.06] bg-white/[0.04] text-white/70 outline-none focus:border-[#D4A85F]/30 transition-colors cursor-pointer"
+            >
+              <option value="all" className="bg-[#0B1220]">All Properties</option>
+              {hotels.map((h) => (
+                <option key={h._id} value={h._id} className="bg-[#0B1220]">{h.name}</option>
+              ))}
+            </select>
+            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30 pointer-events-none" />
+          </div>
+        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-5">
@@ -160,13 +198,12 @@ const ServiceManagement = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px] text-sm">
+            <table className="w-full min-w-[700px] text-sm">
               <thead>
                 <tr className="border-b border-white/8 text-white/50 text-xs uppercase tracking-[0.15em]">
                   <th className="py-4 px-5 text-left font-medium">Type</th>
                   <th className="py-4 px-5 text-left font-medium">Details</th>
                   <th className="py-4 px-5 text-left font-medium">Room</th>
-                  <th className="py-4 px-5 text-left font-medium">Staff</th>
                   <th className="py-4 px-5 text-left font-medium">Requested</th>
                   <th className="py-4 px-5 text-left font-medium">Status</th>
                   <th className="py-4 px-5 text-right font-medium">Actions</th>
@@ -181,9 +218,9 @@ const ServiceManagement = () => {
                     <td className="py-4 px-5 max-w-[200px]">
                       <span className="text-white/60 truncate block">{r.requestDetails || "-"}</span>
                     </td>
-                    <td className="py-4 px-5 text-white/70">{r.room?.roomType || "N/A"}</td>
-                    <td className="py-4 px-5">
-                      <span className="text-white/70">{r.staffAssigned?.name || "Unassigned"}</span>
+                    <td className="py-4 px-5 text-white/70">
+                      {r.roomNumber || r.room?.roomNumber ? `Room ${r.roomNumber || r.room?.roomNumber}` : ""}
+                      {r.room?.roomType ? (r.roomNumber || r.room?.roomNumber ? ` — ${r.room.roomType}` : r.room.roomType) : (!r.roomNumber && !r.room?.roomNumber ? "N/A" : "")}
                     </td>
                     <td className="py-4 px-5 text-xs text-white/40">{formatDate(r.createdAt)}</td>
                     <td className="py-4 px-5">

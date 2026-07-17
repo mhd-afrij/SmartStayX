@@ -1,4 +1,5 @@
 // bookingStatuses.js — Enum-like constants for booking lifecycle statuses
+// Booking lifecycle statuses: pending → confirmed → checked_in → checked_out
 export const BOOKING_STATUS = {
   PENDING: 'pending',
   CONFIRMED: 'confirmed',
@@ -6,11 +7,7 @@ export const BOOKING_STATUS = {
   CHECKED_OUT: 'checked_out',
   CANCELLED: 'cancelled',
   EXPIRED: 'expired',
+  RESERVATION: 'reservation',
 }
 
-export const ACTIVE_STATUSES = [BOOKING_STATUS.PENDING, BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.CHECKED_IN]
-export const BLOCKING_STATUSES = [BOOKING_STATUS.PENDING, BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.CHECKED_IN]
-export const CANCELLABLE_STATUSES = [BOOKING_STATUS.PENDING]
-export const MODIFIABLE_STATUSES = [BOOKING_STATUS.PENDING]
-export const PAYABLE_STATUSES = [BOOKING_STATUS.PENDING]
-export const COMPLETED_STATUSES = [BOOKING_STATUS.CHECKED_OUT, BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED]
+

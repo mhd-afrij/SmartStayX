@@ -5,13 +5,14 @@ import { useAppContext } from '../../src/context/AppContext';
 import toast from 'react-hot-toast'
 
 const HotelReg = () => {
-  const{setShowHotelReg,axios,getToken,setIsOwner,navigate}=useAppContext()
+  const{setShowHotelReg,axios,getToken,refreshUser,navigate}=useAppContext()
 
     const[name,setName]=useState("")
     const[address,setAddress]=useState("")
     const[contact,setContact]=useState("")
     const[city,setCity]=useState("")
 
+    // Submit hotel registration form to the API
     const onSubmitHandler =async (event)=>{
       try {
         event.preventDefault();
@@ -19,7 +20,7 @@ const HotelReg = () => {
 
         if(data.success){
           toast.success(data.message)
-          setIsOwner(true)
+          await refreshUser()
           setShowHotelReg(false)
           navigate('/Owner')
         }else{

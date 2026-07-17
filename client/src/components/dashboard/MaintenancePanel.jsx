@@ -1,4 +1,3 @@
-// MaintenancePanel — Room maintenance management with toggle availability and issue reporting
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -8,12 +7,14 @@ import {
   Plus,
 } from "lucide-react";
 
+// Style config for maintenance priority levels
 const priorityConfig = {
   high: { label: "High", color: "text-[#EF4444] bg-[#EF4444]/10 border-[#EF4444]/20" },
   medium: { label: "Medium", color: "text-[#F59E0B] bg-[#F59E0B]/10 border-[#F59E0B]/20" },
   low: { label: "Low", color: "text-[#22C55E] bg-[#22C55E]/10 border-[#22C55E]/20" },
 };
 
+// MaintenancePanel — Room maintenance management with toggle availability and issue reporting
 const MaintenancePanel = ({ rooms = [], onToggle, togglingId, onReport, submittingReport = false }) => {
   const [showForm, setShowForm] = useState(false);
   const [newIssue, setNewIssue] = useState("");
@@ -83,8 +84,12 @@ const MaintenancePanel = ({ rooms = [], onToggle, togglingId, onReport, submitti
                   ))}
                 </select>
                 <button
-                  onClick={() => {
-                    if (onReport) onReport(newIssue, newRoom);
+                  onClick={async () => {
+                    if (onReport) {
+                      await onReport(newIssue, newRoom);
+                      setNewIssue("");
+                      setNewRoom("");
+                    }
                   }}
                   disabled={submittingReport || !newIssue.trim() || !newRoom}
                   className="w-full py-2 text-xs font-medium rounded-lg bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/20 hover:bg-[#F59E0B]/20 transition-colors disabled:opacity-50"

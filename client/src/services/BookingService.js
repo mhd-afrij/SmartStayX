@@ -1,16 +1,18 @@
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import API_ENDPOINTS from "../config/endpoints";
-import { config } from "../config/ConfigManager";
+
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "";
+const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT) || 30000;
 
 // Booking API service — user and owner booking CRUD, Stripe checkout, refunds.
 class BookingService {
   get #baseUrl() {
-    return config.get("api.baseUrl") || "";
+    return API_BASE_URL;
   }
 
   get #timeout() {
-    return config.get("api.timeout") || 30000;
+    return API_TIMEOUT;
   }
 
   #headers(token) {
@@ -40,7 +42,7 @@ class BookingService {
   }
 
   create(bookingData, token) {
-    return this.#request("post", API_ENDPOINTS.bookings.base, bookingData, token);
+    return this.#request("post", API_ENDPOINTS.bookings.book, bookingData, token);
   }
 
   cancel(bookingId, token) {
@@ -64,11 +66,11 @@ class BookingService {
   }
 
   pay(bookingId, token) {
-    return this.#request("post", API_ENDPOINTS.bookings.base, { bookingId }, token);
+    return this.#request("post", API_ENDPOINTS.bookings.pay, { bookingId }, token);
   }
 
   setPaymentMethod(bookingId, paymentMethod, token) {
-    return this.#request("post", `${API_ENDPOINTS.bookings.base}/payment-method`, { bookingId, paymentMethod }, token);
+    return this.#request("post", API_ENDPOINTS.bookings.paymentMethod, { bookingId, paymentMethod }, token);
   }
 
   fetchHotelBookings(hotelId, token) {

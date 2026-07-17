@@ -5,6 +5,7 @@ import Sidebar from '../components/Sidebar';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext';
 
+// Layout — Owner dashboard layout with sidebar, navbar, and nested route outlet; guards non-owners
 const Layout = () => {
   const { isOwner, user, userLoaded, ownerResolved } = useAppContext();
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ const Layout = () => {
   return (
     /* Owner shell */
     <div className="h-screen bg-[#050816] overflow-hidden flex">
-      <Sidebar />
+      <Sidebar basePath="/Owner" />
       <div className="flex-1 flex flex-col min-w-0">
         {/* Owner top bar and routed content */}
         <Navbar />

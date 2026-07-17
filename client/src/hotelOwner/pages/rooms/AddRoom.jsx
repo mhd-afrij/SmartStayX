@@ -3,27 +3,27 @@ import { useState, useEffect } from "react";
 import { useAppContext } from "../../../context/AppContext";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import { Plus, Image, ChevronDown } from "lucide-react";
+import { Plus, Image, ChevronDown, X } from "lucide-react";
 
+// AddRoom — Owner panel for adding new rooms with images, pricing, and amenities
 const AddRoom = () => {
   const { axios, getToken, user } = useAppContext();
 
   const [hotels, setHotels] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [images, setImages] = useState({ 1: null, 2: null, 3: null, 4: null });
+  const [amenityOptions, setAmenityOptions] = useState([
+    "Free Wifi", "Free Breakfast", "Room Service", "Mountain View", "Pool Access",
+  ]);
   const [inputs, setInputs] = useState({
+    roomNumber: "",
     roomType: "",
     pricePerNight: "",
-    amenities: {
-      "Free Wifi": false,
-      "Free Breakfast": false,
-      "Room Service": false,
-      "Mountain View": false,
-      "Pool Access": false,
-    },
+    amenities: {},
   });
   const [loading, setLoading] = useState(false);
 
+  // fetchHotels — Loads owner's hotels for room assignment
   const fetchHotels = async () => {
     try {
       const token = await getToken();
@@ -48,15 +48,59 @@ const AddRoom = () => {
     if (user) fetchHotels();
   }, [user]);
 
+  // fetchNextRoomNumber — Auto-generates room number based on hotel city and room type
+  useEffect(() => {
+    if (!selectedHotel) return;
+    const getNextNumber = async () => {
+      try {
+        const token = await getToken();
+        const params = inputs.roomType ? `?roomType=${encodeURIComponent(inputs.roomType)}` : '';
+        const { data } = await axios.get(`/api/rooms/next-number/${selectedHotel}${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (data.success) {
+          setInputs((prev) => ({ ...prev, roomNumber: data.roomNumber }));
+        }
+      } catch {
+        // fallback: let user type manually
+      }
+    };
+    getNextNumber();
+  }, [selectedHotel, inputs.roomType]);
+
+  // loadAmenityOptions — Fetches the selected hotel's custom amenity options
+  useEffect(() => {
+    if (!selectedHotel) return;
+    const hotel = hotels.find((h) => h._id === selectedHotel);
+    if (hotel?.amenityOptions && hotel.amenityOptions.length > 0) {
+      setAmenityOptions(hotel.amenityOptions);
+      setInputs((prev) => {
+        const amenities = {};
+        hotel.amenityOptions.forEach((opt) => { amenities[opt] = false; });
+        return { ...prev, amenities };
+      });
+    } else {
+      const defaults = ["Free Wifi", "Free Breakfast", "Room Service", "Mountain View", "Pool Access"];
+      setAmenityOptions(defaults);
+      setInputs((prev) => {
+        const amenities = {};
+        defaults.forEach((opt) => { amenities[opt] = false; });
+        return { ...prev, amenities };
+      });
+    }
+  }, [selectedHotel, hotels]);
+
+  // onSubmitHandler — Submits the new room form with images, type, price, and amenities
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    if (!selectedHotel || !inputs.roomType || !inputs.pricePerNight || !Object.values(images).some((image) => image)) {
+    if (!selectedHotel || !inputs.roomNumber || !inputs.roomType || !inputs.pricePerNight || !Object.values(images).some((image) => image)) {
       toast.error("Please fill all fields and upload at least one image.");
       return;
     }
     setLoading(true);
     try {
       const formData = new FormData();
+      formData.append("roomNumber", inputs.roomNumber);
       formData.append("roomType", inputs.roomType);
       formData.append("pricePerNight", inputs.pricePerNight);
       formData.append("hotelId", selectedHotel);
@@ -70,13 +114,13 @@ const AddRoom = () => {
       });
       if (data.success) {
         toast.success(data.message);
+        const resetAmenities = {};
+        amenityOptions.forEach((opt) => { resetAmenities[opt] = false; });
         setInputs({
+          roomNumber: "",
           roomType: "",
           pricePerNight: "",
-          amenities: {
-            "Free Wifi": false, "Free Breakfast": false, "Room Service": false,
-            "Mountain View": false, "Pool Access": false,
-          },
+          amenities: resetAmenities,
         });
         setImages({ 1: null, 2: null, 3: null, 4: null });
       } else {
@@ -87,6 +131,11 @@ const AddRoom = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // removeImage — Clears a specific image slot
+  const removeImage = (key) => {
+    setImages({ ...images, [key]: null });
   };
 
   return (
@@ -121,7 +170,20 @@ const AddRoom = () => {
                       </span>
                     )}
                     {images[key] ? (
-                      <img src={URL.createObjectURL(images[key])} alt="upload" className="h-full w-full object-cover" />
+                      <>
+                        <img src={URL.createObjectURL(images[key])} alt="upload" className="h-full w-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            removeImage(key);
+                          }}
+                          className="absolute top-1 right-1 z-10 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-colors"
+                        >
+                          <X className="w-3 h-3 text-white" />
+                        </button>
+                      </>
                     ) : (
                       <div className="flex flex-col items-center gap-1 text-white/30 group-hover:text-white/50 transition-colors">
                         <Image className="w-5 h-5" />
@@ -166,7 +228,17 @@ const AddRoom = () => {
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
-              <div className="md:col-span-2">
+              <div>
+                <p className="text-sm font-medium text-white/60 mb-1.5">Room Number</p>
+                <input
+                  type="text"
+                  placeholder='e.g. R101'
+                  className="w-full px-3 py-2.5 text-sm rounded-xl border border-white/[0.06] bg-white/[0.04] text-white/70 placeholder:text-white/30 outline-none focus:border-[#D4A85F]/30 transition-colors"
+                  value={inputs.roomNumber}
+                  onChange={(e) => setInputs({ ...inputs, roomNumber: e.target.value })}
+                />
+              </div>
+              <div>
                 <p className="text-sm font-medium text-white/60 mb-1.5">Room Type</p>
                 <div className="relative">
                   <select
@@ -198,30 +270,34 @@ const AddRoom = () => {
 
             <div>
               <p className="text-sm font-medium text-white/60 mb-2">Amenities</p>
-              <div className="flex flex-wrap gap-2">
-                {Object.keys(inputs.amenities).map((amenity) => {
-                  const selected = inputs.amenities[amenity];
-                  return (
-                    <button
-                      key={amenity}
-                      type="button"
-                      onClick={() =>
-                        setInputs({
-                          ...inputs,
-                          amenities: { ...inputs.amenities, [amenity]: !inputs.amenities[amenity] },
-                        })
-                      }
-                      className={`px-3 py-2 rounded-lg border text-xs font-medium transition-all ${
-                        selected
-                          ? "border-[#D4A85F]/30 bg-[#D4A85F]/10 text-[#D4A85F]"
-                          : "border-white/[0.06] bg-white/[0.04] text-white/50 hover:text-white/70"
-                      }`}
-                    >
-                      {amenity}
-                    </button>
-                  );
-                })}
-              </div>
+              {!selectedHotel ? (
+                <p className="text-xs text-white/30">Select a hotel first to see its amenity options.</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {amenityOptions.map((amenity) => {
+                    const selected = inputs.amenities[amenity] || false;
+                    return (
+                      <button
+                        key={amenity}
+                        type="button"
+                        onClick={() =>
+                          setInputs({
+                            ...inputs,
+                            amenities: { ...inputs.amenities, [amenity]: !inputs.amenities[amenity] },
+                          })
+                        }
+                        className={`px-3 py-2 rounded-lg border text-xs font-medium transition-all ${
+                          selected
+                            ? "border-[#D4A85F]/30 bg-[#D4A85F]/10 text-[#D4A85F]"
+                            : "border-white/[0.06] bg-white/[0.04] text-white/50 hover:text-white/70"
+                        }`}
+                      >
+                        {amenity}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-3 pt-2">

@@ -13,6 +13,7 @@ import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 import { BOOKING_ERRORS, BOOKING_SUCCESS } from "../constants/messages.js";
 import bookingConfig from "../configs/bookingConfig.js";
 import { notifyNewBooking, notifyPaymentReceived, notifyCancellation, notifyRefundRequest } from "../utils/notificationHelper.js";
+import { ok, badRequest, unauthorized, notFound, serverError } from "../utils/apiResponse.js";
 
 // ---------------------------------------------------------------------------
 // Helpers — Clerk display name resolver
@@ -44,7 +45,7 @@ export const checkAvailabilityAPI = async (req, res, next) => {
   try {
     const { room, checkInDate, checkOutDate } = req.body;
     const isAvailable = await bookingService.checkAvailability({ room, checkInDate, checkOutDate });
-    res.json({ success: true, isAvailable });
+    ok(res, { isAvailable });
   } catch (error) {
     next(error);
   }
@@ -54,11 +55,11 @@ export const calculatePrice = async (req, res, next) => {
   try {
     const { roomId, checkInDate, checkOutDate, guests, offerId } = req.body;
     if (typeof roomId !== "string" || !mongoose.Types.ObjectId.isValid(roomId)) {
-      return res.json({ success: false, message: BOOKING_ERRORS.ROOM_NOT_FOUND });
+      return badRequest(res, BOOKING_ERRORS.ROOM_NOT_FOUND);
     }
     const roomData = await Room.findById(roomId).populate("hotel");
     if (!roomData) {
-      return res.json({ success: false, message: BOOKING_ERRORS.ROOM_NOT_FOUND });
+      return notFound(res, BOOKING_ERRORS.ROOM_NOT_FOUND);
     }
 
     // Detect logged-in user (route is public, but Clerk auth is available)
@@ -73,7 +74,7 @@ export const calculatePrice = async (req, res, next) => {
       offerId: offerId || undefined,
       userId,
     });
-    res.json({ success: true, pricing });
+    ok(res, { pricing });
   } catch (error) {
     next(error);
   }
@@ -86,8 +87,7 @@ export const createBooking = async (req, res, next) => {
     const guestDisplayName = req.user?.name || 'Guest';
     const result = await bookingService.createBooking({ userId, room, checkInDate, checkOutDate, guests, offerId, guestDisplayName });
     notifyNewBooking(result.booking);
-    res.json({
-      success: true,
+    ok(res, {
       message: BOOKING_SUCCESS.CREATED,
       booking: result.booking,
       pricing: result.pricing,
@@ -103,80 +103,80 @@ export const createBooking = async (req, res, next) => {
 // User booking management — cancel, refund, modify
 // ---------------------------------------------------------------------------
 
-export const getUserBookings = async (req, res) => {
+export const getUserBookings = async (req, res, next) => {
   try {
     const user = req.user._id;
     const bookings = await Booking.find({ user })
       .populate("room hotel")
       .sort({ createdAt: -1 });
 
-    res.json({ success: true, bookings });
+    ok(res, { bookings });
   } catch (error) {
-    res.json({ success: false, message: BOOKING_ERRORS.FAILED_FETCH });
+    next(error);
   }
 };
 
-export const cancelBooking = async (req, res) => {
+export const cancelBooking = async (req, res, next) => {
   try {
     const user = req.user._id;
     const { bookingId } = req.body;
 
     if (typeof bookingId !== 'string') {
-      return res.json({ success: false, message: "bookingId is required" });
+      return badRequest(res, "bookingId is required");
     }
 
     const booking = await Booking.findOne({ _id: bookingId, user });
     if (!booking) {
-      return res.json({ success: false, message: "Booking not found" });
+      return notFound(res, "Booking not found");
     }
 
     if (booking.status === BOOKING_STATUS.CANCELLED) {
-      return res.json({ success: true, message: BOOKING_ERRORS.ALREADY_CANCELLED, booking });
+      return ok(res, { message: BOOKING_ERRORS.ALREADY_CANCELLED, booking });
     }
 
     if (booking.isPaid) {
-      return res.json({ success: false, message: BOOKING_ERRORS.PAID_CANNOT_CANCEL });
+      return badRequest(res, BOOKING_ERRORS.PAID_CANNOT_CANCEL);
     }
 
     const now = new Date();
     if (new Date(booking.checkInDate) <= now) {
-      return res.json({ success: false, message: BOOKING_ERRORS.CANCELLED_ON_AFTER_CHECKIN });
+      return badRequest(res, BOOKING_ERRORS.CANCELLED_ON_AFTER_CHECKIN);
     }
 
     booking.status = BOOKING_STATUS.CANCELLED;
     await booking.save();
     notifyCancellation(booking);
 
-    return res.json({ success: true, message: BOOKING_SUCCESS.CANCELLED, booking });
+    return ok(res, { message: BOOKING_SUCCESS.CANCELLED, booking });
   } catch (error) {
-    return res.json({ success: false, message: BOOKING_ERRORS.FAILED_CANCEL });
+    next(error);
   }
 };
 
-export const requestRefund = async (req, res) => {
+export const requestRefund = async (req, res, next) => {
   try {
     const user = req.user;
     const { bookingId } = req.body;
 
     if (typeof bookingId !== 'string') {
-      return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_REQUIRED });
+      return badRequest(res, BOOKING_ERRORS.BOOKING_ID_REQUIRED);
     }
 
     const booking = await Booking.findOne({ _id: bookingId, user: user._id }).populate("room hotel");
     if (!booking) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_FOUND });
+      return notFound(res, BOOKING_ERRORS.NOT_FOUND);
     }
 
     if (!booking.isPaid) {
-      return res.json({ success: false, message: "Only paid bookings can request a refund" });
+      return badRequest(res, "Only paid bookings can request a refund");
     }
 
     if (booking.refundStatus === "pending") {
-      return res.json({ success: false, message: "A refund request is already pending for this booking" });
+      return badRequest(res, "A refund request is already pending for this booking");
     }
 
     if (booking.refundStatus === "approved" || booking.refundStatus === "refunded") {
-      return res.json({ success: false, message: "This booking has already been refunded" });
+      return badRequest(res, "This booking has already been refunded");
     }
 
     booking.refundStatus = "pending";
@@ -184,36 +184,36 @@ export const requestRefund = async (req, res) => {
 
     notifyRefundRequest(booking, user);
 
-    return res.json({ success: true, message: BOOKING_SUCCESS.REFUND_REQUESTED, booking });
+    return ok(res, { message: BOOKING_SUCCESS.REFUND_REQUESTED, booking });
   } catch (error) {
-    return res.json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const handleRefund = async (req, res) => {
+export const handleRefund = async (req, res, next) => {
   try {
     const ownerId = req.user._id;
     const { bookingId, action } = req.body;
 
     if (typeof bookingId !== 'string') {
-      return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_REQUIRED });
+      return badRequest(res, BOOKING_ERRORS.BOOKING_ID_REQUIRED);
     }
 
     if (!["approved", "denied"].includes(action)) {
-      return res.json({ success: false, message: "action must be 'approved' or 'denied'" });
+      return badRequest(res, "action must be 'approved' or 'denied'");
     }
 
     const booking = await Booking.findById(bookingId).populate("hotel");
     if (!booking) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_FOUND });
+      return notFound(res, BOOKING_ERRORS.NOT_FOUND);
     }
 
     if (String(booking.hotel.owner) !== String(ownerId)) {
-      return res.json({ success: false, message: "Not authorized to handle this refund" });
+      return unauthorized(res, "Not authorized to handle this refund");
     }
 
     if (booking.refundStatus !== "pending") {
-      return res.json({ success: false, message: "No pending refund request for this booking" });
+      return badRequest(res, "No pending refund request for this booking");
     }
 
     booking.refundStatus = action;
@@ -222,37 +222,37 @@ export const handleRefund = async (req, res) => {
     }
     await booking.save();
 
-    return res.json({ success: true, message: BOOKING_SUCCESS.REFUND_HANDLED, booking });
+    return ok(res, { message: BOOKING_SUCCESS.REFUND_HANDLED, booking });
   } catch (error) {
-    return res.json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-export const modifyBooking = async (req, res) => {
+export const modifyBooking = async (req, res, next) => {
   try {
     const user = req.user._id;
     const { bookingId, checkInDate, checkOutDate, guests } = req.body;
 
     if (typeof bookingId !== 'string') {
-      return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_REQUIRED });
+      return badRequest(res, BOOKING_ERRORS.BOOKING_ID_REQUIRED);
     }
 
     const booking = await Booking.findOne({ _id: bookingId, user }).populate("room hotel");
     if (!booking) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_FOUND });
+      return notFound(res, BOOKING_ERRORS.NOT_FOUND);
     }
 
     if (booking.status === BOOKING_STATUS.CANCELLED) {
-      return res.json({ success: false, message: BOOKING_ERRORS.CANCELLED_CANNOT_MODIFY });
+      return badRequest(res, BOOKING_ERRORS.CANCELLED_CANNOT_MODIFY);
     }
 
     if (booking.isPaid) {
-      return res.json({ success: false, message: BOOKING_ERRORS.PAID_CANNOT_MODIFY });
+      return badRequest(res, BOOKING_ERRORS.PAID_CANNOT_MODIFY);
     }
 
     const now = new Date();
     if (new Date(booking.checkInDate) <= now) {
-      return res.json({ success: false, message: BOOKING_ERRORS.MODIFY_ON_AFTER_CHECKIN });
+      return badRequest(res, BOOKING_ERRORS.MODIFY_ON_AFTER_CHECKIN);
     }
 
     const nextCheckInDate = checkInDate || booking.checkInDate;
@@ -267,16 +267,16 @@ export const modifyBooking = async (req, res) => {
     });
 
     if (!isAvailable) {
-      return res.json({ success: false, message: BOOKING_ERRORS.ROOM_NOT_AVAILABLE });
+      return badRequest(res, BOOKING_ERRORS.ROOM_NOT_AVAILABLE);
     }
 
     const roomData = await Room.findById(booking.room._id).populate("hotel");
     if (!roomData) {
-      return res.json({ success: false, message: BOOKING_ERRORS.ROOM_NOT_FOUND });
+      return notFound(res, BOOKING_ERRORS.ROOM_NOT_FOUND);
     }
 
     if (!Number.isFinite(nextGuests) || nextGuests < 1) {
-      return res.json({ success: false, message: BOOKING_ERRORS.GUESTS_MINIMUM });
+      return badRequest(res, BOOKING_ERRORS.GUESTS_MINIMUM);
     }
 
     const pricing = await bookingService.calculateBookingPricing({
@@ -288,7 +288,7 @@ export const modifyBooking = async (req, res) => {
     });
 
     if (!pricing) {
-      return res.json({ success: false, message: BOOKING_ERRORS.PRICING_FAILED });
+      return serverError(res, BOOKING_ERRORS.PRICING_FAILED);
     }
 
     booking.checkInDate = nextCheckInDate;
@@ -303,13 +303,9 @@ export const modifyBooking = async (req, res) => {
 
     await booking.save();
 
-    return res.json({
-      success: true,
-      message: BOOKING_SUCCESS.MODIFIED,
-      booking,
-    });
+    return ok(res, { message: BOOKING_SUCCESS.MODIFIED, booking });
   } catch (error) {
-    return res.json({ success: false, message: BOOKING_ERRORS.FAILED_MODIFY });
+    next(error);
   }
 };
 
@@ -317,18 +313,18 @@ export const modifyBooking = async (req, res) => {
 // Payment actions — manual pay, payment method selection
 // ---------------------------------------------------------------------------
 
-export const payBooking = async (req, res) => {
+export const payBooking = async (req, res, next) => {
   try {
     const user = req.user._id;
     const { bookingId } = req.body;
 
     if (typeof bookingId !== 'string') {
-      return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_REQUIRED });
+      return badRequest(res, BOOKING_ERRORS.BOOKING_ID_REQUIRED);
     }
 
     const booking = await Booking.findOne({ _id: bookingId, user });
     if (!booking) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_FOUND });
+      return notFound(res, BOOKING_ERRORS.NOT_FOUND);
     }
 
     booking.isPaid = true;
@@ -336,32 +332,32 @@ export const payBooking = async (req, res) => {
     await booking.save();
     notifyPaymentReceived(booking);
 
-    res.json({ success: true, booking });
+    ok(res, { booking });
   } catch (error) {
-    res.json({ success: false, message: BOOKING_ERRORS.FAILED_PAYMENT });
+    next(error);
   }
 };
 
-export const setPaymentMethod = async (req, res) => {
+export const setPaymentMethod = async (req, res, next) => {
   try {
     const user = req.user._id;
     const { bookingId, paymentMethod } = req.body;
 
     if (typeof bookingId !== 'string' || !paymentMethod) {
-      return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_AND_METHOD_REQUIRED });
+      return badRequest(res, BOOKING_ERRORS.BOOKING_ID_AND_METHOD_REQUIRED);
     }
 
     const booking = await Booking.findOne({ _id: bookingId, user });
     if (!booking) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_FOUND });
+      return notFound(res, BOOKING_ERRORS.NOT_FOUND);
     }
 
     booking.paymentMethod = paymentMethod;
     await booking.save();
 
-    res.json({ success: true, booking });
+    ok(res, { booking });
   } catch (error) {
-    res.json({ success: false, message: BOOKING_ERRORS.FAILED_UPDATE_PAYMENT });
+    next(error);
   }
 };
 
@@ -372,18 +368,18 @@ export const setPaymentMethod = async (req, res) => {
 export const createCheckoutSession = async (req, res, next) => {
   try {
     const stripe = getStripe();
-    if (!stripe) return res.json({ success: false, message: BOOKING_ERRORS.STRIPE_NOT_CONFIGURED });
+    if (!stripe) return serverError(res, BOOKING_ERRORS.STRIPE_NOT_CONFIGURED);
 
     const user = req.user._id;
     const { bookingId } = req.body;
-    if (typeof bookingId !== 'string') return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_REQUIRED });
+    if (typeof bookingId !== 'string') return badRequest(res, BOOKING_ERRORS.BOOKING_ID_REQUIRED);
 
     const booking = await Booking.findOne({ _id: bookingId, user }).populate("room hotel");
-    if (!booking) return res.json({ success: false, message: BOOKING_ERRORS.NOT_FOUND });
-    if (booking.isPaid) return res.json({ success: false, message: BOOKING_ERRORS.ALREADY_PAID });
-    if (booking.status !== BOOKING_STATUS.PENDING) return res.json({ success: false, message: BOOKING_ERRORS.NOT_PENDING });
+    if (!booking) return notFound(res, BOOKING_ERRORS.NOT_FOUND);
+    if (booking.isPaid) return badRequest(res, BOOKING_ERRORS.ALREADY_PAID);
+    if (booking.status !== BOOKING_STATUS.PENDING) return badRequest(res, BOOKING_ERRORS.NOT_PENDING);
     if (booking.holdExpiresAt && new Date(booking.holdExpiresAt) <= new Date()) {
-      return res.json({ success: false, message: BOOKING_ERRORS.HOLD_EXPIRED });
+      return badRequest(res, BOOKING_ERRORS.HOLD_EXPIRED);
     }
 
     const frontendBaseUrl = process.env.FRONTEND_URL || req.headers.origin;
@@ -415,7 +411,7 @@ export const createCheckoutSession = async (req, res, next) => {
 
     booking.paymentMethod = "Stripe";
     await booking.save();
-    return res.json({ success: true, sessionId: session.id, url: session.url });
+    return ok(res, { sessionId: session.id, url: session.url });
   } catch (error) {
     next(error);
   }
@@ -424,23 +420,23 @@ export const createCheckoutSession = async (req, res, next) => {
 export const confirmCheckoutSession = async (req, res, next) => {
   try {
     const stripe = getStripe();
-    if (!stripe) return res.json({ success: false, message: BOOKING_ERRORS.STRIPE_NOT_CONFIGURED });
+    if (!stripe) return serverError(res, BOOKING_ERRORS.STRIPE_NOT_CONFIGURED);
 
     const user = req.user._id;
     const { sessionId } = req.body;
-    if (!sessionId) return res.json({ success: false, message: "sessionId is required" });
+    if (!sessionId) return badRequest(res, "sessionId is required");
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     const bookingId = session?.metadata?.bookingId;
     const sessionUserId = session?.metadata?.userId;
 
-    if (!bookingId) return res.json({ success: false, message: BOOKING_ERRORS.SESSION_NOT_FOUND });
+    if (!bookingId) return notFound(res, BOOKING_ERRORS.SESSION_NOT_FOUND);
     if (sessionUserId && sessionUserId !== user.toString()) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_AUTHORIZED_PAYMENT });
+      return unauthorized(res, BOOKING_ERRORS.NOT_AUTHORIZED_PAYMENT);
     }
 
     const booking = await Booking.findOne({ _id: bookingId, user });
-    if (!booking) return res.json({ success: false, message: BOOKING_ERRORS.NOT_FOUND });
+    if (!booking) return notFound(res, BOOKING_ERRORS.NOT_FOUND);
 
     if (session.payment_status === "paid") {
       if (!booking.isPaid) {
@@ -450,10 +446,10 @@ export const confirmCheckoutSession = async (req, res, next) => {
         await booking.save();
         notifyPaymentReceived(booking);
       }
-      return res.json({ success: true, paid: true, booking });
+      return ok(res, { paid: true, booking });
     }
 
-    return res.json({ success: true, paid: false, message: BOOKING_ERRORS.PAYMENT_NOT_COMPLETED });
+    return ok(res, { paid: false, message: BOOKING_ERRORS.PAYMENT_NOT_COMPLETED });
   } catch (error) {
     next(error);
   }
@@ -500,58 +496,58 @@ export const stripeWebhook = async (req, res, next) => {
 // Owner Booking Management — delete, update payment/status
 // ---------------------------------------------------------------------------
 
-export const deleteOwnerBooking = async (req, res) => {
+export const deleteOwnerBooking = async (req, res, next) => {
   try {
     const ownerId = req.user?._id;
     const { bookingId } = req.params;
 
     if (!ownerId) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_AUTHORIZED });
+      return unauthorized(res, BOOKING_ERRORS.NOT_AUTHORIZED);
     }
 
     if (!bookingId) {
-      return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_REQUIRED });
+      return badRequest(res, BOOKING_ERRORS.BOOKING_ID_REQUIRED);
     }
 
     const booking = await Booking.findById(bookingId);
     if (!booking) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_FOUND });
+      return notFound(res, BOOKING_ERRORS.NOT_FOUND);
     }
 
     const ownerHotel = await Hotel.findOne({ _id: booking.hotel, owner: ownerId });
     if (!ownerHotel) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_AUTHORIZED_DELETE });
+      return unauthorized(res, BOOKING_ERRORS.NOT_AUTHORIZED_DELETE);
     }
 
     await Booking.findByIdAndDelete(bookingId);
 
-    return res.json({ success: true, message: BOOKING_SUCCESS.BOOKING_DELETED });
+    return ok(res, { message: BOOKING_SUCCESS.BOOKING_DELETED });
   } catch (error) {
-    return res.json({ success: false, message: BOOKING_ERRORS.FAILED_DELETE });
+    next(error);
   }
 };
 
-export const updateOwnerBookingPayment = async (req, res) => {
+export const updateOwnerBookingPayment = async (req, res, next) => {
   try {
     const ownerId = req.user?._id;
     const { bookingId, isPaid } = req.body;
 
     if (!ownerId) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_AUTHORIZED });
+      return unauthorized(res, BOOKING_ERRORS.NOT_AUTHORIZED);
     }
 
     if (typeof bookingId !== 'string' || typeof isPaid !== "boolean") {
-      return res.json({ success: false, message: BOOKING_ERRORS.BOOKING_ID_AND_PAYMENT_REQUIRED });
+      return badRequest(res, BOOKING_ERRORS.BOOKING_ID_AND_PAYMENT_REQUIRED);
     }
 
     const booking = await Booking.findById(bookingId);
     if (!booking) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_FOUND });
+      return notFound(res, BOOKING_ERRORS.NOT_FOUND);
     }
 
     const ownerHotel = await Hotel.findOne({ _id: booking.hotel, owner: ownerId });
     if (!ownerHotel) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_AUTHORIZED_UPDATE });
+      return unauthorized(res, BOOKING_ERRORS.NOT_AUTHORIZED_UPDATE);
     }
 
     booking.isPaid = isPaid;
@@ -563,41 +559,41 @@ export const updateOwnerBookingPayment = async (req, res) => {
 
     await booking.save();
 
-    return res.json({ success: true, message: BOOKING_SUCCESS.PAYMENT_UPDATED, booking });
+    return ok(res, { message: BOOKING_SUCCESS.PAYMENT_UPDATED, booking });
   } catch (error) {
-    return res.json({ success: false, message: BOOKING_ERRORS.FAILED_OWNER_UPDATE });
+    next(error);
   }
 };
 
-export const updateOwnerBookingStatus = async (req, res) => {
+export const updateOwnerBookingStatus = async (req, res, next) => {
   try {
     const ownerId = req.user?._id;
     const { bookingId } = req.params;
     const { status } = req.body;
 
     if (!ownerId) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_AUTHORIZED });
+      return unauthorized(res, BOOKING_ERRORS.NOT_AUTHORIZED);
     }
     if (!bookingId || !status) {
-      return res.json({ success: false, message: "bookingId and status are required" });
+      return badRequest(res, "bookingId and status are required");
     }
 
     const booking = await Booking.findById(bookingId).populate("room hotel user");
     if (!booking) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_FOUND });
+      return notFound(res, BOOKING_ERRORS.NOT_FOUND);
     }
 
     const ownerHotel = await Hotel.findOne({ _id: booking.hotel, owner: ownerId });
     if (!ownerHotel) {
-      return res.json({ success: false, message: BOOKING_ERRORS.NOT_AUTHORIZED_UPDATE });
+      return unauthorized(res, BOOKING_ERRORS.NOT_AUTHORIZED_UPDATE);
     }
 
     booking.status = status;
     await booking.save();
 
-    return res.json({ success: true, message: "Booking status updated", booking });
+    return ok(res, { message: "Booking status updated", booking });
   } catch (error) {
-    return res.json({ success: false, message: error.message });
+    next(error);
   }
 };
 
@@ -614,8 +610,7 @@ export const getHotelBookings = async (req, res) => {
     const allUserHotels = await Hotel.find({ owner: userId });
 
     if (!allUserHotels || allUserHotels.length === 0) {
-      return res.json({
-        success: true,
+      return ok(res, {
         dashboardData: {
           totalBookings: 0,
           totalRevenue: 0,
@@ -855,8 +850,7 @@ export const getHotelBookings = async (req, res) => {
     ]);
     const avgRating = ratingResult ? Number(ratingResult.avgRating.toFixed(1)) : null;
 
-    res.json({
-      success: true,
+    ok(res, {
       dashboardData: {
         totalBookings: metrics.totalBookings,
         totalRevenue: metrics.totalRevenue,
@@ -881,6 +875,6 @@ export const getHotelBookings = async (req, res) => {
       },
     });
   } catch (error) {
-    res.json({ success: false, message: BOOKING_ERRORS.FAILED_FETCH });
+    next(error);
   }
 };

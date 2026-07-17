@@ -1,9 +1,41 @@
-// clerkWebhooks.js — Clerk webhook handler for user lifecycle events
 import User from "../models/User.js";
+import Organization from "../models/Organization.js";
 import { Webhook } from "svix";
 import { PLACEHOLDER_IMAGE_URL } from "../configs/runtimeDefaults.js";
 
-// Clerk webhook handler — syncs user.created / user.updated / user.deleted to local DB.
+const upsertUser = async (data) => {
+  const userData = {
+    _id: data.id,
+    email: data.email_addresses?.[0]?.email_address || "",
+    username: [data.first_name, data.last_name].filter(Boolean).join(" ") || data.username || "Guest",
+    name: [data.first_name, data.last_name].filter(Boolean).join(" ") || data.username || "Guest",
+    image: data.image_url || PLACEHOLDER_IMAGE_URL,
+  };
+  await User.findByIdAndUpdate(data.id, userData, { upsert: true, new: true });
+};
+
+const deleteUser = async (data) => {
+  await User.findByIdAndDelete(data.id);
+};
+
+const upsertOrganization = async (data) => {
+  const orgData = {
+    _id: data.id,
+    name: data.name,
+    slug: data.slug,
+    imageUrl: data.image_url || "",
+    createdBy: data.created_by,
+    membersCount: data.members_count || 1,
+    maxAllowedMemberships: data.max_allowed_memberships || 5,
+    metadata: data.public_metadata || {},
+  };
+  await Organization.findByIdAndUpdate(data.id, orgData, { upsert: true, new: true });
+};
+
+const deleteOrganization = async (data) => {
+  await Organization.findByIdAndDelete(data.id);
+};
+
 const clerkWebhooks = async (req, res) => {
   try {
     const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
@@ -38,21 +70,26 @@ const clerkWebhooks = async (req, res) => {
     const evt = wh.verify(rawBody, headers);
     const { data, type } = evt;
 
-    const userData = {
-      _id: data.id,
-      email: data.email_addresses?.[0]?.email_address || "",
-      username: [data.first_name, data.last_name].filter(Boolean).join(" ") || data.username || "Guest",
-      name: [data.first_name, data.last_name].filter(Boolean).join(" ") || data.username || "Guest",
-      image: data.image_url || PLACEHOLDER_IMAGE_URL,
-    };
-
     switch (type) {
       case "user.created":
       case "user.updated":
-        await User.findByIdAndUpdate(data.id, userData, { upsert: true, new: true });
+        await upsertUser(data);
         break;
       case "user.deleted":
-        await User.findByIdAndDelete(data.id);
+        await deleteUser(data);
+        break;
+      case "organization.created":
+      case "organization.updated":
+        await upsertOrganization(data);
+        break;
+      case "organization.deleted":
+        await deleteOrganization(data);
+        break;
+      case "organizationMembership.created":
+      case "organizationMembership.updated":
+        await upsertOrganization(data.organization);
+        break;
+      case "organizationMembership.deleted":
         break;
     }
 

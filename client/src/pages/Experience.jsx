@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { assets } from '../assets/assets';
 import Title from '../components/Title';
 
+// Experience — Showcases guest experience highlights, brand mission, and contact info
 const Experience = () => {
   const highlights = [
     { title: 'Our Mission', text: 'To deliver exceptional guest experiences through thoughtful design, attentive service, and locally inspired hospitality.' },

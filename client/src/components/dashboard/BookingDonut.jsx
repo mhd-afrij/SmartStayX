@@ -1,9 +1,9 @@
-// BookingDonut — Pie/donut chart showing booking status distribution (pending, confirmed, etc.)
 import { useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Sector } from "recharts";
 import { motion } from "framer-motion";
 import { CalendarCheck } from "lucide-react";
 
+// Color map for each booking status
 const COLORS = {
   pending: "#F59E0B",
   confirmed: "#4F46E5",
@@ -13,6 +13,7 @@ const COLORS = {
   expired: "#6B7280",
 };
 
+// Human-readable labels for each booking status
 const LABELS = {
   pending: "Pending",
   confirmed: "Confirmed",
@@ -22,6 +23,7 @@ const LABELS = {
   expired: "Expired",
 };
 
+// Custom active donut slice renderer with hover highlight
 const renderActiveShape = (props) => {
   const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, value } =
     props;
@@ -50,6 +52,7 @@ const renderActiveShape = (props) => {
   );
 };
 
+// BookingDonut — Pie/donut chart showing booking status distribution (pending, confirmed, etc.)
 const BookingDonut = ({ bookings = [] }) => {
   // Hover state for the selected slice.
   const [activeIndex, setActiveIndex] = useState(null);

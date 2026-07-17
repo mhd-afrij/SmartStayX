@@ -1,7 +1,7 @@
-// ConfirmModal — Reusable confirmation dialog for destructive actions (delete, etc.)
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// ConfirmModal — Reusable confirmation dialog for destructive actions (delete, etc.)
 const ConfirmModal = ({
   open,
   title,

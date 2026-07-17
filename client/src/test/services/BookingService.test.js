@@ -1,29 +1,28 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import BookingService from '../../services/BookingService';
+
+vi.hoisted(() => {
+  vi.stubEnv('VITE_BACKEND_URL', 'http://localhost:3000');
+  vi.stubEnv('VITE_API_TIMEOUT', '30000');
+});
 
 const mockApiBase = 'http://localhost:3000';
 
-vi.mock('../../config/ConfigManager', () => ({
-  config: {
-    get: vi.fn((key) => {
-      if (key === 'api.baseUrl') return mockApiBase;
-      if (key === 'api.timeout') return 30000;
-      return null;
-    }),
-  },
-}));
+import BookingService from '../../services/BookingService';
 
 vi.mock('../../config/endpoints', () => ({
   default: {
     bookings: {
       user: '/api/bookings/user',
       base: '/api/bookings',
+      book: '/api/bookings/book',
       cancel: '/api/bookings/cancel',
       modify: '/api/bookings/modify',
+      pay: '/api/bookings/pay',
+      paymentMethod: '/api/bookings/payment-method',
       checkAvailability: '/api/bookings/check-availability',
       createCheckout: '/api/bookings/create-checkout-session',
-      confirmCheckout: '/api/bookings/confirm-checkout',
-      hotel: (id) => `/api/bookings/hotel/${id}`,
+      confirmCheckout: '/api/bookings/confirm-checkout-session',
+      hotel: (id) => `/api/bookings/hotel?hotelId=${id}`,
       ownerDelete: (id) => `/api/bookings/owner/${id}`,
       ownerUpdatePayment: '/api/bookings/owner/update-payment',
     },
@@ -45,6 +44,8 @@ describe('BookingService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
+
+
 
   describe('fetchUserBookings', () => {
     it('calls GET /api/bookings/user with auth header', async () => {
@@ -110,7 +111,7 @@ describe('BookingService', () => {
       const result = await BookingService.confirmCheckoutSession('session_abc', 'token');
 
       expect(axios.post).toHaveBeenCalledWith(
-        `${mockApiBase}/api/bookings/confirm-checkout`,
+        `${mockApiBase}/api/bookings/confirm-checkout-session`,
         { sessionId: 'session_abc' },
         expect.objectContaining({ headers: { Authorization: 'Bearer token' } })
       );
@@ -142,7 +143,7 @@ describe('BookingService', () => {
       const result = await BookingService.create({ room: 'room-1' }, 'token');
 
       expect(axios.post).toHaveBeenCalledWith(
-        `${mockApiBase}/api/bookings`,
+        `${mockApiBase}/api/bookings/book`,
         { room: 'room-1' },
         expect.objectContaining({ headers: { Authorization: 'Bearer token' } })
       );
@@ -221,7 +222,7 @@ describe('BookingService', () => {
       const result = await BookingService.fetchHotelBookings('hotel-1', 'token');
 
       expect(axios.get).toHaveBeenCalledWith(
-        `${mockApiBase}/api/bookings/hotel/hotel-1`,
+        `${mockApiBase}/api/bookings/hotel?hotelId=hotel-1`,
         expect.objectContaining({ headers: { Authorization: 'Bearer token' } })
       );
       expect(result.bookings).toHaveLength(1);
@@ -236,7 +237,7 @@ describe('BookingService', () => {
       const result = await BookingService.pay('booking-1', 'token');
 
       expect(axios.post).toHaveBeenCalledWith(
-        `${mockApiBase}/api/bookings`,
+        `${mockApiBase}/api/bookings/pay`,
         { bookingId: 'booking-1' },
         expect.objectContaining({ headers: { Authorization: 'Bearer token' } })
       );

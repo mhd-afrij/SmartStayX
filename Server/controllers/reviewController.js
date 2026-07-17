@@ -14,6 +14,7 @@ const allowedSatisfaction = new Set([
   "very_dissatisfied",
 ]);
 
+// Get visible reviews for a room with average rating and satisfaction breakdown
 export const getRoomReviews = async (req, res) => {
   try {
     const { roomId } = req.params;
@@ -36,6 +37,7 @@ export const getRoomReviews = async (req, res) => {
       very_dissatisfied: 0,
     };
 
+    // Count satisfaction levels for breakdown stats
     for (const review of reviews) {
       if (satisfactionBreakdown[review.satisfaction] !== undefined) {
         satisfactionBreakdown[review.satisfaction] += 1;
@@ -66,6 +68,7 @@ export const getRoomReviews = async (req, res) => {
   }
 };
 
+// Create or update a review for a room (only by guests with paid confirmed booking)
 export const createOrUpdateRoomReview = async (req, res) => {
   try {
     const { roomId } = req.params;
@@ -87,6 +90,7 @@ export const createOrUpdateRoomReview = async (req, res) => {
       return res.json({ success: false, message: "Room not found" });
     }
 
+    // Verify user has a paid confirmed booking for this room
     const eligibleBooking = await Booking.findOne({
       user: userId,
       room: roomId,
@@ -124,6 +128,7 @@ export const createOrUpdateRoomReview = async (req, res) => {
   }
 };
 
+// Get all reviews for hotels owned by the current user
 export const getOwnerReviews = async (req, res) => {
   try {
     const ownerId = req.user?._id;
@@ -150,6 +155,7 @@ export const getOwnerReviews = async (req, res) => {
   }
 };
 
+// Toggle visibility of a review (Admin moderation)
 export const toggleReviewVisibility = async (req, res) => {
   try {
     const { reviewId } = req.params;

@@ -2,6 +2,7 @@
 import React from 'react';
 import { assets } from '../assets/assets';
 
+// About — Displays brand story, mission, values, team, and contact card
 const About = () => {
   return (
     <div className="py-28 px-6 md:px-16 lg:px-24 xl:px-32">

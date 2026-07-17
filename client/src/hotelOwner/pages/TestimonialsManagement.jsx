@@ -2,19 +2,28 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useAppContext } from "../../context/AppContext"
 import { toast } from "react-hot-toast"
-import { Eye, EyeOff, Award } from "lucide-react"
+import { Eye, EyeOff, Trash2, Search } from "lucide-react"
 import StatusBadge from "../../components/dashboard/shared/StatusBadge"
+import ConfirmModal from "../../components/dashboard/ConfirmModal"
 
+// TestimonialsManagement — Owner panel for viewing, editing visibility, and updating guest testimonials
 const TestimonialsManagement = () => {
   const { axios, getToken, user } = useAppContext()
   const [rows, setRows] = useState([])
   const [editingId, setEditingId] = useState(null)
   const [form, setForm] = useState({ name: "", address: "", rating: 5, review: "" })
   const [loading, setLoading] = useState(false)
+  const [togglingId, setTogglingId] = useState(null)
+  const [savingEdit, setSavingEdit] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState({ open: false, id: null })
+  const [deletingId, setDeletingId] = useState(null)
+  const [search, setSearch] = useState("")
 
   const visibleCount = useMemo(() => rows.filter((item) => item.isVisible).length, [rows])
 
+  // toggleVisibility — Toggles a testimonial's visible/hidden status
   const toggleVisibility = async (item) => {
+    setTogglingId(item._id)
     try {
       const token = await getToken()
       const nextVisibility = !item.isVisible
@@ -30,21 +39,27 @@ const TestimonialsManagement = () => {
       }
     } catch (error) {
       toast.error(error.message || "Failed to update visibility")
+    } finally {
+      setTogglingId(null)
     }
   }
 
+  // startEdit — Populates the edit form with testimonial data
   const startEdit = (item) => {
     setEditingId(item._id)
     setForm({ name: item.name, address: item.address, rating: item.rating, review: item.review })
   }
 
+  // cancelEdit — Clears the edit form and exits editing mode
   const cancelEdit = () => {
     setEditingId(null)
     setForm({ name: "", address: "", rating: 5, review: "" })
   }
 
+  // saveEdit — Saves changes to a testimonial (name, address, rating, review)
   const saveEdit = async () => {
     if (!editingId) return
+    setSavingEdit(true)
     const safeRating = Math.min(5, Math.max(1, Number(form.rating) || 1))
     try {
       const token = await getToken()
@@ -65,9 +80,41 @@ const TestimonialsManagement = () => {
       }
     } catch (error) {
       toast.error(error.message || "Failed to update testimonial")
+    } finally {
+      setSavingEdit(false)
     }
   }
 
+  // handleDelete — Opens the delete confirmation modal
+  const handleDelete = (id) => {
+    setConfirmDelete({ open: true, id })
+  }
+
+  // handleDeleteConfirmed — Deletes the testimonial after modal confirmation
+  const handleDeleteConfirmed = async () => {
+    const id = confirmDelete.id
+    setConfirmDelete({ open: false, id: null })
+    if (!id) return
+    setDeletingId(id)
+    try {
+      const token = await getToken()
+      const { data } = await axios.delete(`/api/testimonials/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (data.success) {
+        setRows((prev) => prev.filter((item) => item._id !== id))
+        toast.success("Testimonial deleted")
+      } else {
+        toast.error(data.message || "Failed to delete testimonial")
+      }
+    } catch (error) {
+      toast.error(error.message || "Failed to delete testimonial")
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  // fetchTestimonials — Loads all testimonials for the owner
   const fetchTestimonials = useCallback(async () => {
     if (!user) return
     setLoading(true)
@@ -99,6 +146,17 @@ const TestimonialsManagement = () => {
         <p className="text-sm text-white/40 mt-1">Manage guest feedback visibility for your storefront.</p>
       </div>
 
+      <div className="relative max-w-xs">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
+        <input
+          type="text"
+          placeholder="Search testimonials..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-white/[0.06] bg-white/[0.04] text-white/70 placeholder:text-white/30 outline-none focus:border-[#D4A85F]/30 transition-colors"
+        />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl p-5">
           <p className="text-xs uppercase tracking-[0.15em] text-white/50">Total Testimonials</p>
@@ -128,7 +186,11 @@ const TestimonialsManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {rows.map((item) => (
+              {rows.filter((item) => {
+                if (!search) return true;
+                const q = search.toLowerCase();
+                return item.name.toLowerCase().includes(q) || item.review.toLowerCase().includes(q);
+              }).map((item) => (
                 <tr key={item._id} className="border-t border-white/[0.04] hover:bg-white/[0.02] transition-colors align-top">
                   <td className="py-3 px-4 text-white/80 font-medium">{item.name}</td>
                   <td className="py-3 px-4 text-white/60">{item.address}</td>
@@ -147,10 +209,25 @@ const TestimonialsManagement = () => {
                       </button>
                       <button
                         onClick={() => toggleVisibility(item)}
-                        className="p-1.5 rounded-lg border border-white/[0.06] text-white/30 hover:text-[#F59E0B] hover:border-[#F59E0B]/20 hover:bg-[#F59E0B]/10 transition-all"
+                        disabled={togglingId === item._id}
+                        className="p-1.5 rounded-lg border border-white/[0.06] text-white/30 hover:text-[#F59E0B] hover:border-[#F59E0B]/20 hover:bg-[#F59E0B]/10 transition-all disabled:opacity-40"
                         title={item.isVisible ? "Hide" : "Show"}
                       >
-                        {item.isVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        {togglingId === item._id ? (
+                          <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-transparent rounded-full animate-spin" />
+                        ) : item.isVisible ? (
+                          <EyeOff className="w-3.5 h-3.5" />
+                        ) : (
+                          <Eye className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item._id)}
+                        disabled={deletingId === item._id}
+                        className="p-1.5 rounded-lg border border-white/[0.06] text-white/30 hover:text-[#EF4444] hover:border-[#EF4444]/20 hover:bg-[#EF4444]/10 transition-all disabled:opacity-40"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </td>
@@ -204,9 +281,10 @@ const TestimonialsManagement = () => {
             <div className="mt-4 flex items-center gap-2">
               <button
                 onClick={saveEdit}
-                className="px-4 py-2 text-sm font-medium rounded-xl bg-gradient-to-r from-[#D4A85F] to-[#F5D08A] text-[#0B1220] hover:shadow-lg hover:shadow-[#D4A85F]/20 transition-all"
+                disabled={savingEdit}
+                className="px-4 py-2 text-sm font-medium rounded-xl bg-gradient-to-r from-[#D4A85F] to-[#F5D08A] text-[#0B1220] hover:shadow-lg hover:shadow-[#D4A85F]/20 transition-all disabled:opacity-50"
               >
-                Save Changes
+                {savingEdit ? "Saving..." : "Save Changes"}
               </button>
               <button
                 onClick={cancelEdit}
@@ -218,6 +296,16 @@ const TestimonialsManagement = () => {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        open={confirmDelete.open}
+        title="Delete Testimonial"
+        message="Are you sure you want to delete this testimonial? This action cannot be undone."
+        variant="danger"
+        confirmLabel="Delete"
+        onConfirm={handleDeleteConfirmed}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+      />
     </div>
   )
 }

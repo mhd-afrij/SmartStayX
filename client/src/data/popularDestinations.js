@@ -1,3 +1,4 @@
+// popularDestinations — Static list of featured travel destinations with images, stats, and descriptions
 const popularDestinations = [
   {
     name: 'Maldives',

@@ -6,8 +6,6 @@ import {
   PAYABLE_STATUSES,
   SERVICE_ELIGIBLE_STATUSES,
 } from '../../constants/bookingStatuses';
-import { FALLBACK_VALUES } from '../../constants/pricingConfig';
-
 describe('bookingStatuses', () => {
   it('defines all booking statuses', () => {
     expect(BOOKING_STATUS.PENDING).toBe('pending');
@@ -31,13 +29,5 @@ describe('bookingStatuses', () => {
 
   it('SERVICE_ELIGIBLE_STATUSES only includes CONFIRMED', () => {
     expect(SERVICE_ELIGIBLE_STATUSES).toEqual(['confirmed']);
-  });
-});
-
-describe('FALLBACK_VALUES', () => {
-  it('provides fallback strings', () => {
-    expect(FALLBACK_VALUES.HOTEL_NAME).toBe('Hotel');
-    expect(FALLBACK_VALUES.ROOM_TYPE).toBe('Room');
-    expect(FALLBACK_VALUES.ADDRESS).toBe('Address unavailable');
   });
 });

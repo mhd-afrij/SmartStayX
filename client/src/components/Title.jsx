@@ -1,6 +1,6 @@
+// Title — Reusable section title with optional kicker, subtitle, and alignment
 import React from 'react';
 
-// Title — Reusable section title with optional kicker, subtitle, and alignment
 const Title = ({ font, title, subtitle, align = 'center', kicker }) => {
   return (
     <div className={`flex flex-col justify-center ${align === 'left' ? 'items-start text-left' : 'items-center text-center'}`}>

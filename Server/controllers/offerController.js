@@ -5,19 +5,20 @@ import Room from "../models/Room.js";
 import Hotel from "../models/Hotel.js";
 
 // Offer CRUD — owners manage offers for their rooms; public lists active offers.
+// Extract authenticated user ID from Clerk auth
 const getAuthUserId = (req) => {
   const auth = typeof req.auth === "function" ? req.auth() : req.auth;
   return auth?.userId;
 };
 
+// Create a new offer for a room in an owned hotel
 export const createOffer = async (req, res) => {
   try {
-    // Create a new hotel offer linked to an owned room.
     const ownerId = getAuthUserId(req);
     const { title, description, discountPercent, expiryDate, roomId } = req.body;
 
     if (!ownerId) return res.json({ success: false, message: "Not authenticated" });
-    if (!title || !description || !discountPercent || !expiryDate || typeof roomId !== 'string') {
+    if (!title || !description || discountPercent === undefined || discountPercent === "" || !expiryDate || typeof roomId !== 'string') {
       return res.json({ success: false, message: "All fields are required" });
     }
 
@@ -53,9 +54,9 @@ export const createOffer = async (req, res) => {
   }
 };
 
+// Return active, non-expired offers for the public homepage
 export const getOffers = async (_req, res) => {
   try {
-    // Return active, non-expired offers for the public homepage.
     const now = new Date();
     const offers = await Offer.find({
       isActive: true,
@@ -71,9 +72,9 @@ export const getOffers = async (_req, res) => {
   }
 };
 
+// Return offers scoped to hotels owned by the current user
 export const getOwnerOffers = async (req, res) => {
   try {
-    // Return offers scoped to hotels owned by the current user.
     const ownerId = getAuthUserId(req);
     const hotels = await Hotel.find({ owner: ownerId });
     const hotelIds = hotels.map((h) => h._id.toString());
@@ -89,9 +90,9 @@ export const getOwnerOffers = async (req, res) => {
   }
 };
 
+// Update an existing owner offer
 export const updateOffer = async (req, res) => {
   try {
-    // Update an existing owner offer.
     const ownerId = getAuthUserId(req);
     const { id } = req.params;
     const { title, description, discountPercent, expiryDate, roomId, isActive } = req.body;
@@ -136,9 +137,9 @@ export const updateOffer = async (req, res) => {
   }
 };
 
+// Delete an offer owned by the current user
 export const deleteOffer = async (req, res) => {
   try {
-    // Remove an offer owned by the current user.
     const ownerId = getAuthUserId(req);
     const { id } = req.params;
 

@@ -1,4 +1,5 @@
 // messages.js — Shared response messages and error strings
+// Error message strings for booking-related failures
 export const BOOKING_ERRORS = {
   NOT_FOUND: 'Booking not found',
   NOT_AUTHORIZED: 'Not authenticated',
@@ -34,6 +35,7 @@ export const BOOKING_ERRORS = {
   FAILED_OWNER_UPDATE: 'Failed to update payment',
 }
 
+// Success message strings for booking operations
 export const BOOKING_SUCCESS = {
   CREATED: 'Booking created successfully',
   CANCELLED: 'Booking cancelled successfully',
@@ -44,11 +46,3 @@ export const BOOKING_SUCCESS = {
   REFUND_HANDLED: 'Refund status updated successfully.',
 }
 
-export const REFUND_ERRORS = {
-  NOT_PAID: 'Only paid bookings can request a refund',
-  ALREADY_REQUESTED: 'A refund request is already pending for this booking',
-  ALREADY_REFUNDED: 'This booking has already been refunded',
-  NOT_FOUND: 'Booking not found',
-  NOT_AUTHORIZED: 'Not authorized to handle this refund',
-  NOT_REQUESTED: 'No refund request exists for this booking',
-}

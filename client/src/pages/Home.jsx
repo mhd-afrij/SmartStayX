@@ -1,4 +1,7 @@
-// Home — Main landing page composing hero, stats, featured destinations, offers, testimonials, and more
+/**
+ * Home — Root landing page that composes all home‑page section components
+ * (hero, stats, destinations, offers, testimonials, blog, etc.).
+ */
 import React, { useEffect } from 'react'
 import Hero from '../components/Hero'
 import StatsSection from '../components/StatsSection'
@@ -11,33 +14,34 @@ import BlogPreviews from '../components/BlogPreviews'
 import SocialWall from '../components/SocialWall'
 import AIPlannerSection from '../components/AIPlannerSection'
 import NewsLetter from '../components/NewsLetter'
+import RecommendedRooms from '../components/RecommendedRooms'
 
 const Home = () => {
   useEffect(() => {
-    document.title = 'SmartStayX — Discover Your Perfect Gateway Destination';
-  }, []);
+    document.title = 'SmartStayX — Discover Your Perfect Gateway Destination'
+  }, [])
 
   return (
     <>
-    {/* Hero and discovery sections */}
-    <Hero />
-    <StatsSection />
-    <PopularDestinations />
-    <FeaturedDestination/>
+      {/* Hero + discovery */}
+      <Hero />
+      <StatsSection />
+      <PopularDestinations />
+      <FeaturedDestination />
 
-    {/* Experience and offer highlights */}
-    <ExperienceShowcase />
-    <ExclusiveOffer/>
-    <Testimonial/>
+      {/* Experiences + offers */}
+      <ExperienceShowcase />
+      <RecommendedRooms />
+      <ExclusiveOffer />
+      <Testimonial />
 
-    {/* Travel inspiration */}
-    <BlogPreviews />
-    <SocialWall />
+      {/* Travel inspiration */}
+      <BlogPreviews />
+      <SocialWall />
 
-    {/* Planning and newsletter signup */}
-    <AIPlannerSection />
-    <NewsLetter/>
-    
+      {/* Planning + newsletter */}
+      <AIPlannerSection />
+      <NewsLetter />
     </>
   )
 }
