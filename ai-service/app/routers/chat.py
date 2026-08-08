@@ -12,11 +12,20 @@ from app.models.chat import (
 from app.services.llm_service import generate_response, generate_streaming_response
 from app.services.context_service import get_user_context, get_hotel_context
 from bson import ObjectId
+from bson.errors import InvalidId
 from datetime import datetime
 from typing import Optional
 import json
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
+
+
+def _parse_object_id(value: str) -> ObjectId:
+    """Convert a string to an ObjectId, returning a 400 on malformed input."""
+    try:
+        return ObjectId(value)
+    except (InvalidId, TypeError):
+        raise HTTPException(status_code=400, detail="Invalid conversation id")
 
 
 def _serialize_conversation(conv) -> ConversationResponse:
@@ -31,10 +40,6 @@ def _serialize_conversation(conv) -> ConversationResponse:
         createdAt=conv.get("createdAt", datetime.utcnow()),
         updatedAt=conv.get("updatedAt", datetime.utcnow()),
     )
-
-
-async def _get_user_id(x_user_id: Optional[str] = Header(None)) -> Optional[str]:
-    return x_user_id
 
 
 @router.post("/conversations", response_model=ConversationResponse)
@@ -73,7 +78,7 @@ async def get_conversation(conversation_id: str):
     if not is_db_available():
         raise HTTPException(status_code=503, detail="Conversation storage is unavailable")
     db = get_db()
-    conv = await db.conversations.find_one({"_id": ObjectId(conversation_id)})
+    conv = await db.conversations.find_one({"_id": _parse_object_id(conversation_id)})
     if not conv:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
@@ -92,7 +97,7 @@ async def delete_conversation(conversation_id: str):
     if not is_db_available():
         raise HTTPException(status_code=503, detail="Conversation storage is unavailable")
     db = get_db()
-    result = await db.conversations.delete_one({"_id": ObjectId(conversation_id)})
+    result = await db.conversations.delete_one({"_id": _parse_object_id(conversation_id)})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Conversation not found")
     return {"success": True}
@@ -109,7 +114,7 @@ async def send_message(
     user_id = user_id or "anonymous"
 
     if request.conversationId:
-        conv = await db.conversations.find_one({"_id": ObjectId(request.conversationId)})
+        conv = await db.conversations.find_one({"_id": _parse_object_id(request.conversationId)})
         if not conv:
             raise HTTPException(status_code=404, detail="Conversation not found")
     else:
@@ -165,7 +170,7 @@ async def send_message_stream(
     user_id = user_id or "anonymous"
 
     if request.conversationId:
-        conv = await db.conversations.find_one({"_id": ObjectId(request.conversationId)})
+        conv = await db.conversations.find_one({"_id": _parse_object_id(request.conversationId)})
         if not conv:
             raise HTTPException(status_code=404, detail="Conversation not found")
     else:
