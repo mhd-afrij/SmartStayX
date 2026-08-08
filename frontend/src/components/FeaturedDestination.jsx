@@ -1,0 +1,93 @@
+import React, { useRef } from "react";
+import { motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import HotelCard from "./HotelCard";
+import Title from "./Title";
+import { useAppContext } from "../context/AppContext";
+
+const SkeletonCard = () => (
+  <div className="w-72 flex-shrink-0 animate-pulse">
+    <div className="rounded-[24px] border border-black/[0.06] overflow-hidden bg-white">
+      <div className="h-48 bg-[#f4f2ef]" />
+      <div className="p-5 space-y-3">
+        <div className="h-4 w-3/4 rounded bg-[#f4f2ef]" />
+        <div className="h-3 w-1/2 rounded bg-[#f4f2ef]" />
+        <div className="h-3 w-2/3 rounded bg-[#f4f2ef]" />
+        <div className="h-10 w-full rounded bg-[#f4f2ef] mt-4" />
+      </div>
+    </div>
+  </div>
+);
+
+const FeaturedDestination = () => {
+  const { rooms, navigate } = useAppContext();
+  const scrollRef = useRef(null);
+
+  const scroll = (dir) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: dir * 320, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <section className="luxury-section">
+      <div className="mx-auto max-w-7xl">
+        <div className="flex flex-col items-center space-y-8">
+          <Title
+            kicker="Curated Collection"
+            title="Featured Hotels"
+            subtitle="Discover our handpicked selection of exceptional hotels around the world, offering unparalleled luxury and unforgettable experiences."
+          />
+
+          <div className="relative w-full group/scroll">
+            <button
+              onClick={() => scroll(-1)}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full bg-white border border-black/[0.08] text-slate-500 hover:text-slate-900 hover:border-black/[0.15] shadow-[0_10px_30px_rgba(15,23,42,0.08)] opacity-0 group-hover/scroll:opacity-100 transition-all"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <div ref={scrollRef} className="w-full overflow-x-auto scrollbar-hide">
+              <div className="flex gap-6 pb-4 min-w-max">
+                {rooms.length === 0
+                  ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+                  : rooms.slice(0, 8).map((room, index) => (
+                      <motion.div
+                        key={room._id || room.id}
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5, delay: index * 0.06 }}
+                        className="w-72 flex-shrink-0"
+                      >
+                        <HotelCard room={room} index={index} />
+                      </motion.div>
+                    ))}
+              </div>
+            </div>
+            <button
+              onClick={() => scroll(1)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full bg-white border border-black/[0.08] text-slate-500 hover:text-slate-900 hover:border-black/[0.15] shadow-[0_10px_30px_rgba(15,23,42,0.08)] opacity-0 group-hover/scroll:opacity-100 transition-all"
+              aria-label="Scroll right"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+
+          <motion.button
+            whileHover={{ y: -2 }}
+            onClick={() => {
+              navigate("/rooms");
+              scrollTo(0, 0);
+            }}
+            className="gold-button px-8 py-3 text-sm uppercase tracking-[0.18em]"
+          >
+            View All Hotels
+          </motion.button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default FeaturedDestination;
