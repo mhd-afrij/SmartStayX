@@ -58,20 +58,6 @@ TOOL_DEFINITIONS = [
     {
         "type": "function",
         "function": {
-            "name": "get_booking_details",
-            "description": "Get detailed information about a specific booking",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "bookingId": {"type": "string", "description": "Booking MongoDB ID"},
-                },
-                "required": ["bookingId"],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
             "name": "create_service_request",
             "description": "Create a new service request (housekeeping, maintenance, room service)",
             "parameters": {

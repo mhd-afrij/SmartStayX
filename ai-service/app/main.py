@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 from app.config import settings
 from app.database import connect_db, close_db, is_db_available
-from app.routers import chat, trip_planner, health
+from app.routers import chat, health
 
 
 @asynccontextmanager
@@ -36,7 +36,6 @@ app.add_middleware(
 )
 
 app.include_router(chat.router)
-app.include_router(trip_planner.router)
 app.include_router(health.router)
 
 
