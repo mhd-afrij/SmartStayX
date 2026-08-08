@@ -96,8 +96,8 @@ VITE_OWNER_OVERRIDE_EMAIL=owner@smartstayx.com
 MONGODB_URI=mongodb://localhost:27017/SmartStayX
 OPENAI_API_KEY=
 AI_MODEL=openai/gpt-4o-mini
-AI_HOST=0.0.0.0
-AI_PORT=8000
+AI_HOST=127.0.0.1
+AI_PORT=8001
 ```
 
 ### Run Locally
@@ -116,8 +116,14 @@ npm run dev
 # AI Service
 cd ai-service
 pip install -r requirements.txt
-uvicorn app.main:app --reload
+uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+
+# ML Service
+cd ml-service
+python app.py
 ```
+
+Note: Gunicorn is recommended on Linux/macOS. On Windows, use `python app.py` because Gunicorn depends on Unix-only modules.
 
 ### Run Tests
 
@@ -156,7 +162,7 @@ Unit and contract tests across several test files covering:
 | `POST /api/rooms` | Add room (owner) |
 | `GET /api/rooms` | List rooms (paginated) |
 | `GET /api/rooms/Owner` | Get owner's rooms |
-| `GET /api/rooms/trending` | Get trending rooms |
+| `GET /api/rooms/trending/list` | Get trending rooms |
 | `GET /api/rooms/:id` | Get room by ID |
 | `POST /api/bookings/book` | Create booking |
 | `POST /api/bookings/check-availability` | Check room availability |
@@ -200,8 +206,10 @@ Unit and contract tests across several test files covering:
 | `GET /api/analytics/demographics` | Guest demographics |
 | `GET /api/pricing/suggest` | Get pricing suggestions |
 | `GET /api/pricing/enhanced` | ML-enhanced pricing |
-| `POST /api/chatbot/message` | Send chatbot message |
-| `GET /api/chatbot/conversations` | List chatbot conversations |
+| `POST /api/guest-assistant/chat` | Guest assistant message (Express proxies to the AI service) |
+| `POST /api/chat/message` | AI service: send a concierge message (returns full reply) |
+| `POST /api/chat/message/stream` | AI service: stream a concierge reply (SSE) |
+| `GET /api/chat/conversations` | AI service: list a user's conversations |
 | `POST /api/activities/book` | Book an activity |
 | `POST /api/destinations` | Create destination |
 | `GET /api/destinations` | List destinations |
@@ -209,3 +217,12 @@ Unit and contract tests across several test files covering:
 | `GET /api/receptionist/rooms` | Receptionist room listing |
 | `POST /api/orgs` | Organization CRUD |
 | `POST /api/roles` | Role management |
+
+## Architecture Notes
+
+- Public guest routes are rendered from the React client and mostly read from the Node API.
+- Owner and receptionist dashboards are separate route groups in the client and rely on auth-protected backend endpoints.
+- Booking, hotel, room, payment, analytics, and notification data are owned by the Express API and MongoDB.
+- Conversational AI and trip planning are handled by the FastAPI microservice.
+- Price prediction is handled by the Flask ML service.
+- The Node server can launch all three backend processes together through `npm run server`.

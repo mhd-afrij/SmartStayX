@@ -22,6 +22,9 @@ def load_model():
     return True
 
 
+load_model()
+
+
 @app.route("/predict", methods=["POST"])
 def predict():
     if model is None:
@@ -58,6 +61,6 @@ def health():
 
 
 if __name__ == "__main__":
-    load_model()
     port = int(os.environ.get("ML_SERVICE_PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    host = os.environ.get("ML_SERVICE_HOST", "127.0.0.1")
+    app.run(host=host, port=port, debug=False)
