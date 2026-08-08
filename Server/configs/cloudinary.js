@@ -1,6 +1,7 @@
 // cloudinary.js — Cloudinary SDK configuration for image/media uploads
 import { v2 as cloudinary } from 'cloudinary'
 
+// Configures and returns the Cloudinary SDK client; throws if env vars are missing
 const connectCloudinary = () => {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim()
   const apiKey = process.env.CLOUDINARY_API_KEY?.trim()

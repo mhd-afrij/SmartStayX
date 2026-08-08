@@ -1,10 +1,10 @@
-// AllRooms — Browse all available rooms with filtering, sorting, and pagination
-import React, { useContext, useState, useMemo, useEffect } from "react";
+// AllRooms — Browse all available rooms with value scoring, filtering, sorting, and pagination
+import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { AppContext } from "../context/AppContext";
 import { cities, destinationLocaleConfig } from "../assets/assets";
 import { motion, AnimatePresence } from "framer-motion";
-import { assets } from "../assets/assets";
+import { Star } from "lucide-react";
+import BestValueBadge from "../components/BestValueBadge";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -55,20 +55,20 @@ const StarRating = ({ rating }) => {
   return (
     <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((s) => (
-        <svg key={s} className={`w-3.5 h-3.5 ${s <= stars ? 'text-[#F5D08A]' : 'text-white/20'}`} fill="currentColor" viewBox="0 0 20 20">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
+        <Star key={s} className={`w-3.5 h-3.5 ${s <= stars ? 'text-[#F5D08A] fill-[#F5D08A]' : 'text-white/20'}`} />
       ))}
     </div>
   );
 };
 
 const AllRooms = () => {
-  const { rooms, formatPrice, convertPrice, selectedCurrency, currency, setSelectedCurrency, setSelectedLanguage } = useContext(AppContext);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [rooms, setRooms] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+  const [formatPrice, setFormatPrice] = useState(() => (v) => `$${v}`);
+  const [currency, setCurrency] = useState("$");
 
   useEffect(() => {
     document.title = searchParams.get("destination")
@@ -77,17 +77,22 @@ const AllRooms = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    if (rooms.length > 0) setPageLoading(false);
-    const timer = setTimeout(() => setPageLoading(false), 2000);
-    return () => clearTimeout(timer);
-  }, [rooms]);
-
-  useEffect(() => {
-    const destination = searchParams.get("destination");
-    if (destination && destinationLocaleConfig[destination]) {
-      setSelectedLanguage(destinationLocaleConfig[destination].languageCode);
-      setSelectedCurrency(destinationLocaleConfig[destination].currencyCode);
-    }
+    const fetchRooms = async () => {
+      setPageLoading(true);
+      try {
+        const params = new URLSearchParams({ limit: "50" });
+        const dest = searchParams.get("destination");
+        if (dest) params.set("city", dest);
+        const res = await fetch(`/api/guest/best-value?${params.toString()}`);
+        const data = await res.json();
+        if (data.success) setRooms(data.rooms || []);
+      } catch {
+        setRooms([]);
+      } finally {
+        setPageLoading(false);
+      }
+    };
+    fetchRooms();
   }, [searchParams]);
 
   const [openFilter, setOpenFilter] = useState(false);
@@ -100,30 +105,16 @@ const AllRooms = () => {
 
   const roomTypes = ["Single Bed", "Double Bed", "Luxury Room", "Family Suite"];
 
-  const priceRanges = useMemo(() => {
-    const usdRanges = [
-      { label: "Under $100", min: 0, max: 100 },
-      { label: "$100 – $300", min: 100, max: 300 },
-      { label: "$300 – $500", min: 300, max: 500 },
-      { label: "$500 – $1,000", min: 500, max: 1000 },
-      { label: "$1,000+", min: 1000, max: Infinity },
-    ];
-    if (selectedCurrency === "USD") {
-      return usdRanges.map((r) => ({ ...r, display: r.label }));
-    }
-    return usdRanges.map((r) => {
-      const lo = convertPrice(r.min);
-      const hi = r.max === Infinity ? "+" : convertPrice(r.max);
-      const symbol = currency;
-      const display = r.max === Infinity
-        ? `${symbol}${lo.toLocaleString()}+`
-        : `${symbol}${lo.toLocaleString()} – ${symbol}${hi.toLocaleString()}`;
-      return { ...r, display };
-    });
-  }, [selectedCurrency, convertPrice, currency]);
+  const priceRanges = useMemo(() => [
+    { label: "Under $100", display: "Under $100", min: 0, max: 100 },
+    { label: "$100 – $300", display: "$100 – $300", min: 100, max: 300 },
+    { label: "$300 – $500", display: "$300 – $500", min: 300, max: 500 },
+    { label: "$500 – $1,000", display: "$500 – $1,000", min: 500, max: 1000 },
+    { label: "$1,000+", display: "$1,000+", min: 1000, max: Infinity },
+  ], []);
 
   const ratingOptions = ["3+ stars", "4+ stars", "5 stars"];
-  const sortOptions = ["Price: Low to High", "Price: High to Low", "Newest First", "Highest Rated"];
+  const sortOptions = ["Best Value", "Price: Low to High", "Price: High to Low", "Newest First", "Highest Rated"];
 
   const handleFilterChange = (checked, value, type) => {
     setSelectedFilters((prev) => {
@@ -153,7 +144,7 @@ const AllRooms = () => {
 
   const matchesRating = (room) => {
     if (selectedFilters.rating.length === 0) return true;
-    const rating = room.rating || room.stars || 0;
+    const rating = room.avgRating || 0;
     return selectedFilters.rating.some((filter) => {
       const minStars = parseInt(filter, 10);
       return rating >= minStars;
@@ -172,8 +163,9 @@ const AllRooms = () => {
   const sortRooms = (a, b) => {
     if (selectedSort === "Price: Low to High") return a.pricePerNight - b.pricePerNight;
     if (selectedSort === "Price: High to Low") return b.pricePerNight - a.pricePerNight;
-    if (selectedSort === "Newest First") return new Date(b.createdAt) - new Date(a.createdAt);
-    if (selectedSort === "Highest Rated") return (b.rating || 0) - (a.rating || 0);
+    if (selectedSort === "Newest First") return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    if (selectedSort === "Highest Rated") return (b.avgRating || 0) - (a.avgRating || 0);
+    if (selectedSort === "Best Value") return (b.valueScore || 0) - (a.valueScore || 0);
     return 0;
   };
 
@@ -213,7 +205,6 @@ const AllRooms = () => {
   return (
     <div className="pt-20 min-h-screen bg-[#07111f]">
       <div className="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
           <div>
             <p className="luxury-kicker">Rooms</p>
@@ -248,7 +239,6 @@ const AllRooms = () => {
             </AnimatePresence>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            {/* Destination selector */}
             <select
               value={searchDestination || ""}
               onChange={(e) => {
@@ -278,7 +268,6 @@ const AllRooms = () => {
             </select>
             <button onClick={clearFilters} className="ghost-button px-4 py-2.5 text-sm">Reset</button>
 
-            {/* Mobile filter toggle */}
             <button
               onClick={() => setOpenFilter(!openFilter)}
               className="lg:hidden ghost-button px-4 py-2.5 text-sm"
@@ -288,9 +277,7 @@ const AllRooms = () => {
           </div>
         </div>
 
-        {/* Filters and results grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Sidebar filter panel - collapsible on mobile */}
           <AnimatePresence>
             {openFilter && (
               <motion.aside
@@ -325,7 +312,6 @@ const AllRooms = () => {
           </aside>
 
           <main className="space-y-4 min-w-0 lg:col-span-9">
-            {/* Active filter chips */}
             {activeFilters.length > 0 && (
               <div className="flex flex-wrap items-center gap-2">
                 {activeFilters.map((filter) => (
@@ -341,14 +327,12 @@ const AllRooms = () => {
               </div>
             )}
 
-            {/* Loading skeleton */}
             {pageLoading && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}
               </div>
             )}
 
-            {/* Empty state */}
             {!pageLoading && filteredRooms.length === 0 && (
               <div className="luxury-card p-10 text-center">
                 <h3 className="font-playfair text-xl text-white mb-2">No rooms found</h3>
@@ -357,7 +341,6 @@ const AllRooms = () => {
               </div>
             )}
 
-            {/* Room cards */}
             {!pageLoading && filteredRooms.length > 0 && (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -390,11 +373,9 @@ const AllRooms = () => {
                         <div className="absolute top-3 left-3 rounded-full border border-white/10 bg-black/50 backdrop-blur-xl px-3 py-1 text-xs font-semibold text-white">
                           {formatPrice(room.pricePerNight)} / night
                         </div>
-                        {(room.rating || room.stars) >= 4.5 && (
-                          <div className="absolute top-3 right-3 bg-[#D4A85F]/90 text-[#1b1d20] px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.15em]">
-                            Featured
-                          </div>
-                        )}
+                        <div className="absolute top-3 right-3">
+                          <BestValueBadge score={room.valueScore} savingsPercent={room.savingsPercent} />
+                        </div>
                       </Link>
 
                       <div className="flex flex-1 flex-col p-5">
@@ -407,17 +388,30 @@ const AllRooms = () => {
                             {room.hotel?.name || "Luxury Hotel"}
                           </Link>
                           <div className="flex items-center gap-2 mt-1">
-                            <StarRating rating={room.rating || room.stars || 4} />
-                            <span className="text-xs text-white/40">{(room.rating || room.stars || 4).toFixed(1)}</span>
+                            <StarRating rating={room.avgRating || 4} />
+                            <span className="text-xs text-white/40">{(room.avgRating || 4).toFixed(1)}</span>
+                            {room.reviewCount > 0 && (
+                              <span className="text-xs text-white/30">({room.reviewCount} reviews)</span>
+                            )}
                           </div>
-                          <p className="text-sm text-white/60 mt-0.5">{room.roomType || room.type || "Signature room"}</p>
+                          <p className="text-sm text-white/60 mt-0.5">{room.roomType || "Signature room"}</p>
                           <p className="text-xs text-white/40 mt-1">
                             {room.hotel?.city || room.hotel?.address || "Prime location"}
                             {room.capacity ? ` · Up to ${room.capacity} guests` : ''}
                           </p>
                         </div>
 
-                        <div className="flex flex-wrap gap-1.5 mt-4">
+                        {room.recommendationReasons && (
+                          <div className="flex flex-wrap gap-1.5 mt-3">
+                            {room.recommendationReasons.slice(0, 2).map((reason, i) => (
+                              <span key={i} className="px-2 py-0.5 rounded-full bg-[#D4A85F]/10 text-[#F5D08A] text-[10px]">
+                                {reason}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="flex flex-wrap gap-1.5 mt-3">
                           {room.amenities?.slice(0, 2).map((amenity) => (
                             <span key={amenity} className="px-2.5 py-1 rounded-full border border-white/10 bg-white/5 text-white/55 text-[0.7rem]">
                               {amenity}
@@ -432,23 +426,27 @@ const AllRooms = () => {
 
                         <div className="flex items-center justify-between mt-5 pt-4 border-t border-white/8">
                           <div>
+                            <span className="text-sm text-white/40">Value Score</span>
+                            <span className="text-lg font-bold text-white ml-1">{room.valueScore}</span>
+                            <span className="text-xs text-white/30">/100</span>
+                          </div>
+                          <div className="text-right">
                             <span className="text-lg font-semibold text-white">{formatPrice(room.pricePerNight)}</span>
                             <span className="text-sm text-white/40 ml-1">/ night</span>
                           </div>
-                          <Link
-                            to={`/rooms/${room._id}`}
-                            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                            className="gold-button px-5 py-2.5 text-xs uppercase tracking-[0.18em]"
-                          >
-                            View
-                          </Link>
                         </div>
+                        <Link
+                          to={`/rooms/${room._id}`}
+                          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                          className="gold-button mt-3 px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-center block"
+                        >
+                          View
+                        </Link>
                       </div>
                     </motion.article>
                   ))}
                 </div>
 
-                {/* Load more */}
                 {hasMore && (
                   <div className="flex justify-center pt-6">
                     <button

@@ -1,4 +1,3 @@
-// DashboardNavbar — Owner dashboard top navigation bar with user menu and alerts
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,10 +15,11 @@ import {
   Globe,
   DollarSign,
 } from "lucide-react";
-import { UserButton, useUser, useClerk } from "@clerk/clerk-react";
+import { useUser, useClerk, OrganizationSwitcher } from "@clerk/clerk-react";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
 
+// Color mapping for notification types
 const TYPE_COLORS = {
   new_booking: "#22C55E",
   payment_received: "#3B82F6",
@@ -30,6 +30,7 @@ const TYPE_COLORS = {
   review: "#A855F7",
 };
 
+// Format a date string as a relative time (e.g., "5m ago")
 const timeAgo = (dateStr) => {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
@@ -41,6 +42,7 @@ const timeAgo = (dateStr) => {
   return `${days}d ago`;
 };
 
+// DashboardNavbar — Owner dashboard top navigation bar with user menu and alerts
 const Navbar = () => {
   const { user } = useUser();
   const { signOut } = useClerk();
@@ -53,6 +55,7 @@ const Navbar = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loadingNotifs, setLoadingNotifs] = useState(false);
 
+  // Fetch latest notifications from the API
   const fetchNotifications = useCallback(async () => {
     try {
       setLoadingNotifs(true);
@@ -70,6 +73,7 @@ const Navbar = () => {
     }
   }, [axios, getToken]);
 
+  // Mark a single notification as read
   const handleMarkAsRead = useCallback(async (notificationId) => {
     try {
       const { data } = await axios.put(`/api/notifications/${notificationId}/read`, {}, {
@@ -86,6 +90,7 @@ const Navbar = () => {
     }
   }, [axios, getToken]);
 
+  // Mark all notifications as read
   const handleMarkAllAsRead = useCallback(async () => {
     try {
       const { data } = await axios.put("/api/notifications/read-all", {}, {
@@ -198,12 +203,27 @@ const Navbar = () => {
 
         {/* Action buttons and menus */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowSearch(!showSearch)}
-            className="relative w-9 h-9 rounded-lg border border-white/[0.06] bg-white/[0.04] flex items-center justify-center hover:bg-white/[0.08] transition-colors"
-          >
-            <Search className="w-4 h-4 text-white/50" />
-          </button>
+          <div className="relative">
+            {showSearch ? (
+              <motion.div initial={{ width: 0 }} animate={{ width: 200 }} className="flex items-center">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  autoFocus
+                  onBlur={() => setShowSearch(false)}
+                  onKeyDown={(e) => e.key === 'Escape' && setShowSearch(false)}
+                  className="w-full px-3 py-1.5 text-xs rounded-lg border border-white/[0.06] bg-white/[0.04] text-white/70 placeholder:text-white/30 outline-none focus:border-[#D4A85F]/30 transition-colors"
+                />
+              </motion.div>
+            ) : (
+              <button
+                onClick={() => setShowSearch(true)}
+                className="w-9 h-9 rounded-lg border border-white/[0.06] bg-white/[0.04] flex items-center justify-center hover:bg-white/[0.08] transition-colors"
+              >
+                <Search className="w-4 h-4 text-white/50" />
+              </button>
+            )}
+          </div>
 
           {/* Notifications dropdown */}
           <div className="relative">
@@ -317,12 +337,24 @@ const Navbar = () => {
                     ].map((item) => (
                       <button
                         key={item.label}
+                        onClick={() => { setShowProfile(false); }}
                         className="flex items-center gap-2 w-full px-3 py-2 text-sm text-white/60 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors"
                       >
                         <item.icon className="w-4 h-4" />
                         {item.label}
                       </button>
                     ))}
+                    <div className="border-t border-white/[0.06] mt-1 pt-1 mb-1">
+                      <OrganizationSwitcher
+                        appearance={{
+                          elements: {
+                            organizationSwitcherTrigger: "w-full text-xs text-white/70 hover:text-white bg-white/[0.04] rounded-lg px-2 py-1.5",
+                            organizationSwitcherPopoverCard: "bg-[#0c1a2e] border border-white/10",
+                            organizationSwitcherPopoverActionButton: "text-white/70 text-xs hover:text-white",
+                          }
+                        }}
+                      />
+                    </div>
                     <button
                       onClick={() => signOut()}
                       className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[#EF4444]/70 hover:text-[#EF4444] hover:bg-[#EF4444]/10 rounded-lg transition-colors mt-1"

@@ -5,6 +5,7 @@ import { getUserRecommendations } from "../controllers/recommendationController.
 
 const recommendationRouter = express.Router();
 
+// GET /user — Get AI-powered room and destination recommendations (auth required)
 recommendationRouter.get("/user", protect, getUserRecommendations);
 
 export default recommendationRouter;

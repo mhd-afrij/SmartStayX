@@ -6,7 +6,6 @@ import Hotel from '../models/Hotel.js';
 import Offer from '../models/Offer.js';
 import { BOOKING_STATUS } from '../constants/bookingStatuses.js';
 import bookingConfig from '../configs/bookingConfig.js';
-import { acquireLock, releaseLock, extendLock } from '../utils/redisClient.js';
 
 // -----------------------------------------------------------------------
 // Helpers — date normalization, availability check, pricing rules
@@ -241,7 +240,7 @@ const calculateBookingPricing = async ({ roomData, checkInDate, checkOutDate, gu
 };
 
 // -----------------------------------------------------------------------
-// Booking creation with distributed lock (Redis) and MongoDB transaction
+// Booking creation with MongoDB transaction
 // -----------------------------------------------------------------------
 
 const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, holdMinutes, offerId, guestDisplayName }) => {
@@ -252,9 +251,6 @@ const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, 
 
   const window = normalizeBookingWindow(checkInDate, checkOutDate);
   if (!window) throw Object.assign(new Error('Invalid booking dates'), { status: 400 });
-
-  // Attempt distributed lock (falls back gracefully if Redis is unavailable)
-  const lock = await acquireLock(roomId, window.checkIn, window.checkOut);
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -307,13 +303,9 @@ const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, 
 
     await session.commitTransaction();
 
-    // Extend lock so it covers the full hold duration while payment is pending
-    if (lock) await extendLock(lock.lockKey, lock.lockValue, holdMs);
-
     return { booking, pricing, idempotencyKey, holdExpiresAt };
   } catch (error) {
     await session.abortTransaction();
-    if (lock) releaseLock(lock.lockKey, lock.lockValue);
     throw error;
   } finally {
     session.endSession();

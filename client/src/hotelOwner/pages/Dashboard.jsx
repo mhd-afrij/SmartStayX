@@ -13,7 +13,7 @@ import BookingsTable from "../../components/dashboard/BookingsTable";
 import MaintenancePanel from "../../components/dashboard/MaintenancePanel";
 
 const Dashboard = () => {
-  const { currency, user, getToken, axios, selectedHotelId, setSelectedHotelId, dashboardData, setDashboardData } = useAppContext();
+  const { currency, user, getToken, axios, selectedHotelId, setSelectedHotelId, dashboardData, setDashboardData, formatPrice } = useAppContext();
 
   const [deletingBookingId, setDeletingBookingId] = useState(null);
   const [maintenanceRoomId, setMaintenanceRoomId] = useState(null);
@@ -150,7 +150,7 @@ const Dashboard = () => {
     }
   }, [user, fetchDashboardData]);
 
-  const formatCurrency = (value) => `${currency} ${Number(value || 0).toLocaleString()}`;
+  const formatCurrency = (value) => formatPrice(value, { maximumFractionDigits: 0 });
 
   const isLoading = !dashboardData.hotel && dashboardData.bookings.length === 0;
   const hasNoHotel = dashboardData.allHotels.length === 0;
@@ -209,7 +209,7 @@ const Dashboard = () => {
             </div>
           </div>
           <ErrorBoundary>
-            <KpiCards data={dashboardData} currency={currency} />
+            <KpiCards data={dashboardData} currency={currency} formatPrice={formatCurrency} />
           </ErrorBoundary>
         </>
       )}
@@ -218,7 +218,7 @@ const Dashboard = () => {
         <div className="grid gap-4 lg:grid-cols-3">
           <div className="lg:col-span-2 min-w-0">
             <ErrorBoundary>
-              <RevenueChart revenueData={dashboardData.trends} />
+              <RevenueChart revenueData={dashboardData.trends} currency={currency} formatPrice={formatCurrency} />
             </ErrorBoundary>
           </div>
           <div className="min-w-0">

@@ -1,148 +1,131 @@
-// authMiddleware.js — Clerk JWT authentication and user session resolution
-import User from '../models/User.js'
-import { CLERK_API_BASE_URL, PLACEHOLDER_IMAGE_URL } from '../configs/runtimeDefaults.js'
-import mongoose from 'mongoose'
-import bookingConfig from '../configs/bookingConfig.js'
+import User from '../models/User.js';
+import Organization from '../models/Organization.js';
+import logger from '../utils/logger.js';
 
-// Auth middleware — resolves Clerk JWT to a local User document, creating or updating as needed.
-export const protect = async (req, res, next) => {
-  try {
-    const auth = typeof req.auth === 'function' ? req.auth() : req.auth
-    const userId = auth?.userId
-
-    if (!userId) {
-      return res.json({ success: false, message: 'not authenticated' })
-    }
-
-    const claims = auth?.sessionClaims || {}
-
-    const firstName =
-      claims?.firstName ||
-      claims?.first_name ||
-      claims?.givenName ||
-      claims?.given_name ||
-      ''
-    const lastName =
-      claims?.lastName ||
-      claims?.last_name ||
-      claims?.familyName ||
-      claims?.family_name ||
-      ''
-    const usernameClaim =
-      claims?.username ||
-      claims?.preferred_username ||
-      claims?.preferredUsername ||
-      ''
-    const emailClaim =
-      claims?.email ||
-      claims?.email_address ||
-      claims?.emailAddress ||
-      (Array.isArray(claims?.email_addresses) && claims.email_addresses[0]?.email_address)
-    const imageClaim = claims?.imageUrl || claims?.image_url || claims?.picture || ''
-    const email = emailClaim || `${userId}${bookingConfig.placeholderEmailDomain}`
-
-    const fullName =
-      claims?.fullName ||
-      claims?.full_name ||
-      claims?.name ||
-      [firstName, lastName].filter(Boolean).join(' ') ||
-      usernameClaim ||
-      ''
-
-    // If DB is unavailable, build a minimal user from Clerk claims and proceed.
-    if (mongoose.connection.readyState !== 1) {
-      req.user = {
-        _id: userId,
-        name: fullName || usernameClaim || 'Guest',
-        username: usernameClaim || fullName || 'Guest',
-        email,
-        image: imageClaim || PLACEHOLDER_IMAGE_URL,
-      }
-      return next()
-    }
-
-    let user = await User.findById(userId)
-
-    // Fetch user profile from Clerk API when session claims lack name data.
-    const fetchClerkUser = async () => {
-      const clerkSecret = process.env.CLERK_SECRET_KEY
-      if (!clerkSecret) return null
-      try {
-        const response = await fetch(`${CLERK_API_BASE_URL}/users/${userId}`, {
-          headers: { Authorization: `Bearer ${clerkSecret}` },
-        })
-        if (!response.ok) return null
-        return await response.json()
-      } catch {
-        return null
-      }
-    }
-
-    const resolveName = async () => {
-      if (fullName) return fullName
-      if (usernameClaim) return usernameClaim
-      const clerkData = await fetchClerkUser()
-      if (clerkData) {
-        const clerkName = [clerkData.first_name, clerkData.last_name].filter(Boolean).join(' ').trim()
-        if (clerkName) return clerkName
-        if (clerkData.username) return clerkData.username
-      }
-      return 'Guest'
-    }
-
-    const resolvedName = await resolveName()
-    const resolvedUsername = usernameClaim || resolvedName
-
-    let needsUpdate = false
-
-    if (user) {
-      const updates = {}
-      if (!user.name || user.name === 'Guest') {
-        updates.name = resolvedName
-        needsUpdate = true
-      }
-      if ((!user.username || user.username === 'Guest') && resolvedUsername && resolvedUsername !== 'Guest') {
-        updates.username = resolvedUsername
-        needsUpdate = true
-      }
-      if (
-        (!user.email || String(user.email).endsWith(bookingConfig.placeholderEmailDomain)) &&
-        email &&
-        !String(email).endsWith(bookingConfig.placeholderEmailDomain)
-      ) {
-        updates.email = email
-        needsUpdate = true
-      }
-      if ((!user.image || user.image === PLACEHOLDER_IMAGE_URL) && imageClaim) {
-        updates.image = imageClaim
-        needsUpdate = true
-      }
-      if (needsUpdate) {
-        user = await User.findByIdAndUpdate(userId, { $set: updates }, { new: true })
-      }
-    }
-
-    if (!user) {
-      user = await User.findByIdAndUpdate(
-        userId,
-        {
-          $setOnInsert: {
-            _id: userId,
-            name: resolvedName,
-            username: resolvedUsername,
-            email,
-            image: imageClaim || PLACEHOLDER_IMAGE_URL,
-            recentSearchedCities: [],
-          },
-        },
-        { upsert: true, new: true }
-      )
-    }
-
-    req.user = user
-    next()
-  } catch (error) {
-    console.error('Auth middleware error:', error.message)
-    return res.status(500).json({ success: false, message: 'Authentication setup failed' })
+const extractAuth = (req) => {
+  if (typeof req.auth === 'function') {
+    return req.auth();
   }
-}
+  return req.auth;
+};
+
+const fetchClerkUser = async (userId) => {
+  const secret = process.env.CLERK_SECRET_KEY;
+  if (!secret) return null;
+  try {
+    const res = await fetch(
+      `${process.env.CLERK_API_BASE_URL || "https://api.clerk.com/v1"}/users/${userId}`,
+      { headers: { Authorization: `Bearer ${secret}` } }
+    );
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+};
+
+export const protect = async (req, res, next) => {
+  let auth;
+  try {
+    auth = extractAuth(req);
+  } catch (e) {
+    logger.warn('Auth extraction threw: %s', e.message);
+    auth = null;
+  }
+
+  const clerkUserId = auth?.userId;
+
+  if (!clerkUserId) {
+    return res.status(401).json({ success: false, message: 'Not authenticated' });
+  }
+
+  let user;
+  try {
+    user = await User.findById(clerkUserId);
+  } catch (dbErr) {
+    logger.error('User lookup failed: %s', dbErr.message);
+    return res.status(500).json({ success: false, message: 'Authentication failed' });
+  }
+
+  const resolveEmail = () => {
+    return auth?.claims?.email ||
+      auth?.user?.emailAddresses?.[0]?.emailAddress ||
+      auth?.user?.email ||
+      null;
+  };
+
+  const resolveName = () => {
+    return auth?.claims?.name ||
+      auth?.user?.firstName ||
+      auth?.user?.name ||
+      null;
+  };
+
+  const resolveImage = () => {
+    return auth?.claims?.image_url ||
+      auth?.claims?.picture ||
+      auth?.user?.imageUrl ||
+      null;
+  };
+
+  let email = resolveEmail();
+  let name = resolveName();
+  let image = resolveImage();
+
+  if (!email || !name) {
+    const clerkData = await fetchClerkUser(clerkUserId);
+    if (clerkData) {
+      email = email || clerkData.email_addresses?.[0]?.email_address || "";
+      name = name || [clerkData.first_name, clerkData.last_name].filter(Boolean).join(" ") || clerkData.username || "Guest";
+      image = image || clerkData.image_url || "";
+    }
+  }
+
+  if (!user) {
+    try {
+      user = await User.create({
+        _id: clerkUserId,
+        name: name || 'Guest',
+        username: clerkUserId,
+        email: email || `${clerkUserId}@placeholder.com`,
+        image: image || 'https://ui-avatars.com/api/?name=Guest',
+      });
+      logger.info('Created new user from Clerk: %s', clerkUserId);
+    } catch (createErr) {
+      logger.error('User creation failed: %s', createErr.message);
+      return res.status(500).json({ success: false, message: 'Authentication failed' });
+    }
+  } else if (email && email !== user.email && !user.email.includes('@placeholder.com')) {
+    user.email = email;
+    user.name = name || user.name;
+    user.image = image || user.image;
+    await user.save();
+  } else if (user.email.includes('@placeholder.com') && email) {
+    user.email = email;
+    user.name = name || user.name;
+    user.image = image || user.image;
+    await user.save();
+    logger.info('Updated placeholder user: %s', clerkUserId);
+  }
+
+  req.user = user;
+
+  const orgId = req.headers['x-org-id'] || auth?.orgId || null;
+  const orgRole = req.headers['x-org-role'] || auth?.orgRole || null;
+
+  if (orgId) {
+    try {
+      const org = await Organization.findById(orgId);
+      if (org) {
+        req.org = org;
+        req.orgId = org._id;
+        req.orgRole = orgRole;
+        req.orgSlug = org.slug;
+      }
+    } catch (orgErr) {
+      logger.warn('Org lookup failed: %s', orgErr.message);
+    }
+  }
+
+  next();
+};

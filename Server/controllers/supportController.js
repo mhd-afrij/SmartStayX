@@ -1,134 +1,49 @@
-// supportController.js — Customer support ticket and conversation handling
-import Hotel from "../models/Hotel.js";
-import SupportConversation from "../models/SupportConversation.js";
+// supportController.js — Support ticket CRUD operations
+import SupportTicket from "../models/SupportTicket.js";
 
-// Support conversation handler — guest/agent messaging with access control.
-const canAccessConversation = async (conversation, userId) => {
-  if (!conversation || !userId) return false;
-  if (String(conversation.guest) === String(userId)) return true;
-  if (!conversation.hotel) return false;
-
-  const ownerHotel = await Hotel.findOne({ _id: conversation.hotel, owner: userId });
-  return Boolean(ownerHotel);
+export const getTickets = async (req, res) => {
+  try {
+    const tickets = await SupportTicket.find().sort({ createdAt: -1 });
+    res.json({ success: true, data: tickets });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
-export const createSupportConversation = async (req, res) => {
+export const getMyTickets = async (req, res) => {
   try {
-    const { bookingId, hotelId, subject } = req.body;
-    const guestId = req.user._id;
+    const tickets = await SupportTicket.find({ user: req.auth?.userId }).sort({ createdAt: -1 });
+    res.json({ success: true, data: tickets });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
-    const conversation = await SupportConversation.create({
-      guest: guestId,
-      booking: bookingId || null,
-      hotel: hotelId || null,
-      subject: subject || "Guest Support",
-      status: "open",
+export const createTicket = async (req, res) => {
+  try {
+    const { subject, message } = req.body;
+    const ticket = await SupportTicket.create({
+      user: req.auth?.userId,
+      subject,
+      message,
     });
-
-    res.json({ success: true, conversation });
+    res.status(201).json({ success: true, data: ticket });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const getMySupportConversations = async (req, res) => {
+export const updateTicketStatus = async (req, res) => {
   try {
-    const userId = req.user._id;
-    const ownerHotels = await Hotel.find({ owner: userId }).select("_id");
-    const ownerHotelIds = ownerHotels.map((h) => h._id);
-
-    const conversations = await SupportConversation.find({
-      $or: [{ guest: userId }, { hotel: { $in: ownerHotelIds } }],
-    })
-      .populate("hotel booking")
-      .sort({ lastMessageAt: -1 })
-      .limit(50);
-
-    res.json({ success: true, conversations });
+    const { status } = req.body;
+    const ticket = await SupportTicket.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+    if (!ticket) return res.status(404).json({ success: false, message: "Ticket not found" });
+    res.json({ success: true, data: ticket });
   } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-};
-
-export const getConversationMessages = async (req, res) => {
-  try {
-    const { conversationId } = req.params;
-    const conversation = await SupportConversation.findById(conversationId).populate("hotel booking");
-
-    if (!conversation) {
-      return res.json({ success: false, message: "Conversation not found" });
-    }
-
-    const allowed = await canAccessConversation(conversation, req.user._id);
-    if (!allowed) {
-      return res.json({ success: false, message: "Not authorized" });
-    }
-
-    res.json({ success: true, conversation });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-};
-
-export const sendSupportMessage = async (req, res) => {
-  try {
-    const { conversationId, text } = req.body;
-    if (typeof conversationId !== 'string' || !text || !text.trim()) {
-      return res.json({ success: false, message: "conversationId and text are required" });
-    }
-
-    const conversation = await SupportConversation.findById(conversationId);
-    if (!conversation) {
-      return res.json({ success: false, message: "Conversation not found" });
-    }
-
-    const allowed = await canAccessConversation(conversation, req.user._id);
-    if (!allowed) {
-      return res.json({ success: false, message: "Not authorized" });
-    }
-
-    const message = {
-      senderId: req.user._id,
-      senderRole: String(conversation.guest) === String(req.user._id) ? "guest" : "agent",
-      text: text.trim(),
-      source: "api",
-      createdAt: new Date(),
-    };
-
-    conversation.messages.push(message);
-    conversation.lastMessageAt = new Date();
-    await conversation.save();
-
-    res.json({ success: true, message });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-};
-
-export const updateConversationStatus = async (req, res) => {
-  try {
-    const { conversationId, status } = req.body;
-    const allowedStatuses = ["open", "resolved", "closed"];
-
-    if (typeof conversationId !== 'string' || !allowedStatuses.includes(status)) {
-      return res.json({ success: false, message: "conversationId and valid status are required" });
-    }
-
-    const conversation = await SupportConversation.findById(conversationId);
-    if (!conversation) {
-      return res.json({ success: false, message: "Conversation not found" });
-    }
-
-    const allowed = await canAccessConversation(conversation, req.user._id);
-    if (!allowed) {
-      return res.json({ success: false, message: "Not authorized" });
-    }
-
-    conversation.status = status;
-    await conversation.save();
-
-    res.json({ success: true, conversation });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };

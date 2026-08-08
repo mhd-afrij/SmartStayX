@@ -6,8 +6,10 @@ import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 
 // Hybrid recommendation engine — collaborative filtering + content-based scoring for logged-in users.
 
+// Convert an array to a lowercase Set for case-insensitive matching
 const toSet = (arr = []) => new Set(arr.filter(Boolean).map((v) => String(v).toLowerCase()));
 
+// Generate personalized room recommendations using hybrid collaborative + content-based scoring
 export const getUserRecommendations = async (req, res) => {
   try {
     const user = req.user;
@@ -23,7 +25,7 @@ export const getUserRecommendations = async (req, res) => {
     let averageBudget = 0;
 
     bookings.forEach((booking) => {
-      averageBudget += Number(booking.dynamicPricePerNight || booking.basePricePerNight || 0);
+      averageBudget += Number(booking.basePricePerNight || 0);
       const amenities = booking?.room?.amenities || [];
       amenities.forEach((amenity) => {
         const key = String(amenity).toLowerCase();

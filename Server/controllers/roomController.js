@@ -5,21 +5,23 @@ import Room from "../models/Room.js";
 import roomService from "../services/roomService.js";
 
 // Room CRUD, listing, trending — both public and owner-scoped.
+// Extract authenticated user ID from Clerk auth
 const getAuthUserId = (req) => {
   const auth = typeof req.auth === "function" ? req.auth() : req.auth;
   return auth?.userId;
 };
 
+// Check if the room belongs to one of the user's owned hotels
 const isRoomOwnedByUser = async (room, userId) => {
   const ownerHotels = await Hotel.find({ owner: userId });
   const ownerHotelIds = ownerHotels.map((h) => h._id.toString());
   return ownerHotelIds.includes(room.hotel._id.toString());
 };
 
-// Create a room for an owned hotel with Cloudinary image upload.
+// Create a room for an owned hotel with Cloudinary image upload
 export const createRoom = async (req, res) => {
   try {
-    const { roomType, pricePerNight, amenities, hotelId } = req.body;
+    const { roomType, roomNumber, pricePerNight, amenities, hotelId } = req.body;
     const userId = getAuthUserId(req);
 
     if (typeof hotelId !== 'string') {
@@ -45,6 +47,7 @@ export const createRoom = async (req, res) => {
       hotelName: hotel.name,
       hotelAddress: hotel.address,
       hotelCity: hotel.city,
+      roomNumber,
       roomType,
       pricePerNight: +pricePerNight,
       amenities: JSON.parse(amenities),
@@ -57,7 +60,7 @@ export const createRoom = async (req, res) => {
   }
 };
 
-// Public room listing with pagination (delegates to roomService with caching).
+// Public room listing with pagination and filters (delegates to roomService)
 export const getRooms = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, roomType, minPrice, maxPrice, destination, minRating } = req.query;
@@ -78,7 +81,7 @@ export const getRooms = async (req, res, next) => {
   }
 };
 
-// Rooms managed by the current owner for dashboard display.
+// Get rooms managed by the current owner for dashboard display
 export const getOwnerRooms = async (req, res) => {
   try {
     const userId = getAuthUserId(req);
@@ -91,7 +94,7 @@ export const getOwnerRooms = async (req, res) => {
   }
 };
 
-// Toggle room availability (owner only, invalidates Redis cache).
+// Toggle room availability on/off (owner only, invalidates Redis cache)
 export const toggleRoomAvailability = async (req, res) => {
   try {
     const { roomId } = req.body;
@@ -103,6 +106,7 @@ export const toggleRoomAvailability = async (req, res) => {
   }
 };
 
+// Delete a room (owner only, verifies ownership via hotel)
 export const deleteRoom = async (req, res) => {
   try {
     const userId = getAuthUserId(req);
@@ -124,6 +128,7 @@ export const deleteRoom = async (req, res) => {
   }
 };
 
+// Get a single room by ID with populated hotel and owner details
 export const getRoomById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -140,6 +145,19 @@ export const getRoomById = async (req, res) => {
   }
 };
 
+// Suggest next room number for a hotel based on city and optional room type
+export const suggestRoomNumber = async (req, res) => {
+  try {
+    const { hotelId } = req.params;
+    const { roomType } = req.query;
+    const roomNumber = await roomService.suggestNextRoomNumber({ hotelId, roomType });
+    res.json({ success: true, roomNumber });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// Get trending rooms based on booking activity (delegates to roomService)
 export const getTrendingRooms = async (req, res, next) => {
   try {
     const limit = Math.min(Number(req.query.limit) || 10, 25);
@@ -150,11 +168,12 @@ export const getTrendingRooms = async (req, res, next) => {
   }
 };
 
+// Update room fields (owner only, validates ownership)
 export const updateRoom = async (req, res) => {
   try {
     const userId = getAuthUserId(req);
     const { id } = req.params;
-    const { roomType, pricePerNight, amenities, isAvailable } = req.body;
+    const { roomNumber, roomType, pricePerNight, amenities, isAvailable } = req.body;
 
     const room = await Room.findById(id).populate("hotel");
     if (!room) {
@@ -163,6 +182,10 @@ export const updateRoom = async (req, res) => {
 
     if (!(await isRoomOwnedByUser(room, userId))) {
       return res.json({ success: false, message: "Not authorized to edit this room" });
+    }
+
+    if (roomNumber !== undefined) {
+      room.roomNumber = roomNumber;
     }
 
     if (roomType !== undefined) {

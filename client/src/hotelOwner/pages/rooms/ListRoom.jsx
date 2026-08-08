@@ -4,11 +4,9 @@ import { useAppContext } from '../../../context/AppContext';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { List, Edit3, Trash2, ChevronDown, X } from 'lucide-react';
+import ConfirmModal from '../../../components/dashboard/ConfirmModal';
 
-const AMENITY_OPTIONS = [
-  'Free Wifi', 'Free Breakfast', 'Room Service', 'Mountain View', 'Pool Access',
-];
-
+// ListRoom — Owner panel for viewing, filtering, editing, and deleting existing rooms
 const ListRoom = () => {
   const [rooms, setRooms] = useState([]);
   const [roomTypeFilter, setRoomTypeFilter] = useState('all');
@@ -16,9 +14,15 @@ const ListRoom = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
   const [editForm, setEditForm] = useState({
-    roomType: '', pricePerNight: '', amenities: {}, isAvailable: true,
+    roomNumber: '', roomType: '', pricePerNight: '', amenities: {}, isAvailable: true,
   });
+  const [editAmenityOptions, setEditAmenityOptions] = useState([]);
+  const [confirmDelete, setConfirmDelete] = useState({ open: false, id: null });
+  const [deletingId, setDeletingId] = useState(null);
+  const [editPreview, setEditPreview] = useState(null);
   const { axios, getToken, user, currency } = useAppContext();
+
+  const formatPrice = (value) => `${currency} ${Number(value || 0).toLocaleString()}`;
 
   const roomTypeOptions = [
     'all', ...Array.from(new Set(rooms.map((room) => room.roomType).filter(Boolean))),
@@ -28,6 +32,7 @@ const ListRoom = () => {
     roomTypeFilter === 'all' ? true : room.roomType === roomTypeFilter
   );
 
+  // fetchRooms — Loads all rooms owned by the current user
   const fetchRooms = async () => {
     if (isLoading) return;
     try {
@@ -48,6 +53,7 @@ const ListRoom = () => {
     }
   };
 
+  // toggleAvailability — Toggles a room's availability on/off
   const toggleAvailability = async (roomId) => {
     try {
       const { data } = await axios.post(
@@ -66,7 +72,17 @@ const ListRoom = () => {
     }
   };
 
-  const deleteRoom = async (roomId) => {
+  // deleteRoom — Sets confirm modal for room deletion
+  const deleteRoom = (roomId) => {
+    setConfirmDelete({ open: true, id: roomId });
+  };
+
+  // handleDeleteConfirmed — Performs the actual room deletion after confirmation
+  const handleDeleteConfirmed = async () => {
+    const roomId = confirmDelete.id;
+    if (!roomId) return;
+    setDeletingId(roomId);
+    setConfirmDelete({ open: false, id: null });
     try {
       const { data } = await axios.delete(`/api/rooms/${roomId}`, {
         headers: { Authorization: `Bearer ${await getToken()}` },
@@ -79,28 +95,73 @@ const ListRoom = () => {
       }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to delete room');
+    } finally {
+      setDeletingId(null);
     }
   };
 
-  const openEditModal = (room) => {
+  // openEditModal — Populates the edit form modal with room data
+  const openEditModal = async (room) => {
+    const hotelId = room.hotel?._id || room.hotel;
+    let options = [];
+    if (hotelId) {
+      try {
+        const { data } = await axios.get(`/api/hotels/${hotelId}`);
+        if (data.success) {
+          options = data.hotel?.amenityOptions || [];
+        }
+      } catch { /* fallback to defaults */ }
+    }
+    if (options.length === 0) {
+      options = ["Free Wifi", "Free Breakfast", "Room Service", "Mountain View", "Pool Access"];
+    }
+    setEditAmenityOptions(options);
     const amenityMap = {};
-    AMENITY_OPTIONS.forEach((amenity) => {
+    options.forEach((amenity) => {
       amenityMap[amenity] = (room.amenities || []).includes(amenity);
     });
     setEditForm({
+      roomNumber: room.roomNumber || '',
       roomType: room.roomType || '',
       pricePerNight: room.pricePerNight ?? '',
       amenities: amenityMap,
       isAvailable: Boolean(room.isAvailable),
     });
     setEditingRoom(room);
+    setEditingHotelId(hotelId);
+    setEditPreview(null);
   };
 
+  // Auto-generate room number when room type changes in edit modal
+  const [editingHotelId, setEditingHotelId] = useState(null);
+  useEffect(() => {
+    if (!editingRoom || !editForm.roomType || !editingHotelId) return;
+    const getNextNumber = async () => {
+      try {
+        const token = await getToken();
+        const { data } = await axios.get(`/api/rooms/next-number/${editingHotelId}?roomType=${encodeURIComponent(editForm.roomType)}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (data.success) {
+          setEditForm((prev) => ({ ...prev, roomNumber: data.roomNumber }));
+        }
+      } catch {
+        // fallback: let user type manually
+      }
+    };
+    getNextNumber();
+  }, [editingRoom, editForm.roomType, editingHotelId]);
+
+  // closeEditModal — Closes the edit modal and resets edit state
   const closeEditModal = () => {
+    if (editPreview && editPreview.startsWith('blob:')) URL.revokeObjectURL(editPreview);
     setEditingRoom(null);
+    setEditingHotelId(null);
+    setEditPreview(null);
     setIsSaving(false);
   };
 
+  // submitRoomEdit — Saves edited room details (type, price, amenities, availability, image)
   const submitRoomEdit = async (e) => {
     e.preventDefault();
     if (!editingRoom) return;
@@ -108,20 +169,21 @@ const ListRoom = () => {
       toast.error('Room type and price are required');
       return;
     }
-    const payload = {
-      roomType: editForm.roomType,
-      pricePerNight: Number(editForm.pricePerNight),
-      isAvailable: editForm.isAvailable,
-      amenities: Object.keys(editForm.amenities).filter((key) => editForm.amenities[key]),
-    };
-    if (Number.isNaN(payload.pricePerNight) || payload.pricePerNight < 0) {
+    const payload = new FormData();
+    payload.append("roomNumber", editForm.roomNumber);
+    payload.append("roomType", editForm.roomType);
+    payload.append("pricePerNight", Number(editForm.pricePerNight));
+    payload.append("isAvailable", editForm.isAvailable);
+    payload.append("amenities", JSON.stringify(Object.keys(editForm.amenities).filter((key) => editForm.amenities[key])));
+    if (editForm.newImage) payload.append("image", editForm.newImage);
+    if (Number.isNaN(Number(editForm.pricePerNight)) || Number(editForm.pricePerNight) < 0) {
       toast.error('Please enter a valid price');
       return;
     }
     try {
       setIsSaving(true);
       const { data } = await axios.put(`/api/rooms/${editingRoom._id}`, payload, {
-        headers: { Authorization: `Bearer ${await getToken()}` },
+        headers: { Authorization: `Bearer ${await getToken()}`, 'Content-Type': 'multipart/form-data' },
       });
       if (data.success) {
         toast.success(data.message || 'Room updated');
@@ -215,8 +277,13 @@ const ListRoom = () => {
                     {room.hotel?.name && (
                       <p className="text-xs text-white/40">{room.hotel.name}</p>
                     )}
+                    {room.roomNumber && (
+                      <span className="inline-block mt-1 text-[10px] font-medium text-[#D4A85F] bg-[#D4A85F]/10 px-2 py-0.5 rounded-full border border-[#D4A85F]/20">
+                        Room {room.roomNumber}
+                      </span>
+                    )}
                     <p className="text-lg font-bold text-[#D4A85F] font-space mt-1">
-                      {currency}{room.pricePerNight}
+                      {formatPrice(room.pricePerNight)}
                       <span className="text-xs text-white/30 font-normal"> / night</span>
                     </p>
                   </div>
@@ -271,7 +338,7 @@ const ListRoom = () => {
                     </button>
                     <button
                       className="p-1.5 rounded-lg border border-white/[0.06] text-white/40 hover:text-[#EF4444] hover:border-[#EF4444]/20 hover:bg-[#EF4444]/10 transition-all"
-                      onClick={() => deleteRoom(room._id)}
+                      disabled={deletingId === room._id} onClick={() => deleteRoom(room._id)}
                       title="Delete"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -302,7 +369,17 @@ const ListRoom = () => {
               </button>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-3">
+              <div>
+                <p className="text-sm font-medium text-white/60 mb-1.5">Room Number</p>
+                <input
+                  type="text"
+                  placeholder='e.g. R101'
+                  value={editForm.roomNumber}
+                  onChange={(e) => setEditForm((prev) => ({ ...prev, roomNumber: e.target.value }))}
+                  className="w-full px-3 py-2.5 text-sm rounded-xl border border-white/[0.06] bg-white/[0.04] text-white/70 outline-none focus:border-[#D4A85F]/30 transition-colors"
+                />
+              </div>
               <div>
                 <p className="text-sm font-medium text-white/60 mb-1.5">Room Type</p>
                 <div className="relative">
@@ -335,7 +412,7 @@ const ListRoom = () => {
             <div>
               <p className="text-sm font-medium text-white/60 mb-2">Amenities</p>
               <div className="flex flex-wrap gap-2">
-                {AMENITY_OPTIONS.map((amenity) => (
+                {editAmenityOptions.map((amenity) => (
                   <button
                     key={amenity}
                     type="button"
@@ -355,6 +432,28 @@ const ListRoom = () => {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-medium text-white/60 mb-2">Room Images</p>
+              <label className="border border-dashed border-white/[0.08] rounded-xl px-3 py-4 block text-center cursor-pointer hover:bg-white/[0.04] transition">
+                <input type="file" accept="image/*" hidden onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setEditForm((prev) => ({ ...prev, newImage: file }));
+                    setEditPreview(URL.createObjectURL(file));
+                  }
+                }} />
+                <span className="text-xs text-white/40">Click to upload new image</span>
+              </label>
+              {editPreview && (
+                <div className="mt-2 relative">
+                  <img src={editPreview} alt="preview" className="rounded-xl w-full max-h-48 object-cover" />
+                  <button type="button" onClick={() => { setEditPreview(null); setEditForm((prev) => ({ ...prev, newImage: null })); }} className="absolute top-2 right-2 p-1 rounded-full bg-black/60 text-white/80 hover:text-white">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
 
             <label className="flex items-center gap-3 cursor-pointer">
@@ -386,6 +485,14 @@ const ListRoom = () => {
           </motion.form>
         </div>
       )}
+      <ConfirmModal
+        open={confirmDelete.open}
+        title="Delete Room"
+        message="Are you sure you want to delete this room? This action cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={handleDeleteConfirmed}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+      />
     </motion.div>
   );
 };

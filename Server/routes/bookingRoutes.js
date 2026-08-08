@@ -3,7 +3,7 @@ import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import validateRequest from "../middleware/validateRequest.js";
 import bookingValidators from "../validators/bookingValidators.js";
-import { checkAvailabilityAPI, createBooking, createCheckoutSession, confirmCheckoutSession, cancelBooking, requestRefund, handleRefund, modifyBooking, payBooking, setPaymentMethod, getUserBookings, getHotelBookings, deleteOwnerBooking, updateOwnerBookingPayment, updateOwnerBookingStatus, calculatePrice } from "../controllers/bookingController.js";
+import { checkAvailabilityAPI, createBooking, createCheckoutSession, confirmCheckoutSession, cancelBooking, modifyBooking, payBooking, setPaymentMethod, getUserBookings, getHotelBookings, deleteOwnerBooking, updateOwnerBookingPayment, updateOwnerBookingStatus, calculatePrice } from "../controllers/bookingController.js";
 
 // Booking API routes.
 const bookingRouter = express.Router();
@@ -14,8 +14,6 @@ bookingRouter.post("/book", protect, validateRequest({ body: bookingValidators.c
 bookingRouter.post("/create-checkout-session", protect, validateRequest({ body: bookingValidators.bookingIdBody }), createCheckoutSession);
 bookingRouter.post("/confirm-checkout-session", protect, validateRequest({ body: bookingValidators.sessionIdBody }), confirmCheckoutSession);
 bookingRouter.post("/cancel", protect, validateRequest({ body: bookingValidators.bookingIdBody }), cancelBooking);
-bookingRouter.post("/refund-request", protect, validateRequest({ body: bookingValidators.bookingIdBody }), requestRefund);
-bookingRouter.post("/handle-refund", protect, handleRefund);
 bookingRouter.post("/modify", protect, validateRequest({ body: bookingValidators.modifyBookingBody }), modifyBooking);
 bookingRouter.post("/pay", protect, validateRequest({ body: bookingValidators.bookingIdBody }), payBooking);
 bookingRouter.post("/payment-method", protect, validateRequest({ body: bookingValidators.paymentMethodBody }), setPaymentMethod);

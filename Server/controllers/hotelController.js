@@ -5,7 +5,6 @@ import Room from "../models/Room.js";
 import Offer from "../models/Offer.js";
 import Booking from "../models/Booking.js";
 import ServiceRequest from "../models/ServiceRequest.js";
-import Staff from "../models/Staff.js";
 import { v2 as cloudinary } from "cloudinary";
 
 // Hotel CRUD, search, and owner operations — includes cascading delete.
@@ -175,7 +174,7 @@ export const deleteOwnerHotel = async (req, res) => {
       Offer.deleteMany({ hotel: String(hotel._id) }),
       Booking.deleteMany({ hotel: hotel._id }),
       ServiceRequest.deleteMany({ hotel: hotel._id }),
-      Staff.deleteMany({ hotel: hotel._id }),
+
       roomIds.length > 0 ? Offer.deleteMany({ room: { $in: roomIds.map((id) => String(id)) } }) : Promise.resolve(),
       roomIds.length > 0 ? Booking.deleteMany({ room: { $in: roomIds } }) : Promise.resolve(),
       roomIds.length > 0 ? ServiceRequest.deleteMany({ room: { $in: roomIds } }) : Promise.resolve(),

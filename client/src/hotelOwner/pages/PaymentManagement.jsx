@@ -3,12 +3,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import { CreditCard, Search, ChevronDown, Building2, Trash2, CheckCircle, XCircle, RotateCcw } from "lucide-react";
+import { CreditCard, Search, ChevronDown, Building2, Trash2, CheckCircle, XCircle } from "lucide-react";
 import ConfirmModal from "../../components/dashboard/ConfirmModal";
 import Pagination from "../../components/dashboard/shared/Pagination";
 
 const PER_PAGE = 10;
 
+// METHOD_BADGE — Style map for payment method badges
 const METHOD_BADGE = {
   Stripe: "border-[#4F46E5]/20 bg-[#4F46E5]/10 text-[#4F46E5]",
   Cash: "border-[#D4A85F]/20 bg-[#D4A85F]/10 text-[#D4A85F]",
@@ -21,16 +22,19 @@ const PaymentManagement = () => {
   const [selectedHotelId, setSelectedHotelId] = useState("all");
   const [updatingId, setUpdatingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
-  const [refundingId, setRefundingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [methodFilter, setMethodFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(0);
   const [confirmState, setConfirmState] = useState({ open: false, id: null, title: "", message: "" });
 
+  // requestConfirm — Opens a confirmation modal before deleting a booking
   const requestConfirm = (id, title, message) => {
     setConfirmState({ open: true, id, title, message });
   };
 
+  // handleConfirmed — Executes booking deletion after modal confirmation
   const handleConfirmed = () => {
     const { id } = confirmState;
     setConfirmState({ open: false, id: null, title: "", message: "" });
@@ -39,8 +43,9 @@ const PaymentManagement = () => {
 
   useEffect(() => {
     setPage(0);
-  }, [search, selectedHotelId]);
+  }, [search, selectedHotelId, methodFilter, statusFilter]);
 
+  // loadPayments — Fetches bookings with payment data, optionally filtered by hotel
   const loadPayments = async (hotelId = selectedHotelId) => {
     try {
       setLoading(true);
@@ -65,12 +70,14 @@ const PaymentManagement = () => {
     if (user) loadPayments("all");
   }, [user]);
 
+  // handleHotelFilterChange — Changes hotel filter and reloads payment data
   const handleHotelFilterChange = async (event) => {
     const hotelId = event.target.value;
     setSelectedHotelId(hotelId);
     await loadPayments(hotelId);
   };
 
+  // updatePayment — Toggles a booking's paid/unpaid status
   const updatePayment = async (bookingId, isPaid) => {
     setUpdatingId(bookingId);
     try {
@@ -92,6 +99,7 @@ const PaymentManagement = () => {
     }
   };
 
+  // handleDeleteBooking — Deletes a booking record
   const handleDeleteBooking = async (bookingId) => {
     setDeletingId(bookingId);
     try {
@@ -111,38 +119,19 @@ const PaymentManagement = () => {
     }
   };
 
-  const handleRefund = async (bookingId, action) => {
-    setRefundingId(bookingId);
-    try {
-      const { data } = await axios.post(
-        "/api/bookings/handle-refund",
-        { bookingId, action },
-        { headers: { Authorization: `Bearer ${await getToken()}` } }
-      );
-      if (data.success) {
-        toast.success(`Refund ${action} successfully`);
-        await loadPayments(selectedHotelId);
-      } else {
-        toast.error(data.message || "Failed to process refund");
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to process refund");
-    } finally {
-      setRefundingId(null);
-    }
-  };
-
   const filtered = useMemo(() => {
     return bookings.filter((b) => {
-      if (!search) return true;
+      if (!search && methodFilter === "all" && statusFilter === "all") return true;
       const q = search.toLowerCase();
-      return (
-        (b.user?.name || b.user?.username || "").toLowerCase().includes(q) ||
-        (b.hotel?.name || "").toLowerCase().includes(q) ||
-        (b.room?.roomType || "").toLowerCase().includes(q)
-      );
+      if (search && !(b.user?.name || b.user?.username || "").toLowerCase().includes(q) &&
+          !(b.hotel?.name || "").toLowerCase().includes(q) &&
+          !(b.room?.roomType || "").toLowerCase().includes(q) &&
+          !(b.roomNumber || b.room?.roomNumber || "").toLowerCase().includes(q)) return false;
+      if (methodFilter !== "all" && (b.paymentMethod || "N/A") !== methodFilter) return false;
+      if (statusFilter !== "all" && (b.isPaid ? "paid" : "unpaid") !== statusFilter) return false;
+      return true;
     });
-  }, [bookings, search]);
+  }, [bookings, search, methodFilter, statusFilter]);
 
   const pages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const paginated = useMemo(
@@ -193,6 +182,26 @@ const PaymentManagement = () => {
                 <p className="text-xs text-white/40">Update status and method from one screen</p>
               </div>
             </div>
+            <div className="flex items-center gap-2">
+              <select
+                value={methodFilter}
+                onChange={(e) => setMethodFilter(e.target.value)}
+                className="px-2 py-2 text-xs rounded-lg border border-white/[0.06] bg-white/[0.04] text-white/70 outline-none focus:border-[#D4A85F]/30 transition-colors"
+              >
+                <option value="all" className="bg-[#0B1220]">All Methods</option>
+                <option value="Stripe" className="bg-[#0B1220]">Stripe</option>
+                <option value="Cash" className="bg-[#0B1220]">Cash</option>
+              </select>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-2 py-2 text-xs rounded-lg border border-white/[0.06] bg-white/[0.04] text-white/70 outline-none focus:border-[#D4A85F]/30 transition-colors"
+              >
+                <option value="all" className="bg-[#0B1220]">All Status</option>
+                <option value="paid" className="bg-[#0B1220]">Paid</option>
+                <option value="unpaid" className="bg-[#0B1220]">Unpaid</option>
+              </select>
+            </div>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
               <input
@@ -221,7 +230,7 @@ const PaymentManagement = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/[0.06]">
-                    {["Guest", "Hotel", "Room", "Total", "Method", "Status", "Refund", "Actions"].map((h) => (
+                    {["Guest", "Hotel", "Room", "Total", "Method", "Status", "Actions"].map((h) => (
                       <th key={h} className="py-3 px-4 text-left text-xs font-medium text-white/40 uppercase tracking-wider">
                         {h}
                       </th>
@@ -242,7 +251,10 @@ const PaymentManagement = () => {
                         </div>
                       </td>
                       <td className="py-3 px-4 text-white/60">{item.hotel?.name || "Hotel"}</td>
-                      <td className="py-3 px-4 text-white/60">{item.room?.roomType || "Room"}</td>
+                      <td className="py-3 px-4 text-white/60">
+                        {item.roomNumber || item.room?.roomNumber ? `Room ${item.roomNumber || item.room?.roomNumber}` : ""}
+                        {item.room?.roomType ? (item.roomNumber || item.room?.roomNumber ? ` — ${item.room.roomType}` : item.room.roomType) : "Room"}
+                      </td>
                       <td className="py-3 px-4 text-white font-space">{formatPrice(item.totalPrice)}</td>
                       <td className="py-3 px-4">
                         <span className={`inline-block px-2 py-0.5 text-[10px] font-medium rounded-full border ${METHOD_BADGE[item.paymentMethod] || "border-white/[0.06] bg-white/[0.04] text-white/60"}`}>
@@ -261,41 +273,10 @@ const PaymentManagement = () => {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        {item.refundStatus === "pending" ? (
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => handleRefund(item._id, "approved")}
-                              disabled={refundingId === item._id}
-                              className="p-1 rounded border border-[#22C55E]/20 text-[#22C55E]/70 hover:text-[#22C55E] hover:bg-[#22C55E]/10 transition disabled:opacity-40"
-                              title="Approve Refund"
-                            >
-                              <CheckCircle className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleRefund(item._id, "denied")}
-                              disabled={refundingId === item._id}
-                              className="p-1 rounded border border-[#EF4444]/20 text-[#EF4444]/70 hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition disabled:opacity-40"
-                              title="Deny Refund"
-                            >
-                              <XCircle className="w-3.5 h-3.5" />
-                            </button>
-                            <span className="text-[10px] text-yellow-400 ml-1">Pending</span>
-                          </div>
-                        ) : item.refundStatus === "approved" ? (
-                          <span className="text-[10px] text-green-400">Approved</span>
-                        ) : item.refundStatus === "denied" ? (
-                          <span className="text-[10px] text-red-400">Denied</span>
-                        ) : item.refundStatus === "refunded" ? (
-                          <span className="text-[10px] text-blue-400">Refunded</span>
-                        ) : (
-                          <span className="text-[10px] text-white/30">—</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4">
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => updatePayment(item._id, true)}
-                            disabled={updatingId === item._id || deletingId === item._id || item.status === "cancelled" || refundingId === item._id}
+                            disabled={updatingId === item._id || deletingId === item._id || item.status === "cancelled"}
                             className="p-1.5 rounded-lg border border-white/[0.06] text-[#22C55E]/50 hover:text-[#22C55E] hover:border-[#22C55E]/20 hover:bg-[#22C55E]/10 transition-all disabled:opacity-40"
                             title="Mark Paid"
                           >
@@ -303,7 +284,7 @@ const PaymentManagement = () => {
                           </button>
                           <button
                             onClick={() => updatePayment(item._id, false)}
-                            disabled={updatingId === item._id || deletingId === item._id || item.status === "cancelled" || refundingId === item._id}
+                            disabled={updatingId === item._id || deletingId === item._id || item.status === "cancelled"}
                             className="p-1.5 rounded-lg border border-white/[0.06] text-[#F59E0B]/50 hover:text-[#F59E0B] hover:border-[#F59E0B]/20 hover:bg-[#F59E0B]/10 transition-all disabled:opacity-40"
                             title="Mark Unpaid"
                           >
@@ -311,7 +292,7 @@ const PaymentManagement = () => {
                           </button>
                           <button
                             onClick={() => requestConfirm(item._id, "Delete Booking", "Delete this booking record? This action cannot be undone.")}
-                            disabled={updatingId === item._id || deletingId === item._id || refundingId === item._id}
+                            disabled={updatingId === item._id || deletingId === item._id}
                             className="p-1.5 rounded-lg border border-white/[0.06] text-white/30 hover:text-[#EF4444] hover:border-[#EF4444]/20 hover:bg-[#EF4444]/10 transition-all disabled:opacity-40"
                             title="Delete"
                           >

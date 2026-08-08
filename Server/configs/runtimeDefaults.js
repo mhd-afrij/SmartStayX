@@ -1,11 +1,13 @@
 // runtimeDefaults.js — Runtime environment defaults and placeholder values
+// Base URL for Clerk authentication API
 export const CLERK_API_BASE_URL = process.env.CLERK_API_BASE_URL || 'https://api.clerk.com/v1'
 
-export const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1'
 
+// Fallback image URL when no room/hotel image is available
 export const PLACEHOLDER_IMAGE_URL =
   process.env.PLACEHOLDER_IMAGE_URL || 'https://via.placeholder.com/150'
 
+// Default set of testimonials shown when no user-submitted reviews exist
 export const DEFAULT_TESTIMONIALS = [
   {
     name: 'Emma Rodriguez',

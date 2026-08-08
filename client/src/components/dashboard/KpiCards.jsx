@@ -1,4 +1,3 @@
-// KpiCards — Key performance indicator cards: revenue, occupancy, bookings, etc.
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -10,6 +9,7 @@ import {
   TrendingDown,
 } from "lucide-react";
 
+// Staggered container animation variants
 const containerVariants = {
   hidden: {},
   visible: {
@@ -17,6 +17,7 @@ const containerVariants = {
   },
 };
 
+// Individual card entrance animation variants
 const cardVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: {
@@ -26,6 +27,7 @@ const cardVariants = {
   },
 };
 
+// Animated number counter that counts up when scrolled into view
 function AnimatedCounter({ value, suffix = "", decimals = 0 }) {
   const [display, setDisplay] = useState(0);
   const ref = useRef(null);
@@ -66,6 +68,7 @@ function AnimatedCounter({ value, suffix = "", decimals = 0 }) {
   );
 }
 
+// Tiny inline SVG sparkline chart for trend visualization
 const MiniSparkline = ({ data, color }) => {
   if (!data || data.length === 0) return null;
   const max = Math.max(...data);
@@ -105,6 +108,7 @@ const MiniSparkline = ({ data, color }) => {
   );
 };
 
+// KPI card configuration array
 const cards = [
   {
     key: "bookings",
@@ -136,6 +140,7 @@ const cards = [
   },
 ];
 
+// Build metric values from dashboard data with trend calculation
 const buildMetrics = (data) => {
   const trends = data.trends || [];
   const hasTrends = trends.length >= 2;
@@ -182,9 +187,10 @@ const buildMetrics = (data) => {
   ];
 };
 
-const KpiCards = ({ data, currency }) => {
-  const formatCurrency = (value) =>
-    `${currency} ${Number(value || 0).toLocaleString()}`;
+// KpiCards — Key performance indicator cards: revenue, occupancy, bookings, etc.
+const KpiCards = ({ data, currency, formatPrice }) => {
+  const formatCurrency = formatPrice || ((value) =>
+    `${currency} ${Number(value || 0).toLocaleString()}`);
 
   const metrics = buildMetrics(data);
 
@@ -244,11 +250,15 @@ const KpiCards = ({ data, currency }) => {
                   </p>
                   <p className="text-2xl font-bold text-white font-space tracking-tight">
                     {metric.prefix || ""}
-                    <AnimatedCounter
-                      value={metric.value}
-                      suffix={metric.suffix}
-                      decimals={metric.decimals}
-                    />
+                    {card.key === 'revenue' ? (
+                      formatCurrency(metric.value)
+                    ) : (
+                      <AnimatedCounter
+                        value={metric.value}
+                        suffix={metric.suffix}
+                        decimals={metric.decimals}
+                      />
+                    )}
                   </p>
                 </div>
                 {metric.sparkline.length > 1 && (

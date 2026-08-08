@@ -5,24 +5,15 @@ import {
   requestService,
   updateServiceStatus,
   getHotelServiceHistory,
-  addStaff,
-  getStaffList,
-  updateStaff,
-  deleteStaff,
-  toggleStaffAvailability,
-  getServiceStats,
 } from "../controllers/serviceController.js";
 
 const serviceRouter = express.Router();
 
+// POST /request — Request a room service (auth required)
 serviceRouter.post("/request", protect, requestService);
+// POST /update-status — Update the status of a service request (auth required)
 serviceRouter.post("/update-status", protect, updateServiceStatus);
+// GET /history — Get service request history for the hotel (auth required)
 serviceRouter.get("/history", protect, getHotelServiceHistory);
-serviceRouter.post("/add-staff", protect, addStaff);
-serviceRouter.get("/staff", protect, getStaffList);
-serviceRouter.put("/staff/:id", protect, updateStaff);
-serviceRouter.delete("/staff/:id", protect, deleteStaff);
-serviceRouter.patch("/staff/:id/toggle-availability", protect, toggleStaffAvailability);
-serviceRouter.get("/stats", protect, getServiceStats);
 
 export default serviceRouter;

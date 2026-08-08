@@ -1,14 +1,18 @@
-// supportRoutes.js — Customer support conversation routes
+// supportRoutes.js — Support ticket management routes
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
-import { createSupportConversation, getMySupportConversations, getConversationMessages, sendSupportMessage, updateConversationStatus } from "../controllers/supportController.js";
+import {
+  getTickets,
+  getMyTickets,
+  createTicket,
+  updateTicketStatus,
+} from "../controllers/supportController.js";
 
 const supportRouter = express.Router();
 
-supportRouter.post("/conversations", protect, createSupportConversation);
-supportRouter.get("/conversations", protect, getMySupportConversations);
-supportRouter.get("/conversations/:conversationId", protect, getConversationMessages);
-supportRouter.post("/messages", protect, sendSupportMessage);
-supportRouter.post("/status", protect, updateConversationStatus);
+supportRouter.get("/", protect, getTickets);
+supportRouter.get("/mine", protect, getMyTickets);
+supportRouter.post("/", protect, createTicket);
+supportRouter.patch("/:id/status", protect, updateTicketStatus);
 
 export default supportRouter;

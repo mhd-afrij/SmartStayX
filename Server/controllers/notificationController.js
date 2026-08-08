@@ -2,7 +2,7 @@
 import Notification from "../models/Notification.js";
 import Hotel from "../models/Hotel.js";
 
-// Notification listing, mark-as-read, and mark-all-as-read for hotel owners.
+// List notifications for a Admin with pagination and unread filter
 export const getNotifications = async (req, res) => {
   try {
     const auth = typeof req.auth === "function" ? req.auth() : req.auth;
@@ -43,6 +43,7 @@ export const getNotifications = async (req, res) => {
   }
 };
 
+// Mark a single notification as read
 export const markAsRead = async (req, res) => {
   try {
     const { notificationId } = req.params;
@@ -60,6 +61,7 @@ export const markAsRead = async (req, res) => {
   }
 };
 
+// Mark all unread notifications as read for a Admin
 export const markAllAsRead = async (req, res) => {
   try {
     const auth = typeof req.auth === "function" ? req.auth() : req.auth;

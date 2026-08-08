@@ -1,31 +1,7 @@
 // placesController.js — Nearby places search via external APIs
-import TripItinerary from "../models/TripItinerary.js";
-import getRedis from "../utils/redisClient.js";
 
 // Google Places API integration: attractions, restaurants, routes, and trip itineraries.
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
-const CACHE_TTL = 300;
-
-const getCache = async (key) => {
-  const redis = getRedis();
-  if (!redis) return null;
-  try {
-    const cached = await redis.get(`places:${key}`);
-    return cached ? JSON.parse(cached) : null;
-  } catch {
-    return null;
-  }
-};
-
-const setCache = async (key, value) => {
-  const redis = getRedis();
-  if (!redis) return;
-  try {
-    await redis.set(`places:${key}`, JSON.stringify(value), "EX", CACHE_TTL);
-  } catch {
-    // best-effort
-  }
-};
 
 const readQueryLocation = (query) => {
   const lat = Number(query.lat);
@@ -63,10 +39,6 @@ const fetchPlaces = async ({ type, radius, queryValue, lat, lng }) => {
     return { source: "missing_key", results: [], message: "GOOGLE_API_KEY is not configured" };
   }
 
-  const cacheKey = `${type}:${radius}:${queryValue || ""}:${lat || ""}:${lng || ""}`;
-  const cached = await getCache(cacheKey);
-  if (cached) return cached;
-
   const endpoint = queryValue
     ? "https://maps.googleapis.com/maps/api/place/textsearch/json"
     : "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
@@ -81,13 +53,10 @@ const fetchPlaces = async ({ type, radius, queryValue, lat, lng }) => {
   const response = await fetch(url.toString());
   const data = await response.json();
 
-  const payload = {
+  return {
     source: "google",
     results: Array.isArray(data.results) ? data.results.map(normalizePlace) : [],
   };
-
-  await setCache(cacheKey, payload);
-  return payload;
 };
 
 export const getAttractions = async (req, res) => {
@@ -179,59 +148,25 @@ export const getRoute = async (req, res) => {
   }
 };
 
-export const getItinerary = async (req, res) => {
+export const geocode = async (req, res) => {
   try {
-    const { tripId } = req.query;
-    if (!tripId) {
-      return res.json({ success: false, message: "tripId is required" });
+    const { place } = req.query;
+    if (!place) {
+      return res.json({ success: false, message: "place query param is required" });
     }
-
-    const itinerary = await TripItinerary.findOne({ user: req.user._id, tripId: String(tripId) });
-    res.json({ success: true, itinerary: itinerary || null });
+    if (!GOOGLE_API_KEY) {
+      return res.json({ success: false, message: "GOOGLE_API_KEY is not configured" });
+    }
+    const url = new URL("https://maps.googleapis.com/maps/api/geocode/json");
+    url.searchParams.set("address", place);
+    url.searchParams.set("key", GOOGLE_API_KEY);
+    const response = await fetch(url.toString());
+    const data = await response.json();
+    const location = data?.results?.[0]?.geometry?.location || null;
+    res.json({ success: Boolean(location), location, place: data?.results?.[0]?.formatted_address || place });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.json({ success: false, message: error.message, location: null });
   }
 };
 
-export const upsertItineraryItem = async (req, res) => {
-  try {
-    const {
-      tripId, title, type, day = 1, address = "", notes = "",
-      placeId = "", rating = 0, photoUrl = "", lat, lng,
-    } = req.body;
 
-    if (!tripId || !title || !type) {
-      return res.json({ success: false, message: "tripId, title and type are required" });
-    }
-
-    const itinerary = await TripItinerary.findOneAndUpdate(
-      { user: req.user._id, tripId: String(tripId) },
-      {
-        $setOnInsert: {
-          user: req.user._id,
-          tripId,
-          title: `Trip ${tripId}`,
-        },
-        $push: {
-          items: {
-            type,
-            title,
-            address,
-            day: Number(day) || 1,
-            notes,
-            placeId,
-            rating: Number(rating) || 0,
-            photoUrl,
-            lat: Number.isFinite(Number(lat)) ? Number(lat) : undefined,
-            lng: Number.isFinite(Number(lng)) ? Number(lng) : undefined,
-          },
-        },
-      },
-      { new: true, upsert: true }
-    );
-
-    res.json({ success: true, message: "Itinerary item added", itinerary });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-};

@@ -11,12 +11,14 @@ import {
 import { motion } from "framer-motion";
 import { TrendingUp, DollarSign } from "lucide-react";
 
+// Time range filter options
 const filters = [
   { key: "7d", label: "7 days" },
   { key: "30d", label: "30 days" },
   { key: "12m", label: "12 months" },
 ];
 
+// Custom tooltip for the revenue area chart
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
@@ -30,7 +32,7 @@ const CustomTooltip = ({ active, payload, label }) => {
           />
           <span className="text-white/70">{entry.name}:</span>
           <span className="text-white font-medium font-space">
-            {entry.name === "Revenue" ? `$${entry.value.toLocaleString()}` : entry.value}
+            {entry.name === "Revenue" ? `${currency}${entry.value.toLocaleString()}` : entry.value}
           </span>
         </div>
       ))}
@@ -38,7 +40,8 @@ const CustomTooltip = ({ active, payload, label }) => {
   );
 };
 
-const RevenueChart = ({ revenueData }) => {
+// RevenueChart — Area chart showing revenue over time with filter controls
+const RevenueChart = ({ revenueData, currency = '$', formatPrice }) => {
   const [activeFilter, setActiveFilter] = useState("7d");
   const [hovered, setHovered] = useState(null);
 
@@ -95,7 +98,7 @@ const RevenueChart = ({ revenueData }) => {
               <div>
                 <h3 className="text-sm font-medium text-white">Revenue Overview</h3>
                 <p className="text-2xl font-bold text-white font-space tracking-tight">
-                  ${totalRevenue.toLocaleString()}
+                  {formatPrice ? formatPrice(totalRevenue) : `${currency}${totalRevenue.toLocaleString()}`}
                 </p>
               </div>
             </div>
@@ -152,7 +155,7 @@ const RevenueChart = ({ revenueData }) => {
                 tickLine={false}
                 tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }}
                 dx={-10}
-                tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                tickFormatter={(v) => `${currency}${(v / 1000).toFixed(0)}k`}
               />
               <Tooltip content={<CustomTooltip />} cursor={false} />
               <Area

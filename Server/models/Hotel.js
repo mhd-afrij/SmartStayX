@@ -7,6 +7,7 @@ const hotelSchema = new mongoose.Schema(
     address: { type: String, required: true },
     contact: { type: String, required: true },
     owner: { type: String, required: true, ref: "User" },
+    orgId: { type: String, ref: "Organization", default: null },
     city: { type: String, required: true },
     image: { type: String, default: "" },
     description: { type: String, default: "" },

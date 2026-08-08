@@ -1,6 +1,6 @@
-// FeaturedDestination — Curated hotel collection with horizontal scroll carousel
 import React, { useRef } from "react";
 import { motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import HotelCard from "./HotelCard";
 import Title from "./Title";
 import { useAppContext } from "../context/AppContext";
@@ -45,7 +45,7 @@ const FeaturedDestination = () => {
               className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full bg-[#07111f]/90 border border-white/10 text-white/60 hover:text-white hover:border-white/30 backdrop-blur-xl opacity-0 group-hover/scroll:opacity-100 transition-all"
               aria-label="Scroll left"
             >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              <ChevronLeft className="h-4 w-4" />
             </button>
             <div ref={scrollRef} className="w-full overflow-x-auto scrollbar-hide">
               <div className="flex gap-6 pb-4 min-w-max">
@@ -70,7 +70,7 @@ const FeaturedDestination = () => {
               className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full bg-[#07111f]/90 border border-white/10 text-white/60 hover:text-white hover:border-white/30 backdrop-blur-xl opacity-0 group-hover/scroll:opacity-100 transition-all"
               aria-label="Scroll right"
             >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <ChevronRight className="h-4 w-4" />
             </button>
           </div>
 

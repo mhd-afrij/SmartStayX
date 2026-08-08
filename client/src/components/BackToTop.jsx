@@ -1,6 +1,6 @@
-// BackToTop — Floating button that appears on scroll to return to page top
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronUp } from 'lucide-react';
 
 const BackToTop = () => {
   const [visible, setVisible] = useState(false);
@@ -24,9 +24,7 @@ const BackToTop = () => {
           className="fixed bottom-8 right-8 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-[#D4A85F] text-[#07111f] shadow-2xl hover:bg-[#F5D08A] transition-colors"
           aria-label="Back to top"
         >
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-          </svg>
+          <ChevronUp className="h-5 w-5" />
         </motion.button>
       )}
     </AnimatePresence>

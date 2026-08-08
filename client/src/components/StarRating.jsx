@@ -1,6 +1,5 @@
-// StarRating — Visual star rating display (1-5 stars) using filled/outlined icons
 import React from 'react'
-import { assets } from '../assets/assets'
+import { Star } from 'lucide-react'
 
 const StarRating = ({ rating = 4 }) => {
   return (
@@ -8,11 +7,9 @@ const StarRating = ({ rating = 4 }) => {
       {Array(5)
         .fill()
         .map((_, index) => (
-          <img
-            key={index} // Added key to each child
-            src={rating > index ? assets.starIconFilled : assets.starIconOutlined}
-            alt="star-icon"
-            className="w-4.5 h-4.5"
+          <Star
+            key={index}
+            className={`w-4 h-4 ${rating > index ? 'text-[#F5D08A] fill-[#F5D08A]' : 'text-white/20'}`}
           />
         ))}
     </>

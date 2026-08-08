@@ -7,11 +7,8 @@ import {
   Building2,
   CalendarCheck,
   CreditCard,
-  PlusCircle,
-  List,
+  DoorOpen,
   Star,
-  BarChart3,
-  Settings,
   ChevronLeft,
   ChevronRight,
   Hotel,
@@ -19,20 +16,27 @@ import {
   ConciergeBell,
   MessageSquare,
   Award,
+  TrendingUp,
+  LineChart,
+  ShieldCheck,
+  Globe,
 } from "lucide-react";
 
 // Owner sidebar navigation links.
 const links = [
   { name: "Dashboard", path: "/Owner", icon: LayoutDashboard },
   { name: "Hotel Management", path: "/Owner/hotel-management", icon: Building2 },
+
+  { name: "Dynamic Pricing", path: "/Owner/pricing", icon: TrendingUp },
+  { name: "Analytics", path: "/Owner/analytics", icon: LineChart },
   { name: "Payments", path: "/Owner/payments", icon: CreditCard },
-  { name: "Add Room", path: "/Owner/add-room", icon: PlusCircle },
-  { name: "Room List", path: "/Owner/list-room", icon: List },
+  { name: "Room Management", path: "/Owner/room-management", icon: DoorOpen },
   { name: "Offers", path: "/Owner/offers", icon: Star },
-  { name: "Staff Management", path: "/Owner/staff-management", icon: Users },
   { name: "Service Management", path: "/Owner/service-management", icon: ConciergeBell },
   { name: "Guest Reviews", path: "/Owner/reviews", icon: MessageSquare },
   { name: "Testimonials", path: "/Owner/testimonials", icon: Award },
+  { name: "Role Management", path: "/Owner/role-management", icon: ShieldCheck },
+  { name: "Destinations", path: "/Owner/destinations", icon: Globe },
 ];
 
 const Sidebar = () => {
@@ -42,7 +46,7 @@ const Sidebar = () => {
     <motion.aside
       animate={{ width: collapsed ? 80 : 280 }}
       transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="relative h-full flex-shrink-0 overflow-hidden"
+      className="relative h-full flex-shrink-0"
     >
       {/* Sidebar background layers */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0B1220] via-[#0A1020] to-[#080E1A]" />
@@ -69,7 +73,7 @@ const Sidebar = () => {
           </AnimatePresence>
         </Link>
 
-        <nav className="flex-1 space-y-1 px-3">
+        <nav className="flex-1 overflow-y-auto space-y-1 px-3 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
           {links.map((item) => (
             <NavLink
               key={item.path}

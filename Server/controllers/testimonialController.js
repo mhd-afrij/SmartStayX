@@ -5,6 +5,7 @@ import Hotel from "../models/Hotel.js";
 import { DEFAULT_TESTIMONIALS } from "../configs/runtimeDefaults.js";
 
 // Testimonial management — combines manual testimonials with positive reviews for display.
+// Ensure the user is a Admin (auto-promote if they own a hotel)
 const ensureOwner = async (req, res) => {
   if (req.user?.role === "hotelOwner") return true;
 
@@ -15,10 +16,11 @@ const ensureOwner = async (req, res) => {
     return true;
   }
 
-  res.json({ success: false, message: "Only hotel owners can manage testimonials" });
+  res.json({ success: false, message: "Only Admins can manage testimonials" });
   return false;
 };
 
+// Get visible testimonials combined with positive reviews for public display
 export const getVisibleTestimonials = async (_req, res) => {
   try {
     const [testimonials, reviews] = await Promise.all([
@@ -56,6 +58,7 @@ export const getVisibleTestimonials = async (_req, res) => {
   }
 };
 
+// Get testimonials for owner management (seeds defaults if none exist)
 export const getOwnerTestimonials = async (req, res) => {
   try {
     if (!(await ensureOwner(req, res))) return;
@@ -80,6 +83,7 @@ export const getOwnerTestimonials = async (req, res) => {
   }
 };
 
+// Update a testimonial's name, address, rating, or review text
 export const updateTestimonial = async (req, res) => {
   try {
     if (!(await ensureOwner(req, res))) return;
@@ -107,6 +111,7 @@ export const updateTestimonial = async (req, res) => {
   }
 };
 
+// Toggle a testimonial's visibility on the public page
 export const updateTestimonialVisibility = async (req, res) => {
   try {
     if (!(await ensureOwner(req, res))) return;
