@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, useUser, useClerk } from "@clerk/clerk-react";
 import React from "react";
@@ -57,7 +57,7 @@ export const AppProvider = ({ children }) => {
 
   const deriveDashboardAccess = (role) => (role === "owner" ? "owner" : role === "staff" ? "receptionist" : "none");
 
-  const syncSession = async () => {
+  const syncSession = useCallback(async () => {
     try {
       const { data } = await axios.get("/api/user");
       if (data.success) {
@@ -67,13 +67,14 @@ export const AppProvider = ({ children }) => {
         setUser(null);
         setDashboardAccess("none");
       }
-    } catch {
+    } catch (error) {
+      console.error("Failed to sync session:", error);
       setUser(null);
       setDashboardAccess("none");
     } finally {
       setAuthLoaded(true);
     }
-  };
+  }, []);
 
   const logout = async () => { await signOut(); setUser(null); setDashboardAccess("none"); navigate("/"); };
 
@@ -82,8 +83,12 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const interceptor = axios.interceptors.request.use(async (config) => {
       if (isSignedIn) {
-        const token = await getToken();
-        if (token) config.headers.Authorization = `Bearer ${token}`;
+        try {
+          const token = await getToken();
+          if (token) config.headers.Authorization = `Bearer ${token}`;
+        } catch (error) {
+          console.error("Failed to get Clerk token:", error);
+        }
       }
       return config;
     });
@@ -99,7 +104,7 @@ export const AppProvider = ({ children }) => {
       setDashboardAccess("none");
       setAuthLoaded(true);
     }
-  }, [clerkAuthLoaded, isSignedIn]);
+  }, [clerkAuthLoaded, isSignedIn, syncSession]);
 
   useEffect(() => { fetchRooms(); fetchOffers(); }, []);
   useEffect(() => { localStorage.setItem("selectedCurrency", selectedCurrency); }, [selectedCurrency]);
