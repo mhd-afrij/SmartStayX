@@ -32,7 +32,17 @@ export const updateRoomBody = z.object({
   roomType: z.string().optional(),
   pricePerNight: z.preprocess((v) => (v === undefined ? undefined : Number(v)), z.number().nonnegative().optional()),
   amenities: z.array(z.string()).optional(),
-  isAvailable: z.preprocess((v) => (v === undefined ? undefined : Boolean(v)), z.boolean().optional()),
+  // Coerce booleans and the strings "true"/"false" (form data) correctly;
+  // a plain Boolean("false") would silently become true.
+  isAvailable: z.preprocess(
+    (v) => {
+      if (v === undefined) return undefined;
+      if (v === true || v === "true") return true;
+      if (v === false || v === "false") return false;
+      return v;
+    },
+    z.boolean().optional()
+  ),
 });
 
 export default { getRoomsQuery, createRoomBody, toggleAvailabilityBody, updateRoomBody };

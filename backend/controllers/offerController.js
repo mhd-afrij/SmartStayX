@@ -31,7 +31,7 @@ export const createOffer = async (req, res) => {
 
     let imageUrl = null;
     if (req.file) {
-      const uploadRes = await cloudinary.uploader.upload(req.file.path);
+      const uploadRes = await cloudinary.uploader.upload(req.file.buffer, { resource_type: "auto" });
       imageUrl = uploadRes.secure_url;
     }
 
@@ -118,7 +118,7 @@ export const updateOffer = async (req, res) => {
     }
 
     if (req.file) {
-      const uploadRes = await cloudinary.uploader.upload(req.file.path);
+      const uploadRes = await cloudinary.uploader.upload(req.file.buffer, { resource_type: "auto" });
       offer.image = uploadRes.secure_url;
     }
 

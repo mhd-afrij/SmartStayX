@@ -1,6 +1,10 @@
 import json
+import logging
+import uuid
 from typing import AsyncGenerator
+
 from openai import AsyncOpenAI
+
 from app.config import settings
 from app.utils.tools import TOOL_DEFINITIONS
 from app.services.context_service import (
@@ -8,7 +12,18 @@ from app.services.context_service import (
     get_available_rooms,
     get_hotel_details_db,
     get_user_bookings_db,
+    get_booking_status_db,
     create_service_request_db,
+)
+
+logger = logging.getLogger("ai_service")
+
+# Upper bound on how long one LLM round-trip may take (seconds).
+LLM_TIMEOUT = 30.0
+
+GENERIC_ERROR_MESSAGE = (
+    "I'm sorry, I'm having trouble processing that request right now. "
+    "Please try again in a moment."
 )
 
 SYSTEM_PROMPT_TEMPLATE = """You are the SmartStayX Concierge, an expert AI hotel concierge and travel assistant.
@@ -45,6 +60,7 @@ def _get_client() -> AsyncOpenAI:
     return AsyncOpenAI(
         api_key=settings.openai_api_key,
         base_url="https://openrouter.ai/api/v1",
+        timeout=LLM_TIMEOUT,
     )
 
 
@@ -64,6 +80,11 @@ async def _execute_tool(name: str, args: dict, user_id: str | None) -> str:
                 return "User not authenticated"
             results = await get_user_bookings_db(user_id)
             return json.dumps(results, default=str)
+        elif name == "get_booking_status":
+            if not user_id:
+                return "User not authenticated"
+            result = await get_booking_status_db(user_id, args["bookingId"])
+            return json.dumps(result, default=str)
         elif name == "create_service_request":
             if not user_id:
                 return "User not authenticated"
@@ -75,8 +96,11 @@ async def _execute_tool(name: str, args: dict, user_id: str | None) -> str:
             return json.dumps({"city": args["city"], "message": "Local attractions data available on the SmartStayX platform."})
         else:
             return json.dumps({"error": f"Unknown tool: {name}"})
-    except Exception as e:
-        return json.dumps({"error": str(e)})
+    except Exception:
+        # Tool internals (db errors, object ids, stack traces) must never reach
+        # the LLM or the guest; log them server-side only.
+        logger.exception("Tool execution failed: %s", name)
+        return json.dumps({"error": "The requested operation could not be completed."})
 
 
 async def generate_response(
@@ -146,8 +170,10 @@ async def generate_response(
 
         return choice.message.content or ""
 
-    except Exception as e:
-        return f"I apologize, but I'm having trouble connecting to my knowledge base right now. Please try again in a moment. (Error: {str(e)})"
+    except Exception:
+        request_id = uuid.uuid4().hex[:12]
+        logger.exception("LLM request failed request_id=%s", request_id)
+        return f"{GENERIC_ERROR_MESSAGE} (reference: {request_id})"
 
 
 async def generate_streaming_response(
@@ -249,5 +275,7 @@ async def generate_streaming_response(
                 if delta and delta.content:
                     yield delta.content
 
-    except Exception as e:
-        yield f"I apologize, but I'm having trouble connecting right now. Please try again. (Error: {str(e)})"
+    except Exception:
+        request_id = uuid.uuid4().hex[:12]
+        logger.exception("LLM streaming request failed request_id=%s", request_id)
+        yield f"{GENERIC_ERROR_MESSAGE} (reference: {request_id})"

@@ -10,6 +10,41 @@ def encode_season(season_str):
 def encode_room_type(room_type_str):
     return ROOM_TYPE_MAP.get(str(room_type_str).lower().strip(), 0)
 
+def _coerce_float(raw, key):
+    """Return the numeric value of `raw[key]`, or None if missing/unparsable."""
+    try:
+        return float(raw.get(key))
+    except (TypeError, ValueError):
+        return None
+
+def validate_input(raw):
+    """Validate the request payload. Returns a list of error messages (empty = valid).
+
+    Bad input must produce a 400, not an arbitrary price, so range checks are
+    enforced before any feature is built.
+    """
+    errors = []
+
+    base_price = _coerce_float(raw, "basePrice")
+    if base_price is None:
+        errors.append("basePrice is required and must be a number")
+    elif base_price <= 0:
+        errors.append("basePrice must be > 0")
+
+    occupancy = _coerce_float(raw, "occupancy")
+    if occupancy is not None and not (0 <= occupancy <= 1):
+        errors.append("occupancy must be between 0 and 1")
+
+    lead_time = _coerce_float(raw, "leadTimeDays")
+    if lead_time is not None and lead_time < 0:
+        errors.append("leadTimeDays must be >= 0")
+
+    amenities = _coerce_float(raw, "amenitiesCount")
+    if amenities is not None and amenities < 0:
+        errors.append("amenitiesCount must be >= 0")
+
+    return errors
+
 def preprocess_features(raw):
     features = {
         "basePrice": float(raw.get("basePrice", 0)),
@@ -17,7 +52,6 @@ def preprocess_features(raw):
         "leadTimeDays": float(raw.get("leadTimeDays", 0)),
         "season_encoded": encode_season(raw.get("season", "off-peak")),
         "isWeekend": int(bool(raw.get("isWeekend", False))),
-        "competitorPrice": float(raw.get("competitorPrice", 0)),
         "amenitiesCount": int(raw.get("amenitiesCount", 0)),
         "roomType_encoded": encode_room_type(raw.get("roomType", "standard")),
         "isReturningGuest": int(bool(raw.get("isReturningGuest", False))),
@@ -32,7 +66,6 @@ def build_feature_vector(raw):
         pf["leadTimeDays"],
         pf["season_encoded"],
         pf["isWeekend"],
-        pf["competitorPrice"],
         pf["amenitiesCount"],
         pf["roomType_encoded"],
         pf["isReturningGuest"],
@@ -40,8 +73,7 @@ def build_feature_vector(raw):
 
 FEATURE_NAMES = [
     "basePrice", "occupancy", "leadTimeDays", "season_encoded",
-    "isWeekend", "competitorPrice", "amenitiesCount",
-    "roomType_encoded", "isReturningGuest",
+    "isWeekend", "amenitiesCount", "roomType_encoded", "isReturningGuest",
 ]
 
 def generate_sample_training_data(n_samples=500):
@@ -52,7 +84,6 @@ def generate_sample_training_data(n_samples=500):
         "leadTimeDays": np.random.exponential(30, n_samples).clip(0, 365),
         "season_encoded": np.random.choice([0, 1, 2, 3], n_samples),
         "isWeekend": np.random.choice([0, 1], n_samples),
-        "competitorPrice": np.random.uniform(3000, 50000, n_samples),
         "amenitiesCount": np.random.randint(1, 20, n_samples),
         "roomType_encoded": np.random.choice([0, 1, 2, 3, 4, 5, 6], n_samples),
         "isReturningGuest": np.random.choice([0, 1], n_samples),
@@ -64,7 +95,6 @@ def generate_sample_training_data(n_samples=500):
     lead = df["leadTimeDays"]
     season = df["season_encoded"]
     weekend = df["isWeekend"]
-    comp = df["competitorPrice"]
     amenities = df["amenitiesCount"]
     room_type = df["roomType_encoded"]
     returning = df["isReturningGuest"]

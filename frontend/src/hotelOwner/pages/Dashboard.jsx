@@ -168,19 +168,19 @@ const Dashboard = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="rounded-2xl border border-black/[0.06] bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)] p-10 text-center"
+          className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] p-10 text-center"
         >
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#2563EB]/10 border border-[#2563EB]/20 flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#D4A853]/10 border border-[#D4A853]/40 flex items-center justify-center">
             <span className="text-2xl">🏨</span>
           </div>
-          <h2 className="text-xl font-bold text-slate-900 mb-2">Welcome to your Partner Dashboard!</h2>
-          <p className="text-sm text-slate-500 max-w-md mx-auto mb-6">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] mb-2">Welcome to your Partner Dashboard!</h2>
+          <p className="text-sm text-slate-500 dark:text-[#8299A0] max-w-md mx-auto mb-6">
             You haven't registered a hotel yet. Add your property details to start managing rooms,
             bookings, and revenue.
           </p>
           <a
-            href="/Owner/hotel-management"
-            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl bg-[#2563EB] text-white hover:shadow-lg hover:shadow-[#2563EB]/20 transition-all"
+            href="/manager/hotel-management"
+            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl bg-[#D4A853] dark:bg-[#E6C075] text-[#2A230F] hover:shadow-lg hover:shadow-[#D4A853]/30 transition-all"
           >
             Register Your Hotel
           </a>
@@ -195,17 +195,17 @@ const Dashboard = () => {
               <select
                 value={selectedHotelId}
                 onChange={(e) => setSelectedHotelId(e.target.value)}
-                className="appearance-none pl-9 pr-8 py-2 text-sm rounded-xl border border-black/[0.08] bg-white text-slate-600 outline-none focus:border-[#2563EB]/40 transition-colors cursor-pointer"
+                className="appearance-none pl-9 pr-8 py-2 text-sm rounded-xl border border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#161925] text-slate-600 dark:text-[#9FB2B8] outline-none focus:border-[#D4A853]/60 transition-colors cursor-pointer"
               >
-                <option value="all" className="bg-white">All Properties</option>
+                <option value="all" className="bg-white dark:bg-[#161925]">All Properties</option>
                 {dashboardData.allHotels.map((h) => (
-                  <option key={h._id} value={h._id} className="bg-white">
+                  <option key={h._id} value={h._id} className="bg-white dark:bg-[#161925]">
                     {h.name}
                   </option>
                 ))}
               </select>
-              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
             </div>
           </div>
           <ErrorBoundary>

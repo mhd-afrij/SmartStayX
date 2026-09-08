@@ -32,7 +32,7 @@ const SocialWall = () => {
             >
               <TiltCard
                 maxTilt={4}
-                className="group relative overflow-hidden rounded-[16px] border border-black/[0.06] shadow-[0_20px_60px_rgba(15,23,42,0.06)] h-full"
+                className="group relative overflow-hidden rounded-[16px] border border-black/[0.06] dark:border-[#1D3842] shadow-[0_20px_60px_rgba(0,56,68,0.06)] h-full"
               >
                 <img
                   src={dest.image}

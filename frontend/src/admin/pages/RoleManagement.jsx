@@ -39,8 +39,8 @@ const RoleFormModal = ({ open, initial, onSave, onCancel, saving }) => {
           onClick={(e) => e.stopPropagation()}
           className="w-full max-w-md mx-4"
         >
-          <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-2xl space-y-4">
-            <h3 className="text-lg font-semibold text-[#0F172A]">{initial ? 'Edit role' : 'New role'}</h3>
+          <div className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] p-6 shadow-2xl space-y-4">
+            <h3 className="text-lg font-semibold text-[#003844] dark:text-[#E9F1F2]">{initial ? 'Edit role' : 'New role'}</h3>
             <Input
               label="Role name"
               required
@@ -62,13 +62,13 @@ const RoleFormModal = ({ open, initial, onSave, onCancel, saving }) => {
               onChange={(e) => setForm((f) => ({ ...f, dashboardAccess: e.target.value }))}
             >
               <option value="none">None</option>
-              <option value="owner">Owner</option>
+              <option value="hotel_manager">Hotel Manager</option>
               <option value="receptionist">Receptionist</option>
             </Select>
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={onCancel}
-                className="px-4 py-2 text-sm font-medium rounded-xl border border-black/[0.08] text-slate-500 hover:text-slate-900 hover:bg-[#f4f2ef] transition-all"
+                className="px-4 py-2 text-sm font-medium rounded-xl border border-black/[0.08] dark:border-[#232737] text-slate-500 dark:text-[#8299A0] hover:text-slate-900 dark:hover:text-[#E9F1F2] hover:bg-[#f4f2ef] dark:hover:bg-[#232737] transition-all"
               >
                 Cancel
               </button>
@@ -178,23 +178,23 @@ const RoleManagement = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#E2E8F0] bg-[#F8FAFC]">
-                  <th className="py-3 px-4 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider">Name</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider">Description</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider">Dashboard access</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider">Users</th>
-                  <th className="py-3 px-4 text-right text-xs font-medium text-[#64748B] uppercase tracking-wider">Actions</th>
+                <tr className="border-b border-[#E8E0D1] dark:border-[#232737] bg-[#FFFAF4] dark:bg-[#10131D]">
+                  <th className="py-3 px-4 text-left text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">Name</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">Description</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">Dashboard access</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">Users</th>
+                  <th className="py-3 px-4 text-right text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {roles.map((role) => (
-                  <tr key={role._id} className="border-b border-[#E2E8F0] last:border-b-0 hover:bg-[#F1F5F9] transition-colors">
-                    <td className="py-3 px-4 font-medium text-[#0F172A]">{role.name}</td>
-                    <td className="py-3 px-4 text-[#64748B]">{role.description || '—'}</td>
+                  <tr key={role._id} className="border-b border-[#E8E0D1] dark:border-[#232737] last:border-b-0 hover:bg-[#F3ECDE] dark:hover:bg-[#232737] transition-colors">
+                    <td className="py-3 px-4 font-medium text-[#003844] dark:text-[#E9F1F2]">{role.name}</td>
+                    <td className="py-3 px-4 text-[#4D6166] dark:text-[#9FB2B8]">{role.description || '—'}</td>
                     <td className="py-3 px-4">
                       <Badge tone={ACCESS_TONES[role.dashboardAccess] || 'neutral'}>{role.dashboardAccess}</Badge>
                     </td>
-                    <td className="py-3 px-4 text-[#64748B]">{role.userCount ?? 0}</td>
+                    <td className="py-3 px-4 text-[#4D6166] dark:text-[#9FB2B8]">{role.userCount ?? 0}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center justify-end gap-1">
                         <IconButton icon={Pencil} variant="ghost" size="sm" label="Edit role" onClick={() => openEdit(role)} />

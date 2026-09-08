@@ -9,7 +9,7 @@ const StarRating = ({ rating = 4 }) => {
         .map((_, index) => (
           <Star
             key={index}
-            className={`w-4 h-4 ${rating > index ? 'text-[#2563EB] fill-[#2563EB]' : 'text-slate-300'}`}
+            className={`w-4 h-4 ${rating > index ? 'text-[#5077B3] dark:text-[#93B3E0] fill-[#5077B3]' : 'text-slate-300 dark:text-[#4E646B]'}`}
           />
         ))}
     </>

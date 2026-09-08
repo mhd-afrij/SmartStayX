@@ -14,7 +14,7 @@ import { Skeleton, EmptyState, ErrorState } from './States';
 const SortIcon = ({ sorted }) => {
   if (sorted === 'asc') return <ChevronUp className="h-3.5 w-3.5" />;
   if (sorted === 'desc') return <ChevronDown className="h-3.5 w-3.5" />;
-  return <ChevronsUpDown className="h-3.5 w-3.5 text-[#94A3B8]" />;
+  return <ChevronsUpDown className="h-3.5 w-3.5 text-[#879497] dark:text-[#6B828A]" />;
 };
 
 // DataTable — Generic TanStack-Table-powered table with sorting, search, pagination, and loading/empty/error states
@@ -55,7 +55,7 @@ const DataTable = ({
             if (el) el.indeterminate = table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected();
           }}
           onChange={table.getToggleAllPageRowsSelectedHandler()}
-          className="h-4 w-4 rounded border-[#E2E8F0] text-[#2563EB] focus:ring-[#2563EB]"
+          className="h-4 w-4 rounded border-[#E8E0D1] dark:border-[#232737] text-[#B58A2E] dark:text-[#E6C075] focus:ring-[#D4A853]"
         />
       ),
       cell: ({ row }) => (
@@ -64,7 +64,7 @@ const DataTable = ({
           checked={row.getIsSelected()}
           disabled={!row.getCanSelect()}
           onChange={row.getToggleSelectedHandler()}
-          className="h-4 w-4 rounded border-[#E2E8F0] text-[#2563EB] focus:ring-[#2563EB]"
+          className="h-4 w-4 rounded border-[#E8E0D1] dark:border-[#232737] text-[#B58A2E] dark:text-[#E6C075] focus:ring-[#D4A853]"
         />
       ),
       enableSorting: false,
@@ -95,18 +95,18 @@ const DataTable = ({
   return (
     <Card padded={false} className="overflow-hidden">
       {(title || searchable || headerActions) && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-[#E2E8F0]">
-          {title && <h3 className="text-sm font-semibold text-[#0F172A]">{title}</h3>}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-[#E8E0D1] dark:border-[#232737]">
+          {title && <h3 className="text-sm font-semibold text-[#003844] dark:text-[#E9F1F2]">{title}</h3>}
           <div className="flex items-center gap-2">
             {searchable && (
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#879497] dark:text-[#6B828A]" />
                 <input
                   type="text"
                   placeholder={searchPlaceholder}
                   value={globalFilter}
                   onChange={(e) => setGlobalFilter(e.target.value)}
-                  className="w-48 sm:w-56 pl-9 pr-3 py-2 text-xs rounded-lg border border-[#E2E8F0] bg-white text-[#0F172A] placeholder:text-[#94A3B8] outline-none focus:border-[#2563EB]/40 transition-colors"
+                  className="w-48 sm:w-56 pl-9 pr-3 py-2 text-xs rounded-lg border border-[#E8E0D1] dark:border-[#232737] bg-white dark:bg-[#161925] text-[#003844] dark:text-[#E9F1F2] placeholder:text-[#879497] dark:placeholder:text-[#6B828A] outline-none focus:border-[#D4A853]/60 transition-colors"
                 />
               </div>
             )}
@@ -131,12 +131,12 @@ const DataTable = ({
             <table className="w-full text-sm">
               <thead>
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id} className="border-b border-[#E2E8F0] bg-[#F8FAFC]">
+                  <tr key={headerGroup.id} className="border-b border-[#E8E0D1] dark:border-[#232737] bg-[#FFFAF4] dark:bg-[#10131D]">
                     {headerGroup.headers.map((header) => (
                       <th
                         key={header.id}
-                        className={`py-3 px-4 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider ${
-                          header.column.getCanSort() ? 'cursor-pointer select-none hover:text-[#0F172A]' : ''
+                        className={`py-3 px-4 text-left text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider ${
+                          header.column.getCanSort() ? 'cursor-pointer select-none hover:text-[#003844] dark:hover:text-[#E9F1F2]' : ''
                         }`}
                         onClick={header.column.getToggleSortingHandler()}
                       >
@@ -155,10 +155,10 @@ const DataTable = ({
                 {rows.map((row) => (
                   <tr
                     key={row.id}
-                    className="border-b border-[#E2E8F0] last:border-b-0 hover:bg-[#F1F5F9] transition-colors"
+                    className="border-b border-[#E8E0D1] dark:border-[#232737] last:border-b-0 hover:bg-[#F3ECDE] dark:hover:bg-[#232737] transition-colors"
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="py-3 px-4 text-[#0F172A]">
+                      <td key={cell.id} className="py-3 px-4 text-[#003844] dark:text-[#E9F1F2]">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
@@ -169,15 +169,15 @@ const DataTable = ({
           </div>
 
           {pageCount > 1 && (
-            <div className="flex items-center justify-between px-4 py-4 border-t border-[#E2E8F0]">
-              <span className="text-xs text-[#94A3B8]">
+            <div className="flex items-center justify-between px-4 py-4 border-t border-[#E8E0D1] dark:border-[#232737]">
+              <span className="text-xs text-[#879497] dark:text-[#6B828A]">
                 Page {pageIndex + 1} of {pageCount}
               </span>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
-                  className="p-1.5 rounded-lg border border-[#E2E8F0] text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded-lg border border-[#E8E0D1] dark:border-[#232737] text-[#879497] dark:text-[#6B828A] hover:text-[#003844] dark:hover:text-[#E9F1F2] hover:bg-[#F3ECDE] dark:hover:bg-[#232737] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                 </button>
@@ -187,8 +187,8 @@ const DataTable = ({
                     onClick={() => table.setPageIndex(i)}
                     className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${
                       i === pageIndex
-                        ? 'bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20'
-                        : 'text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#F1F5F9] border border-transparent'
+                        ? 'bg-[#D4A853]/10 text-[#B58A2E] dark:text-[#E6C075] border border-[#D4A853]/40'
+                        : 'text-[#879497] dark:text-[#6B828A] hover:text-[#003844] dark:hover:text-[#E9F1F2] hover:bg-[#F3ECDE] dark:hover:bg-[#232737] border border-transparent'
                     }`}
                   >
                     {i + 1}
@@ -197,7 +197,7 @@ const DataTable = ({
                 <button
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
-                  className="p-1.5 rounded-lg border border-[#E2E8F0] text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded-lg border border-[#E8E0D1] dark:border-[#232737] text-[#879497] dark:text-[#6B828A] hover:text-[#003844] dark:hover:text-[#E9F1F2] hover:bg-[#F3ECDE] dark:hover:bg-[#232737] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>

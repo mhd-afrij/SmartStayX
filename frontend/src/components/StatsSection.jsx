@@ -42,7 +42,7 @@ const StatsSection = () => {
           className="luxury-card relative overflow-hidden px-6 py-12 md:py-16"
         >
           {/* Subtle gold radial glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37, 99, 235,0.06),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(80, 119, 179,0.06),transparent_50%)]" />
 
           <div className="relative grid grid-cols-2 md:grid-cols-4 gap-8">
             {STATS.map((stat, i) => (
@@ -54,10 +54,10 @@ const StatsSection = () => {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="text-center"
               >
-                <p className="font-playfair text-4xl md:text-5xl text-[#2563EB]">
+                <p className="font-playfair text-4xl md:text-5xl text-[#5077B3] dark:text-[#93B3E0]">
                   {stat.value}
                 </p>
-                <p className="mt-1.5 text-sm uppercase tracking-[0.18em] text-slate-500">
+                <p className="mt-1.5 text-sm uppercase tracking-[0.18em] text-slate-500 dark:text-[#8299A0]">
                   {stat.label}
                 </p>
               </motion.div>

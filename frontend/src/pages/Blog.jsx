@@ -81,8 +81,8 @@ const Blog = () => {
     return (
       <section className="luxury-section min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <h1 className="font-playfair text-4xl text-slate-900">Destination not found</h1>
-          <p className="text-slate-500">The travel guide you are looking for does not exist yet.</p>
+          <h1 className="font-playfair text-4xl text-slate-900 dark:text-[#E9F1F2]">Destination not found</h1>
+          <p className="text-slate-500 dark:text-[#8299A0]">The travel guide you are looking for does not exist yet.</p>
           <Link to="/" className="gold-button inline-flex px-6 py-3 text-sm">
             Back to Home
             <ArrowRight className="w-4" />
@@ -101,10 +101,10 @@ const Blog = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="font-playfair text-4xl md:text-6xl text-slate-900 leading-tight">
+          <h1 className="font-playfair text-4xl md:text-6xl text-slate-900 dark:text-[#E9F1F2] leading-tight">
             {data.title}
           </h1>
-          <p className="mt-6 text-lg text-slate-600 leading-relaxed">{data.intro}</p>
+          <p className="mt-6 text-lg text-slate-600 dark:text-[#9FB2B8] leading-relaxed">{data.intro}</p>
         </motion.div>
 
         {/* Highlights grid */}
@@ -118,10 +118,10 @@ const Blog = () => {
               transition={{ duration: 0.4 }}
               className="luxury-card p-6"
             >
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-[#6B828A]">
                 {item.label}
               </p>
-              <p className="mt-2 font-playfair text-xl text-slate-900">{item.value}</p>
+              <p className="mt-2 font-playfair text-xl text-slate-900 dark:text-[#E9F1F2]">{item.value}</p>
             </motion.div>
           ))}
         </div>

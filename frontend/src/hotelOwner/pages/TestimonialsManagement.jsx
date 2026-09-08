@@ -145,20 +145,20 @@ const TestimonialsManagement = () => {
   const columns = useMemo(() => [
     columnHelper.accessor("name", {
       header: "Guest",
-      cell: (info) => <span className="text-slate-900 font-medium">{info.getValue()}</span>,
+      cell: (info) => <span className="text-slate-900 dark:text-[#E9F1F2] font-medium">{info.getValue()}</span>,
     }),
     columnHelper.accessor("address", {
       header: "Location",
-      cell: (info) => <span className="text-slate-600">{info.getValue()}</span>,
+      cell: (info) => <span className="text-slate-600 dark:text-[#9FB2B8]">{info.getValue()}</span>,
     }),
     columnHelper.accessor("rating", {
       header: "Rating",
-      cell: (info) => <span className="text-slate-900">{info.getValue()}/5</span>,
+      cell: (info) => <span className="text-slate-900 dark:text-[#E9F1F2]">{info.getValue()}/5</span>,
     }),
     columnHelper.accessor("review", {
       header: "Review",
       enableSorting: false,
-      cell: (info) => <span className="text-slate-600 max-w-md block">{info.getValue()}</span>,
+      cell: (info) => <span className="text-slate-600 dark:text-[#9FB2B8] max-w-md block">{info.getValue()}</span>,
     }),
     columnHelper.accessor((row) => (row.isVisible ? "visible" : "hidden"), {
       id: "status",
@@ -175,18 +175,18 @@ const TestimonialsManagement = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => startEdit(item)}
-              className="text-xs px-3 py-1.5 rounded-lg border border-black/[0.08] text-slate-500 hover:text-[#2563EB] hover:border-[#2563EB]/30 hover:bg-[#2563EB]/10 transition-all"
+              className="text-xs px-3 py-1.5 rounded-lg border border-black/[0.08] dark:border-[#232737] text-slate-500 dark:text-[#8299A0] hover:text-[#B58A2E] dark:hover:text-[#E6C075] hover:border-[#D4A853]/40 hover:bg-[#D4A853]/10 transition-all"
             >
               Edit
             </button>
             <button
               onClick={() => toggleVisibility(item)}
               disabled={togglingId === item._id}
-              className="p-1.5 rounded-lg border border-black/[0.08] text-slate-400 hover:text-amber-600 hover:border-amber-200 hover:bg-amber-50 transition-all disabled:opacity-40"
+              className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#232737] text-slate-400 dark:text-[#6B828A] hover:text-amber-600 dark:hover:text-amber-300 hover:border-[#B9B4CE]/45 dark:hover:border-[#3D4660]/45 hover:bg-[#F4F2F9] dark:hover:bg-[#1B2436] transition-all disabled:opacity-40"
               title={item.isVisible ? "Hide" : "Show"}
             >
               {togglingId === item._id ? (
-                <div className="w-3.5 h-3.5 border-2 border-slate-300 border-t-transparent rounded-full animate-spin" />
+                <div className="w-3.5 h-3.5 border-2 border-slate-300 dark:border-[#27434D] border-t-transparent rounded-full animate-spin" />
               ) : item.isVisible ? (
                 <EyeOff className="w-3.5 h-3.5" />
               ) : (
@@ -196,7 +196,7 @@ const TestimonialsManagement = () => {
             <button
               onClick={() => handleDelete(item._id)}
               disabled={deletingId === item._id}
-              className="p-1.5 rounded-lg border border-black/[0.08] text-slate-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all disabled:opacity-40"
+              className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#232737] text-slate-400 dark:text-[#6B828A] hover:text-red-600 dark:hover:text-red-300 hover:border-red-200 dark:hover:border-red-500/25 hover:bg-red-50 transition-all disabled:opacity-40"
               title="Delete"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -210,22 +210,22 @@ const TestimonialsManagement = () => {
   return (
     <div className="space-y-6 pb-10">
       <div>
-        <h1 className="text-xl font-bold text-slate-900 tracking-tight">Testimonials</h1>
-        <p className="text-sm text-slate-400 mt-1">Manage guest feedback visibility for your storefront.</p>
+        <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Testimonials</h1>
+        <p className="text-sm text-slate-400 dark:text-[#6B828A] mt-1">Manage guest feedback visibility for your storefront.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="luxury-card p-5">
-          <p className="text-xs uppercase tracking-[0.15em] text-slate-500">Total Testimonials</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">{rows.length}</p>
+          <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-[#8299A0]">Total Testimonials</p>
+          <p className="mt-2 text-3xl font-bold text-slate-900 dark:text-[#E9F1F2]">{rows.length}</p>
         </div>
         <div className="luxury-card p-5">
-          <p className="text-xs uppercase tracking-[0.15em] text-slate-500">Visible</p>
-          <p className="mt-2 text-3xl font-bold text-green-600">{visibleCount}</p>
+          <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-[#8299A0]">Visible</p>
+          <p className="mt-2 text-3xl font-bold text-green-600 dark:text-green-300">{visibleCount}</p>
         </div>
         <div className="luxury-card p-5">
-          <p className="text-xs uppercase tracking-[0.15em] text-slate-500">Hidden</p>
-          <p className="mt-2 text-3xl font-bold text-red-600">{rows.length - visibleCount}</p>
+          <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-[#8299A0]">Hidden</p>
+          <p className="mt-2 text-3xl font-bold text-red-600 dark:text-red-300">{rows.length - visibleCount}</p>
         </div>
       </div>
 
@@ -243,10 +243,10 @@ const TestimonialsManagement = () => {
       {editingId !== null && (
         <div className="luxury-card overflow-hidden">
           <div className="m-5 luxury-card-soft p-5">
-            <h4 className="text-sm font-semibold text-slate-900 mb-3">Edit Testimonial</h4>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-[#E9F1F2] mb-3">Edit Testimonial</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-slate-500">Guest Name</label>
+                <label className="text-xs text-slate-500 dark:text-[#8299A0]">Guest Name</label>
                 <input
                   value={form.name}
                   onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
@@ -254,7 +254,7 @@ const TestimonialsManagement = () => {
                 />
               </div>
               <div>
-                <label className="text-xs text-slate-500">Location</label>
+                <label className="text-xs text-slate-500 dark:text-[#8299A0]">Location</label>
                 <input
                   value={form.address}
                   onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}
@@ -262,7 +262,7 @@ const TestimonialsManagement = () => {
                 />
               </div>
               <div>
-                <label className="text-xs text-slate-500">Rating (1-5)</label>
+                <label className="text-xs text-slate-500 dark:text-[#8299A0]">Rating (1-5)</label>
                 <input
                   type="number" min="1" max="5"
                   value={form.rating}
@@ -271,7 +271,7 @@ const TestimonialsManagement = () => {
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="text-xs text-slate-500">Review</label>
+                <label className="text-xs text-slate-500 dark:text-[#8299A0]">Review</label>
                 <textarea
                   rows="4"
                   value={form.review}

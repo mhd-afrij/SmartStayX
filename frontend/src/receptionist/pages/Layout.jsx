@@ -4,29 +4,32 @@ import { useAppContext } from '../../context/AppContext';
 import ReceptionistNavbar from '../components/Navbar';
 
 const Layout = () => {
-  const { isReceptionist, user, userLoaded, receptionistResolved } = useAppContext();
+  // Super admins and hotel managers may view the receptionist dashboard
+  // (route definitions allow it), so the layout must not bounce them out.
+  const { isReceptionist, isHotelManager, isSuperAdmin, user, userLoaded, roleResolved } = useAppContext();
   const navigate = useNavigate();
+  const canAccess = isReceptionist || isHotelManager || isSuperAdmin;
 
   useEffect(() => {
-    if (!userLoaded || !receptionistResolved) return;
-    if (!user || !isReceptionist) navigate('/');
-  }, [isReceptionist, user, navigate, userLoaded, receptionistResolved]);
+    if (!userLoaded || !roleResolved) return;
+    if (!user || !canAccess) navigate('/');
+  }, [canAccess, user, navigate, userLoaded, roleResolved]);
 
-  if (!userLoaded || !receptionistResolved) {
+  if (!userLoaded || !roleResolved) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fbfaf8]">
+      <div className="min-h-screen flex items-center justify-center bg-[#fffaf4] dark:bg-[#0B1D24]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 rounded-full border-2 border-[#2563EB]/30 border-t-[#2563EB] animate-spin" />
-          <span className="text-sm text-slate-400 font-space">Loading dashboard...</span>
+          <div className="w-8 h-8 rounded-full border-2 border-[#5077B3]/30 border-t-[#5077B3] animate-spin" />
+          <span className="text-sm text-slate-400 dark:text-[#6B828A] font-space">Loading dashboard...</span>
         </div>
       </div>
     );
   }
 
-  if (!user || !isReceptionist) return null;
+  if (!user || !canAccess) return null;
 
   return (
-    <div className="min-h-screen bg-[#fbfaf8]">
+    <div className="min-h-screen bg-[#fffaf4] dark:bg-[#0B1D24]">
       <div className="flex flex-col">
         <ReceptionistNavbar />
         <main className="flex-1 overflow-y-auto scrollbar-hide">

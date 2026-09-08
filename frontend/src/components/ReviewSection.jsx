@@ -12,11 +12,11 @@ const SATISFACTION_OPTIONS = [
 ];
 
 const SATISFACTION_STYLES = {
-  very_satisfied: "bg-green-50 text-green-700 border-green-200",
+  very_satisfied: "bg-green-50 text-green-700 dark:text-green-300 border-green-200 dark:border-green-500/25",
   satisfied: "bg-emerald-50 text-emerald-700 border-emerald-200",
   neutral: "bg-yellow-50 text-yellow-700 border-yellow-200",
   dissatisfied: "bg-orange-50 text-orange-700 border-orange-200",
-  very_dissatisfied: "bg-red-50 text-red-700 border-red-200",
+  very_dissatisfied: "bg-red-50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-500/25",
 };
 
 const StarInput = ({ value, onChange }) => (
@@ -29,7 +29,7 @@ const StarInput = ({ value, onChange }) => (
         className="p-0.5 transition-transform hover:scale-110"
       >
         <Star
-          className={`w-6 h-6 ${star <= value ? "text-[#2563eb] fill-[#2563eb]" : "text-slate-300"}`}
+          className={`w-6 h-6 ${star <= value ? "text-[#5077b3] dark:text-[#93B3E0] fill-[#5077b3]" : "text-slate-300 dark:text-[#4E646B]"}`}
         />
       </button>
     ))}
@@ -113,9 +113,9 @@ export default function ReviewSection({ roomId }) {
   return (
     <section className="space-y-6">
       <div className="flex items-center gap-3">
-        <h2 className="text-2xl md:text-3xl font-playfair text-slate-900">Reviews</h2>
+        <h2 className="text-2xl md:text-3xl font-playfair text-slate-900 dark:text-[#E9F1F2]">Reviews</h2>
         {!loading && totalReviews > 0 && (
-          <span className="text-sm text-slate-500">({totalReviews})</span>
+          <span className="text-sm text-slate-500 dark:text-[#8299A0]">({totalReviews})</span>
         )}
       </div>
 
@@ -124,30 +124,30 @@ export default function ReviewSection({ roomId }) {
           {[1, 2, 3].map((i) => (
             <div key={i} className="luxury-card p-5 animate-pulse">
               <div className="flex items-center gap-3 mb-3">
-                <div className="h-10 w-10 rounded-full bg-black/[0.05]" />
+                <div className="h-10 w-10 rounded-full bg-black/[0.05] dark:bg-white/5" />
                 <div className="space-y-2">
-                  <div className="h-4 w-24 rounded bg-black/[0.05]" />
-                  <div className="h-3 w-16 rounded bg-black/[0.05]" />
+                  <div className="h-4 w-24 rounded bg-black/[0.05] dark:bg-white/5" />
+                  <div className="h-3 w-16 rounded bg-black/[0.05] dark:bg-white/5" />
                 </div>
               </div>
-              <div className="h-3 w-3/4 rounded bg-black/[0.05]" />
+              <div className="h-3 w-3/4 rounded bg-black/[0.05] dark:bg-white/5" />
             </div>
           ))}
         </div>
       ) : !reviews || reviews.length === 0 ? (
         <div className="luxury-card p-8 text-center">
-          <p className="text-slate-500">No reviews yet. Be the first to share your experience!</p>
+          <p className="text-slate-500 dark:text-[#8299A0]">No reviews yet. Be the first to share your experience!</p>
         </div>
       ) : (
         <div className="space-y-4">
           {satisfactionBreakdown && totalReviews > 0 && (
             <div className="luxury-card-soft p-4 flex flex-wrap gap-4 text-xs">
-              <span className="text-slate-600">
-                Average: <span className="text-[#2563eb] font-semibold">{averageRating.toFixed(1)}</span> / 5
+              <span className="text-slate-600 dark:text-[#9FB2B8]">
+                Average: <span className="text-[#5077b3] dark:text-[#93B3E0] font-semibold">{averageRating.toFixed(1)}</span> / 5
               </span>
               {SATISFACTION_OPTIONS.map((opt) => (
-                <span key={opt.value} className="text-slate-400">
-                  {opt.label}: <span className="text-slate-600">{satisfactionBreakdown[opt.value] || 0}</span>
+                <span key={opt.value} className="text-slate-400 dark:text-[#6B828A]">
+                  {opt.label}: <span className="text-slate-600 dark:text-[#9FB2B8]">{satisfactionBreakdown[opt.value] || 0}</span>
                 </span>
               ))}
             </div>
@@ -159,31 +159,31 @@ export default function ReviewSection({ roomId }) {
                   <img
                     src={review.user?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.guestName)}&background=fbf2e1&color=b8862f&size=40`}
                     alt={review.guestName}
-                    className="h-10 w-10 rounded-full object-cover border border-black/[0.06]"
+                    className="h-10 w-10 rounded-full object-cover border border-black/[0.06] dark:border-[#1D3842]"
                     onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(review.guestName)}&background=fbf2e1&color=b8862f&size=40`; }}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-medium text-slate-900">{review.guestName}</span>
-                      <span className="text-[10px] text-slate-400">{formatDate(review.createdAt)}</span>
+                      <span className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">{review.guestName}</span>
+                      <span className="text-[10px] text-slate-400 dark:text-[#6B828A]">{formatDate(review.createdAt)}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex items-center gap-0.5">
                         {[1, 2, 3, 4, 5].map((s) => (
                           <Star
                             key={s}
-                            className={`w-3 h-3 ${s <= review.rating ? "text-[#2563eb] fill-[#2563eb]" : "text-slate-300"}`}
+                            className={`w-3 h-3 ${s <= review.rating ? "text-[#5077b3] dark:text-[#93B3E0] fill-[#5077b3]" : "text-slate-300 dark:text-[#4E646B]"}`}
                           />
                         ))}
                       </div>
                       {review.satisfaction && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full border ${SATISFACTION_STYLES[review.satisfaction] || "bg-black/[0.03] text-slate-500"}`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full border ${SATISFACTION_STYLES[review.satisfaction] || "bg-black/[0.03] dark:bg-white/5 text-slate-500 dark:text-[#8299A0]"}`}>
                           {SATISFACTION_OPTIONS.find((o) => o.value === review.satisfaction)?.label || review.satisfaction}
                         </span>
                       )}
                     </div>
                     {review.comment && (
-                      <p className="text-sm text-slate-600 mt-2 leading-relaxed">{review.comment}</p>
+                      <p className="text-sm text-slate-600 dark:text-[#9FB2B8] mt-2 leading-relaxed">{review.comment}</p>
                     )}
                   </div>
                 </div>
@@ -195,28 +195,28 @@ export default function ReviewSection({ roomId }) {
 
       {user && (
         <div className="luxury-card p-6">
-          <h3 className="text-lg font-playfair text-slate-900 mb-4">Write a Review</h3>
+          <h3 className="text-lg font-playfair text-slate-900 dark:text-[#E9F1F2] mb-4">Write a Review</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-600 mb-2">Rating</label>
+              <label className="block text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-2">Rating</label>
               <StarInput value={form.rating} onChange={(val) => setForm((p) => ({ ...p, rating: val }))} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-600 mb-2">Satisfaction</label>
+              <label className="block text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-2">Satisfaction</label>
               <select
                 value={form.satisfaction}
                 onChange={(e) => setForm((p) => ({ ...p, satisfaction: e.target.value }))}
                 className="luxury-select text-sm w-full"
               >
-                <option value="" className="bg-white">Select satisfaction level</option>
+                <option value="" className="bg-white dark:bg-[#122A32]">Select satisfaction level</option>
                 {SATISFACTION_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value} className="bg-white">{opt.label}</option>
+                  <option key={opt.value} value={opt.value} className="bg-white dark:bg-[#122A32]">{opt.label}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-600 mb-2">
-                Comment <span className="text-slate-400 font-normal">({500 - form.comment.length} characters left)</span>
+              <label className="block text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-2">
+                Comment <span className="text-slate-400 dark:text-[#6B828A] font-normal">({500 - form.comment.length} characters left)</span>
               </label>
               <textarea
                 value={form.comment}

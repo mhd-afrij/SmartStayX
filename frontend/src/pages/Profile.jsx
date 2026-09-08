@@ -81,31 +81,31 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white pt-32 flex items-start justify-center">
-        <Loader2 className="w-6 h-6 text-[#2563EB] animate-spin mt-20" />
+      <div className="min-h-screen bg-[#F3ECDE] dark:bg-[#122A32] pt-32 flex items-start justify-center">
+        <Loader2 className="w-6 h-6 text-[#5077B3] dark:text-[#93B3E0] animate-spin mt-20" />
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white pt-24 pb-16">
+    <div className="relative min-h-screen overflow-hidden bg-[#F3ECDE] dark:bg-[#122A32] pt-24 pb-16">
       <div className="absolute inset-0 mesh-glow opacity-60" />
       <div className="relative mx-auto max-w-2xl px-4 md:px-8">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 h-20 w-20 rounded-full bg-gradient-to-br from-[#2563EB]/15 to-[#2563EB]/5 border border-[#2563EB]/20 flex items-center justify-center">
-            <User className="w-8 h-8 text-[#2563EB]" />
+          <div className="mx-auto mb-4 h-20 w-20 rounded-full bg-gradient-to-br from-[#5077B3]/15 to-[#5077B3]/5 border border-[#5077B3]/20 flex items-center justify-center">
+            <User className="w-8 h-8 text-[#5077B3] dark:text-[#93B3E0]" />
           </div>
-          <h1 className="text-2xl font-playfair text-slate-900">My Profile</h1>
-          <p className="text-sm text-slate-400 mt-1">Manage your personal information and preferences</p>
+          <h1 className="text-2xl font-playfair text-slate-900 dark:text-[#E9F1F2]">My Profile</h1>
+          <p className="text-sm text-slate-400 dark:text-[#6B828A] mt-1">Manage your personal information and preferences</p>
         </div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="luxury-card overflow-hidden p-6 md:p-8 space-y-6">
           <form onSubmit={handleSave} className="space-y-5">
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-slate-500 uppercase tracking-[0.12em] mb-1.5">Name</label>
+                <label className="block text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-[0.12em] mb-1.5">Name</label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#6B828A]" />
                   <input
                     type="text"
                     value={profile.name}
@@ -115,9 +115,9 @@ const Profile = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 uppercase tracking-[0.12em] mb-1.5">Email</label>
+                <label className="block text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-[0.12em] mb-1.5">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#6B828A]" />
                   <input
                     type="email"
                     value={profile.email}
@@ -127,9 +127,9 @@ const Profile = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 uppercase tracking-[0.12em] mb-1.5">Phone</label>
+                <label className="block text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-[0.12em] mb-1.5">Phone</label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#6B828A]" />
                   <input
                     type="tel"
                     value={profile.phone}
@@ -140,9 +140,9 @@ const Profile = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 uppercase tracking-[0.12em] mb-1.5">Date of Birth</label>
+                <label className="block text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-[0.12em] mb-1.5">Date of Birth</label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#6B828A]" />
                   <input
                     type="date"
                     value={profile.dateOfBirth}
@@ -152,9 +152,9 @@ const Profile = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 uppercase tracking-[0.12em] mb-1.5">Country</label>
+                <label className="block text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-[0.12em] mb-1.5">Country</label>
                 <div className="relative">
-                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#6B828A]" />
                   <input
                     type="text"
                     value={profile.country}
@@ -165,9 +165,9 @@ const Profile = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 uppercase tracking-[0.12em] mb-1.5">Preferred Currency</label>
+                <label className="block text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-[0.12em] mb-1.5">Preferred Currency</label>
                 <div className="relative">
-                  <Coins className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Coins className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#6B828A]" />
                   <select
                     value={profile.preferredCurrency}
                     onChange={(e) => setProfile({ ...profile, preferredCurrency: e.target.value })}
@@ -181,15 +181,15 @@ const Profile = () => {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-black/[0.06]">
-              <div className="mb-4 rounded-2xl border border-black/[0.06] bg-[#f4f2ef] p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="pt-4 border-t border-black/[0.06] dark:border-[#1D3842]">
+              <div className="mb-4 rounded-2xl border border-black/[0.06] dark:border-[#1D3842] bg-[#f4f2ef] dark:bg-[#16303A] p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-900">Password security</p>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">Password security</p>
+                  <p className="text-xs text-slate-400 dark:text-[#6B828A] mt-1">
                     Update your password from your secure account settings.
                   </p>
                 </div>
-                <div className="inline-flex items-center gap-2 rounded-xl border border-black/[0.08] px-4 py-2 text-xs uppercase tracking-[0.16em] text-slate-600">
+                <div className="inline-flex items-center gap-2 rounded-xl border border-black/[0.08] dark:border-[#1D3842] px-4 py-2 text-xs uppercase tracking-[0.16em] text-slate-600 dark:text-[#9FB2B8]">
                   <ShieldCheck className="w-4 h-4" />
                   Change Password via your account settings
                 </div>

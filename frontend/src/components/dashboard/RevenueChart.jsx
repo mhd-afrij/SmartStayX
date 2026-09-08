@@ -22,16 +22,16 @@ const filters = [
 const CustomTooltip = ({ active, payload, label, currency }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-xl border border-black/[0.06] bg-white px-4 py-3 shadow-2xl">
-      <p className="text-xs text-slate-400 mb-2">{label}</p>
+    <div className="rounded-xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] px-4 py-3 shadow-2xl">
+      <p className="text-xs text-slate-400 dark:text-[#6B828A] mb-2">{label}</p>
       {payload.map((entry, i) => (
         <div key={i} className="flex items-center gap-2 text-sm">
           <div
             className="w-2 h-2 rounded-full"
             style={{ backgroundColor: entry.color }}
           />
-          <span className="text-slate-500">{entry.name}:</span>
-          <span className="text-slate-900 font-medium font-space">
+          <span className="text-slate-500 dark:text-[#8299A0]">{entry.name}:</span>
+          <span className="text-slate-900 dark:text-[#E9F1F2] font-medium font-space">
             {entry.name === "Revenue" ? `${currency}${entry.value.toLocaleString()}` : entry.value}
           </span>
         </div>
@@ -61,18 +61,18 @@ const RevenueChart = ({ revenueData, currency = '$', formatPrice }) => {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="relative rounded-2xl border border-black/[0.06] bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)] overflow-hidden"
+        className="relative rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] overflow-hidden"
       >
         <div className="relative z-10 p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center">
               <DollarSign className="w-4 h-4 text-indigo-600" />
             </div>
-            <h3 className="text-sm font-medium text-slate-900">Revenue Overview</h3>
+            <h3 className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">Revenue Overview</h3>
           </div>
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <DollarSign className="w-10 h-10 text-slate-300 mb-3" />
-            <p className="text-sm text-slate-400">No revenue data yet</p>
+            <DollarSign className="w-10 h-10 text-slate-300 dark:text-[#4E646B] mb-3" />
+            <p className="text-sm text-slate-400 dark:text-[#6B828A]">No revenue data yet</p>
           </div>
         </div>
       </motion.div>
@@ -84,7 +84,7 @@ const RevenueChart = ({ revenueData, currency = '$', formatPrice }) => {
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
-      className="relative rounded-2xl border border-black/[0.06] bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)] overflow-hidden"
+      className="relative rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] overflow-hidden"
     >
       <div className="absolute top-0 left-1/4 right-0 h-px bg-gradient-to-r from-transparent via-indigo-300/40 to-transparent" />
 
@@ -96,15 +96,15 @@ const RevenueChart = ({ revenueData, currency = '$', formatPrice }) => {
                 <DollarSign className="w-4 h-4 text-indigo-600" />
               </div>
               <div>
-                <h3 className="text-sm font-medium text-slate-900">Revenue Overview</h3>
-                <p className="text-2xl font-bold text-slate-900 font-space tracking-tight">
+                <h3 className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">Revenue Overview</h3>
+                <p className="text-2xl font-bold text-slate-900 dark:text-[#E9F1F2] font-space tracking-tight">
                   {formatPrice ? formatPrice(totalRevenue) : `${currency}${totalRevenue.toLocaleString()}`}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="flex gap-1 p-1 rounded-lg border border-black/[0.06] bg-[#f4f2ef]">
+          <div className="flex gap-1 p-1 rounded-lg border border-black/[0.06] dark:border-[#232737] bg-[#f4f2ef] dark:bg-[#10131D]">
             {filters.map((f) => (
               <button
                 key={f.key}
@@ -112,7 +112,7 @@ const RevenueChart = ({ revenueData, currency = '$', formatPrice }) => {
                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 ${
                   activeFilter === f.key
                     ? "bg-indigo-600 text-white shadow-sm"
-                    : "text-slate-500 hover:text-slate-800 hover:bg-white"
+                    : "text-slate-500 dark:text-[#8299A0] hover:text-slate-800 dark:hover:text-[#D3DFE2] hover:bg-white dark:hover:bg-[#122A32]"
                 }`}
               >
                 {f.label}
@@ -147,13 +147,13 @@ const RevenueChart = ({ revenueData, currency = '$', formatPrice }) => {
                 dataKey="date"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#94a3b8", fontSize: 11 }}
+                tick={{ fill: "#879497", fontSize: 11 }}
                 dy={10}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#94a3b8", fontSize: 11 }}
+                tick={{ fill: "#879497", fontSize: 11 }}
                 dx={-10}
                 tickFormatter={(v) => `${currency}${(v / 1000).toFixed(0)}k`}
               />

@@ -82,17 +82,17 @@ const getCallouts = (pricing) => {
 };
 
 const Skeleton = () => (
-  <div className="pt-24 min-h-screen bg-white">
+  <div className="pt-24 min-h-screen bg-[#F3ECDE] dark:bg-[#122A32]">
     <div className="mx-auto max-w-[1200px] px-4 md:px-8 lg:px-10 py-8 animate-pulse">
-      <div className="h-4 w-48 rounded bg-[#f4f2ef] mb-8" />
+      <div className="h-4 w-48 rounded bg-[#f4f2ef] dark:bg-[#16303A] mb-8" />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-6">
-          <div className="h-8 w-64 rounded bg-[#f4f2ef]" />
-          <div className="aspect-[16/9] rounded-[2rem] bg-[#f4f2ef]" />
-          <div className="h-24 w-full rounded-2xl bg-[#f4f2ef]" />
+          <div className="h-8 w-64 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
+          <div className="aspect-[16/9] rounded-[2rem] bg-[#f4f2ef] dark:bg-[#16303A]" />
+          <div className="h-24 w-full rounded-2xl bg-[#f4f2ef] dark:bg-[#16303A]" />
         </div>
         <div className="lg:col-span-4">
-          <div className="h-96 rounded-[2rem] bg-[#f4f2ef]" />
+          <div className="h-96 rounded-[2rem] bg-[#f4f2ef] dark:bg-[#16303A]" />
         </div>
       </div>
     </div>
@@ -283,9 +283,9 @@ const RoomDetails = () => {
 
   if (!room) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
+      <div className="flex min-h-screen items-center justify-center bg-[#F3ECDE] dark:bg-[#122A32]">
         <div className="text-center">
-          <p className="font-playfair text-2xl text-slate-900 mb-2">Room not found</p>
+          <p className="font-playfair text-2xl text-slate-900 dark:text-[#E9F1F2] mb-2">Room not found</p>
           <Link to="/rooms" className="gold-button inline-flex px-6 py-3 text-sm">Browse rooms</Link>
         </div>
       </div>
@@ -301,16 +301,16 @@ const RoomDetails = () => {
   })();
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white pt-24 pb-16">
+    <div className="relative min-h-screen overflow-hidden bg-[#F3ECDE] dark:bg-[#122A32] pt-24 pb-16">
       <div className="absolute inset-0 mesh-glow opacity-40" />
 
       <div className="relative mx-auto max-w-[1200px] px-4 md:px-8 lg:px-10">
-        <div className="mb-6 flex flex-wrap items-center gap-2 text-xs text-slate-400">
-          <Link to="/" className="hover:text-[#2563EB] transition-colors">Home</Link>
+        <div className="mb-6 flex flex-wrap items-center gap-2 text-xs text-slate-400 dark:text-[#6B828A]">
+          <Link to="/" className="hover:text-[#5077B3] dark:hover:text-[#93B3E0] transition-colors">Home</Link>
           <span>/</span>
-          <Link to="/rooms" className="hover:text-[#2563EB] transition-colors">Rooms</Link>
+          <Link to="/rooms" className="hover:text-[#5077B3] dark:hover:text-[#93B3E0] transition-colors">Rooms</Link>
           <span>/</span>
-          <span className="text-slate-600">{room.hotel?.name}</span>
+          <span className="text-slate-600 dark:text-[#9FB2B8]">{room.hotel?.name}</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -318,29 +318,29 @@ const RoomDetails = () => {
             <div className="space-y-3">
               <p className="luxury-kicker">Room</p>
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-3xl md:text-4xl font-playfair text-slate-900">
+                <h1 className="text-3xl md:text-4xl font-playfair text-slate-900 dark:text-[#E9F1F2]">
                   {room.hotel?.name}
                 </h1>
-                <span className="text-xs uppercase tracking-widest font-semibold text-[#2563EB] border border-[#2563EB]/30 px-3 py-1 rounded-full">
+                <span className="text-xs uppercase tracking-widest font-semibold text-[#5077B3] dark:text-[#93B3E0] border border-[#5077B3]/30 px-3 py-1 rounded-full">
                   {room.roomType}
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-slate-600">
-                <Star className="w-4 h-4 text-[#2563EB] fill-[#2563EB]" />
+              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-[#9FB2B8]">
+                <Star className="w-4 h-4 text-[#5077B3] dark:text-[#93B3E0] fill-[#5077B3]" />
                 <span>200+ reviews</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-slate-600">
-                <MapPin className="w-4 h-4 text-slate-600" />
+              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-[#9FB2B8]">
+                <MapPin className="w-4 h-4 text-slate-600 dark:text-[#9FB2B8]" />
                 <span>{room.hotel?.address}</span>
               </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-              <div className="lg:col-span-2 rounded-[2rem] overflow-hidden bg-[#f4f2ef] aspect-[16/9] max-h-[360px] border border-black/[0.06]">
+              <div className="lg:col-span-2 rounded-[2rem] overflow-hidden bg-[#f4f2ef] dark:bg-[#16303A] aspect-[16/9] max-h-[360px] border border-black/[0.06] dark:border-[#1D3842]">
                 {mainImage ? (
                   <img src={mainImage} alt="Room" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs uppercase tracking-[0.2em] text-slate-400">No image</div>
+                  <div className="w-full h-full flex items-center justify-center text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-[#6B828A]">No image</div>
                 )}
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
@@ -350,7 +350,7 @@ const RoomDetails = () => {
                     onClick={() => setMainImage(image)}
                     key={`${image}-${index}`}
                     className={`overflow-hidden rounded-2xl border transition aspect-[16/9] ${
-                      mainImage === image ? "border-[#2563EB]" : "border-black/[0.06]"
+                      mainImage === image ? "border-[#5077B3]" : "border-black/[0.06] dark:border-[#1D3842]"
                     }`}
                   >
                     <img src={image} alt="Room Image" className="w-full h-full object-cover" />
@@ -360,15 +360,15 @@ const RoomDetails = () => {
             </div>
 
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-playfair text-slate-900">Experience understated luxury</h2>
+              <h2 className="text-2xl md:text-3xl font-playfair text-slate-900 dark:text-[#E9F1F2]">Experience understated luxury</h2>
               <div className="flex flex-wrap gap-2">
                 {room.amenities?.map((item, index) => (
-                  <div key={index} className="flex items-center gap-2 px-3 py-2 rounded-full bg-[#f4f2ef] border border-black/[0.06]">
+                  <div key={index} className="flex items-center gap-2 px-3 py-2 rounded-full bg-[#f4f2ef] dark:bg-[#16303A] border border-black/[0.06] dark:border-[#1D3842]">
                     {(() => {
                       const AmenityIcon = getAmenityIcon(item);
-                      return <AmenityIcon className="w-4 h-4 text-slate-500" />;
+                      return <AmenityIcon className="w-4 h-4 text-slate-500 dark:text-[#8299A0]" />;
                     })()}
-                    <p className="text-xs text-slate-600">{item}</p>
+                    <p className="text-xs text-slate-600 dark:text-[#9FB2B8]">{item}</p>
                   </div>
                 ))}
               </div>
@@ -377,21 +377,21 @@ const RoomDetails = () => {
             <section className="space-y-4">
               {roomCommonData.map((spec, index) => (
                 <div key={index} className="flex items-start gap-3">
-                  <div className="h-10 w-10 rounded-2xl bg-[#f4f2ef] border border-black/[0.06] flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-2xl bg-[#f4f2ef] dark:bg-[#16303A] border border-black/[0.06] dark:border-[#1D3842] flex items-center justify-center">
                     {(() => {
                       const FactIcon = getRoomFactIcon(spec.title);
-                      return <FactIcon className="w-5 h-5 text-slate-500" />;
+                      return <FactIcon className="w-5 h-5 text-slate-500 dark:text-[#8299A0]" />;
                     })()}
                   </div>
                   <div>
-                    <p className="text-base text-slate-900 font-medium">{spec.title}</p>
-                    <p className="text-sm text-slate-500">{spec.description}</p>
+                    <p className="text-base text-slate-900 dark:text-[#E9F1F2] font-medium">{spec.title}</p>
+                    <p className="text-sm text-slate-500 dark:text-[#8299A0]">{spec.description}</p>
                   </div>
                 </div>
               ))}
             </section>
 
-            <div className="border-y border-black/[0.06] py-8 text-slate-600">
+            <div className="border-y border-black/[0.06] dark:border-[#1D3842] py-8 text-slate-600 dark:text-[#9FB2B8]">
               <p>Guests will be allocated on the ground floor according to availability. You get a comfortable two bedroom apartment with a true city feeling. The price quoted is for two guests; please mark the number of guests to get the exact price for groups.</p>
             </div>
 
@@ -400,17 +400,17 @@ const RoomDetails = () => {
                 <img
                   src={room.hotel?.owner?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(room.hotel?.name || "H")}&background=f4f2ef&color=B8862F&size=56`}
                   alt="Host"
-                  className="h-14 w-14 rounded-full object-cover border border-black/[0.06]"
+                  className="h-14 w-14 rounded-full object-cover border border-black/[0.06] dark:border-[#1D3842]"
                   onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(room.hotel?.name || "H")}&background=f4f2ef&color=B8862F&size=56`; }}
                 />
                 <div>
-                  <p className="text-lg text-slate-900">Hosted by {room.hotel?.name}</p>
-                  <div className="flex items-center gap-2 mt-1 text-sm text-slate-600">
-                    <Star className="w-4 h-4 text-[#2563EB] fill-[#2563EB]" />
+                  <p className="text-lg text-slate-900 dark:text-[#E9F1F2]">Hosted by {room.hotel?.name}</p>
+                  <div className="flex items-center gap-2 mt-1 text-sm text-slate-600 dark:text-[#9FB2B8]">
+                    <Star className="w-4 h-4 text-[#5077B3] dark:text-[#93B3E0] fill-[#5077B3]" />
                     <span>200+ reviews</span>
                   </div>
                   {room.hotel?.address && (
-                    <p className="text-xs text-slate-400 mt-1">{room.hotel.address}</p>
+                    <p className="text-xs text-slate-400 dark:text-[#6B828A] mt-1">{room.hotel.address}</p>
                   )}
                 </div>
               </div>
@@ -423,18 +423,18 @@ const RoomDetails = () => {
               </button>
 
               {showContact && (
-                <div className="mt-4 pt-4 border-t border-black/[0.06] space-y-2 text-sm">
+                <div className="mt-4 pt-4 border-t border-black/[0.06] dark:border-[#1D3842] space-y-2 text-sm">
                   {room.hotel?.contact ? (
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <Phone className="w-4 h-4 text-[#2563EB] shrink-0" />
-                      <a href={`tel:${room.hotel.contact}`} className="hover:text-[#2563EB] transition-colors">{room.hotel.contact}</a>
+                    <div className="flex items-center gap-2 text-slate-600 dark:text-[#9FB2B8]">
+                      <Phone className="w-4 h-4 text-[#5077B3] dark:text-[#93B3E0] shrink-0" />
+                      <a href={`tel:${room.hotel.contact}`} className="hover:text-[#5077B3] dark:hover:text-[#93B3E0] transition-colors">{room.hotel.contact}</a>
                     </div>
                   ) : (
-                    <p className="text-slate-400">No contact information available.</p>
+                    <p className="text-slate-400 dark:text-[#6B828A]">No contact information available.</p>
                   )}
                   {room.hotel?.address && (
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <MapPin className="w-4 h-4 text-[#2563EB] shrink-0" />
+                    <div className="flex items-center gap-2 text-slate-600 dark:text-[#9FB2B8]">
+                      <MapPin className="w-4 h-4 text-[#5077B3] dark:text-[#93B3E0] shrink-0" />
                       <span>{room.hotel?.address}</span>
                     </div>
                   )}
@@ -458,24 +458,24 @@ const RoomDetails = () => {
               <div className="flex items-end justify-between gap-4">
                 <div>
                   <p className="luxury-kicker">{pricePreview ? "Dynamic price" : "Base price"}</p>
-                  <p className="text-3xl font-semibold text-slate-900">
+                  <p className="text-3xl font-semibold text-slate-900 dark:text-[#E9F1F2]">
                     {pricePreview ? formatPrice(pricePreview.dynamicPricePerNight) : formatPrice(room.pricePerNight)}
                   </p>
                 </div>
-                <span className="text-sm text-slate-500">per night</span>
+                <span className="text-sm text-slate-500 dark:text-[#8299A0]">per night</span>
               </div>
 
               {pricePreview && (
-                <div className="mt-4 space-y-2 text-xs text-slate-600 bg-[#f4f2ef] rounded-2xl p-4 border border-black/[0.06]">
+                <div className="mt-4 space-y-2 text-xs text-slate-600 dark:text-[#9FB2B8] bg-[#f4f2ef] dark:bg-[#16303A] rounded-2xl p-4 border border-black/[0.06] dark:border-[#1D3842]">
                   <div className="flex justify-between">
                     <span>Base rate</span>
-                    <span className="text-slate-900">{formatPrice(pricePreview.basePricePerNight)} / night</span>
+                    <span className="text-slate-900 dark:text-[#E9F1F2]">{formatPrice(pricePreview.basePricePerNight)} / night</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Multiplier</span>
-                    <span className="text-slate-900">{pricePreview.priceMultiplier.toFixed(2)}x</span>
+                    <span className="text-slate-900 dark:text-[#E9F1F2]">{pricePreview.priceMultiplier.toFixed(2)}x</span>
                   </div>
-                  <div className="flex justify-between font-medium text-[#2563EB] border-t border-black/[0.06] pt-2 mt-2">
+                  <div className="flex justify-between font-medium text-[#5077B3] dark:text-[#93B3E0] border-t border-black/[0.06] dark:border-[#1D3842] pt-2 mt-2">
                     <span>{pricePreview.nights} {pricePreview.nights > 1 ? "nights" : "night"} total</span>
                     <span>{formatPrice(pricePreview.totalPrice)}</span>
                   </div>
@@ -483,25 +483,25 @@ const RoomDetails = () => {
               )}
 
               {priceLoading && (
-                <div className="mt-2 text-xs text-slate-400 animate-pulse text-center">Calculating price...</div>
+                <div className="mt-2 text-xs text-slate-400 dark:text-[#6B828A] animate-pulse text-center">Calculating price...</div>
               )}
 
               {pricePreview && pricePreview.offerDiscountPercent > 0 && (
-                <div className="mt-3 rounded-2xl bg-green-50 border border-green-200 p-4">
-                  <div className="flex items-center gap-2 text-green-700 text-xs font-medium mb-2">
+                <div className="mt-3 rounded-2xl bg-green-50 border border-green-200 dark:border-green-500/25 p-4">
+                  <div className="flex items-center gap-2 text-green-700 dark:text-green-300 text-xs font-medium mb-2">
                     <Tag className="w-3.5 h-3.5" />
                     Offer Applied
                   </div>
-                  <div className="space-y-1 text-xs text-slate-600">
+                  <div className="space-y-1 text-xs text-slate-600 dark:text-[#9FB2B8]">
                     <div className="flex justify-between">
                       <span>Original price</span>
-                      <span className="text-slate-500 line-through">{formatPrice(pricePreview.originalPricePerNight)} / night</span>
+                      <span className="text-slate-500 dark:text-[#8299A0] line-through">{formatPrice(pricePreview.originalPricePerNight)} / night</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Discount</span>
-                      <span className="text-green-700">-{pricePreview.offerDiscountPercent}%</span>
+                      <span className="text-green-700 dark:text-green-300">-{pricePreview.offerDiscountPercent}%</span>
                     </div>
-                    <div className="flex justify-between font-medium text-green-700 border-t border-green-200 pt-1 mt-1">
+                    <div className="flex justify-between font-medium text-green-700 dark:text-green-300 border-t border-green-200 dark:border-green-500/25 pt-1 mt-1">
                       <span>Discounted price</span>
                       <span>{formatPrice(pricePreview.dynamicPricePerNight)} / night</span>
                     </div>
@@ -514,10 +514,10 @@ const RoomDetails = () => {
                   {getCallouts(pricePreview).map((c, i) => (
                     <div key={i} className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full ${
                       c.type === "saving"
-                        ? "bg-green-50 text-green-700 border border-green-200"
+                        ? "bg-green-50 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-500/25"
                         : c.type === "offer"
-                        ? "bg-green-50 text-green-700 border border-green-200"
-                        : "bg-amber-50 text-amber-700 border border-amber-200"
+                        ? "bg-green-50 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-500/25"
+                        : "bg-[#F4F2F9] dark:bg-[#1B2436] text-amber-700 dark:text-amber-300 border border-[#B9B4CE]/45 dark:border-[#3D4660]/45"
                     }`}>
                       <span>{c.text}</span>
                     </div>
@@ -527,7 +527,7 @@ const RoomDetails = () => {
 
               {roomOffers.length > 0 && !pricePreview?.offerDiscountPercent && (
                 <div className="mt-4 space-y-2">
-                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <p className="text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-wider flex items-center gap-1.5">
                     <Tag className="w-3 h-3" />
                     Available Offers
                   </p>
@@ -538,16 +538,16 @@ const RoomDetails = () => {
                       onClick={() => setSelectedOfferId(selectedOfferId === offer._id ? null : offer._id)}
                       className={`w-full text-left rounded-xl border p-3 transition-colors ${
                         selectedOfferId === offer._id
-                          ? "border-green-300 bg-green-50"
-                          : "border-black/[0.06] bg-[#f4f2ef] hover:bg-black/[0.04]"
+                          ? "border-green-300 dark:border-green-500/25 bg-green-50"
+                          : "border-black/[0.06] dark:border-[#1D3842] bg-[#f4f2ef] dark:bg-[#16303A] hover:bg-black/[0.04] dark:hover:bg-white/5"
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-slate-700 truncate">{offer.title}</p>
-                          <p className="text-xs text-slate-400 mt-0.5 truncate">{offer.description}</p>
+                          <p className="text-sm text-slate-700 dark:text-[#C1D2D6] truncate">{offer.title}</p>
+                          <p className="text-xs text-slate-400 dark:text-[#6B828A] mt-0.5 truncate">{offer.description}</p>
                         </div>
-                        <span className="text-sm font-bold text-green-700 shrink-0 ml-3">-{offer.discountPercent}%</span>
+                        <span className="text-sm font-bold text-green-700 dark:text-green-300 shrink-0 ml-3">-{offer.discountPercent}%</span>
                       </div>
                     </button>
                   ))}
@@ -560,17 +560,17 @@ const RoomDetails = () => {
               >
                 Book This Room
               </Link>
-              <p className="mt-2 text-center text-[11px] text-slate-400">Guided step-by-step booking with review &amp; secure payment</p>
+              <p className="mt-2 text-center text-[11px] text-slate-400 dark:text-[#6B828A]">Guided step-by-step booking with review &amp; secure payment</p>
 
               <div className="my-5 flex items-center gap-3">
-                <div className="h-px flex-1 bg-black/[0.06]" />
-                <span className="text-[10px] uppercase tracking-wider text-slate-400">or quick book</span>
-                <div className="h-px flex-1 bg-black/[0.06]" />
+                <div className="h-px flex-1 bg-black/[0.06] dark:bg-white/5" />
+                <span className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-[#6B828A]">or quick book</span>
+                <div className="h-px flex-1 bg-black/[0.06] dark:bg-white/5" />
               </div>
 
               <form className="space-y-4" onSubmit={handleAvailabilitySubmit}>
                 <div>
-                  <label htmlFor="checkInDate" className="text-sm font-medium text-slate-700">Check in</label>
+                  <label htmlFor="checkInDate" className="text-sm font-medium text-slate-700 dark:text-[#C1D2D6]">Check in</label>
                   <input
                     type="date"
                     id="checkInDate"
@@ -581,7 +581,7 @@ const RoomDetails = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="checkOutDate" className="text-sm font-medium text-slate-700">Check out</label>
+                  <label htmlFor="checkOutDate" className="text-sm font-medium text-slate-700 dark:text-[#C1D2D6]">Check out</label>
                   <input
                     type="date"
                     id="checkOutDate"
@@ -592,7 +592,7 @@ const RoomDetails = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="guests" className="text-sm font-medium text-slate-700">Guests</label>
+                  <label htmlFor="guests" className="text-sm font-medium text-slate-700 dark:text-[#C1D2D6]">Guests</label>
                   <input
                     type="number"
                     id="guests"
@@ -613,8 +613,8 @@ const RoomDetails = () => {
               </form>
             </div>
 
-            <div className="luxury-card-soft p-5 text-sm text-slate-600">
-              <p className="font-medium text-slate-900">What you will love</p>
+            <div className="luxury-card-soft p-5 text-sm text-slate-600 dark:text-[#9FB2B8]">
+              <p className="font-medium text-slate-900 dark:text-[#E9F1F2]">What you will love</p>
               <ul className="mt-3 space-y-2">
                 <li>Instant confirmation on select dates</li>
                 <li>Flexible check-in windows</li>

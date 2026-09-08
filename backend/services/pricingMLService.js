@@ -9,6 +9,7 @@ import bookingConfig from "../configs/bookingConfig.js";
 import logger from "../utils/logger.js";
 
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:5000';
+const ML_INTERNAL_TOKEN = process.env.ML_INTERNAL_TOKEN || '';
 
 class PricingMLService {
   async predictWithML({ room, checkInDate, userId } = {}) {
@@ -52,19 +53,26 @@ class PricingMLService {
         leadTimeDays,
         season,
         isWeekend: checkIn.getDay() === 5 || checkIn.getDay() === 6,
-        competitorPrice: roomData.pricePerNight * 1.1,
         amenitiesCount: roomData.amenities?.length || 0,
         roomType: (roomData.roomType || 'standard').toLowerCase(),
         isReturningGuest,
+        // Real hotel currency, echoed back by the ML service. No fabricated
+        // competitor data — there is no market-data provider yet, so the model
+        // is trained without a competitorPrice feature.
+        currency: roomData.hotel?.currency,
       };
 
-      const response = await axios.post(`${ML_SERVICE_URL}/predict`, features, { timeout: 3000 });
+      const response = await axios.post(`${ML_SERVICE_URL}/predict`, features, {
+        timeout: 3000,
+        ...(ML_INTERNAL_TOKEN ? { headers: { 'x-internal-token': ML_INTERNAL_TOKEN } } : {}),
+      });
       const predictedPrice = response.data?.predictedPrice;
 
       if (predictedPrice && predictedPrice > 0) {
         return {
           predictedPrice: Number(predictedPrice.toFixed(2)),
-          mlConfidence: response.data.confidence || 0,
+          // The ML service reports tree agreement (0-1), not a probability.
+          mlAgreement: response.data.modelAgreement || 0,
           features,
         };
       }
@@ -193,7 +201,7 @@ class PricingMLService {
       // Merge ML prediction if available
       const ml = mlResults[rm.roomId];
       const mlPredictedPrice = ml?.predictedPrice || null;
-      const mlConfidence = ml?.mlConfidence || null;
+      const mlAgreement = ml?.mlAgreement || null;
 
       return {
         roomId: rm.roomId,
@@ -201,7 +209,7 @@ class PricingMLService {
         currentPrice: rm.currentPrice,
         suggestedPrice,
         mlPredictedPrice,
-        mlConfidence: mlConfidence ? Number(mlConfidence.toFixed(2)) : null,
+        mlAgreement: mlAgreement ? Number(mlAgreement.toFixed(2)) : null,
         changePercent: rm.currentPrice > 0 ? Math.round(((suggestedPrice - rm.currentPrice) / rm.currentPrice) * 100) : 0,
         mlChangePercent: (mlPredictedPrice && rm.currentPrice > 0)
           ? Math.round(((mlPredictedPrice - rm.currentPrice) / rm.currentPrice) * 100)

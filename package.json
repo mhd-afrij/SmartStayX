@@ -1,1 +1,10 @@
-{}
+{
+  "name": "smartstayx",
+  "private": true,
+  "scripts": {
+    "server": "npm run server --prefix backend",
+    "server:api": "npm run server:api --prefix backend",
+    "server:ai": "npm run server:ai --prefix backend",
+    "server:ml": "npm run server:ml --prefix backend"
+  }
+}

@@ -27,13 +27,15 @@ class PaymentGatewayService {
     const stripe = getStripe();
     if (!stripe) throw Object.assign(new Error("Stripe is not configured"), { status: 500 });
 
+    // Charge in the hotel's own currency (falls back to the platform default).
+    const currency = (booking.hotel?.currency || process.env.DEFAULT_CURRENCY || "USD").toLowerCase();
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
       line_items: [{
         quantity: 1,
         price_data: {
-          currency: "usd",
+          currency,
           unit_amount: Math.round(Number(booking.totalPrice || 0) * 100),
           product_data: {
             name: `Booking - ${booking.hotel?.name || "Hotel"}`,

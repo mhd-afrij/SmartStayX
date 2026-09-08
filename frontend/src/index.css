@@ -2,24 +2,29 @@
 
 @import "tailwindcss";
 
+/* Class-based dark mode: enables `dark:` utilities when <html class="dark"> */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --color-navy: #0f172a;
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
+  --color-navy: #003844;
+  --color-primary: #5077b3;
+  --color-primary-hover: #4168a0;
+  --color-accent: #b9b4ce;
+  --color-accent-soft: #efedf7;
   --color-gold: #d4a853;
   --color-gold-soft: #fbf2e1;
-  --color-teal: #0f766e;
+  --color-teal: #2f6b70;
   --color-success: #16a34a;
   --color-warning: #d97706;
   --color-danger: #dc2626;
   --color-info: #0284c7;
-  --color-bg: #f8fafc;
+  --color-bg: #fffaf4;
   --color-surface: #ffffff;
-  --color-bg-alt: #f1f5f9;
-  --color-text: #0f172a;
-  --color-text-secondary: #64748b;
-  --color-text-muted: #94a3b8;
-  --color-border: #e2e8f0;
+  --color-bg-alt: #f3ecde;
+  --color-text: #003844;
+  --color-text-secondary: #4d6166;
+  --color-text-muted: #879497;
+  --color-border: #e8e0d1;
 
   /* legacy aliases kept for existing luxury-card, gold-button, ghost-button classes */
   --color-primary-soft: var(--color-gold-soft);
@@ -42,9 +47,9 @@
   --radius-dialog: 20px;
 
   /* shadow scale */
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.12);
+  --shadow-sm: 0 1px 2px rgba(0, 56, 68, 0.06);
+  --shadow-md: 0 8px 24px rgba(0, 56, 68, 0.08);
+  --shadow-lg: 0 20px 50px rgba(0, 56, 68, 0.12);
 }
 
 * {
@@ -68,6 +73,7 @@ body {
   background: var(--color-bg);
   overflow-x: hidden;
   min-height: 100vh;
+  transition: background-color 300ms ease, color 300ms ease;
 }
 
 #root {
@@ -105,7 +111,7 @@ body {
   height: 20rem;
   left: -8rem;
   top: 6rem;
-  background: rgba(37, 99, 235, 0.06);
+  background: rgba(80, 119, 179, 0.07);
 }
 
 .luxury-shell::after {
@@ -113,7 +119,7 @@ body {
   height: 18rem;
   right: -6rem;
   bottom: 6rem;
-  background: rgba(15, 23, 42, 0.03);
+  background: rgba(185, 180, 206, 0.18);
 }
 
 .luxury-section {
@@ -193,7 +199,7 @@ body {
 .luxury-input:focus,
 .luxury-select:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 3px rgba(80, 119, 179, 0.15);
   background: var(--color-surface);
 }
 
@@ -245,7 +251,7 @@ body {
   background: #fff;
 }
 
-/* Primary button — solid blue, per design-system spec */
+/* Primary button — solid steel blue (#5077b3), per design-system spec */
 .gold-button {
   display: inline-flex;
   align-items: center;
@@ -258,7 +264,7 @@ body {
   font-family: 'Inter', sans-serif;
   font-weight: 600;
   letter-spacing: 0.01em;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 56, 68, 0.05);
   transition: background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
@@ -327,9 +333,9 @@ body {
 
 .mesh-glow {
   background:
-    radial-gradient(circle at top left, rgba(37, 99, 235, 0.06), transparent 30%),
-    radial-gradient(circle at top right, rgba(15, 23, 42, 0.03), transparent 24%),
-    radial-gradient(circle at bottom center, rgba(15, 23, 42, 0.02), transparent 28%);
+    radial-gradient(circle at top left, rgba(80, 119, 179, 0.07), transparent 30%),
+    radial-gradient(circle at top right, rgba(185, 180, 206, 0.22), transparent 32%),
+    radial-gradient(circle at bottom center, rgba(0, 56, 68, 0.03), transparent 28%);
 }
 
 .slow-zoom {
@@ -347,7 +353,7 @@ body {
 
 .luxury-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(15, 23, 42, 0.12), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0, 56, 68, 0.12), transparent);
 }
 
 .nav-link {
@@ -399,5 +405,182 @@ body {
 @keyframes floatY {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-12px); }
+}
+
+/* ============================================================
+   Dark mode — huemint palette variant (deep teal + steel blue)
+   ============================================================ */
+.dark {
+  color-scheme: dark;
+
+  /* ink & surfaces */
+  --color-bg: #0b1d24;
+  --color-surface: #122a32;
+  --color-bg-alt: #16303a;
+  --color-border: #1d3842;
+  --color-text: #e9f1f2;
+  --color-text-secondary: #9fb2b8;
+  --color-text-muted: #6b828a;
+
+  /* brand accents — keep the steel blue as-is so white text on primary
+     CTAs keeps ~4.4:1 contrast; brighten only foreground accents below */
+  --color-primary: #5077b3;
+  --color-primary-hover: #4168a0;
+
+  /* shadows go deeper in the dark */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+.dark .mesh-glow {
+  background:
+    radial-gradient(circle at top left, rgba(110, 147, 201, 0.12), transparent 30%),
+    radial-gradient(circle at top right, rgba(185, 180, 206, 0.1), transparent 32%),
+    radial-gradient(circle at bottom center, rgba(233, 241, 242, 0.03), transparent 28%);
+}
+
+.dark .luxury-shell::before {
+  background: rgba(110, 147, 201, 0.12);
+}
+
+.dark .luxury-shell::after {
+  background: rgba(185, 180, 206, 0.08);
+}
+
+.dark .luxury-divider {
+  background: linear-gradient(90deg, transparent, rgba(233, 241, 242, 0.12), transparent);
+}
+
+.dark .luxury-input:focus,
+.dark .luxury-select:focus {
+  box-shadow: 0 0 0 3px rgba(110, 147, 201, 0.22);
+}
+
+/* Small-caps kickers get a brighter blue on dark ink for readability */
+.dark .luxury-kicker {
+  color: #93b3e0;
+}
+
+.dark .gold-badge {
+  background: rgba(212, 168, 83, 0.12);
+  color: #e6c075;
+  border-color: rgba(212, 168, 83, 0.35);
+}
+
+/* Native date/select controls must flip text to light in dark mode */
+.dark .booking-date-input,
+.dark .booking-select {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  caret-color: #fff;
+}
+
+.dark .booking-date-input::-webkit-datetime-edit,
+.dark .booking-date-input::-webkit-datetime-edit-fields-wrapper,
+.dark .booking-date-input::-webkit-datetime-edit-text,
+.dark .booking-date-input::-webkit-datetime-edit-month-field,
+.dark .booking-date-input::-webkit-datetime-edit-day-field,
+.dark .booking-date-input::-webkit-datetime-edit-year-field {
+  color: #fff !important;
+}
+
+.dark .booking-select option {
+  color: #fff;
+  background: #122a32;
+}
+
+/* Recharts surfaces render in the dark theme (axis ticks only — chart
+   label colors set per-series are left alone) */
+.dark .recharts-default-tooltip {
+  background-color: #122a32 !important;
+  border-color: #1d3842 !important;
+}
+
+.dark .recharts-cartesian-grid line {
+  stroke: #1d3842 !important;
+}
+
+.dark .recharts-cartesian-axis-tick text {
+  fill: #9fb2b8 !important;
+}
+
+/* Clerk auth components — adapt surfaces to the dark theme (sign-in/sign-up
+   modals, the user-button popover, and any embedded forms). */
+.dark .cl-card,
+.dark .cl-modalCard,
+.dark .cl-userButtonPopoverCard,
+.dark .cl-popoverCard {
+  background-color: #122a32 !important;
+  color: #e9f1f2 !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45) !important;
+}
+
+.dark .cl-headerTitle,
+.dark .cl-headerSubtitle,
+.dark .cl-formTitle,
+.dark .cl-formSubtitle,
+.dark .cl-socialButtonsBlockButtonText,
+.dark .cl-formFieldLabel,
+.dark .cl-footerActionText,
+.dark .cl-footerActionLink,
+.dark .cl-dividerText,
+.dark .cl-alternativeMethodsBlockButtonText {
+  color: #e9f1f2 !important;
+}
+
+.dark .cl-formFieldInput,
+.dark .cl-phoneInputBox,
+.dark .cl-searchBox {
+  background-color: #0b1d24 !important;
+  border-color: #1d3842 !important;
+  color: #e9f1f2 !important;
+}
+
+.dark .cl-formFieldInput::placeholder,
+.dark .cl-phoneInputBox::placeholder {
+  color: #6b828a !important;
+}
+
+.dark .cl-socialButtonsBlockButton,
+.dark .cl-alternativeMethodsBlockButton {
+  background-color: #16303a !important;
+  border-color: #1d3842 !important;
+}
+
+.dark .cl-footer,
+.dark .cl-dividerRow {
+  background: transparent !important;
+}
+
+.dark .cl-otpInput {
+  background-color: #0b1d24 !important;
+  border-color: #1d3842 !important;
+  color: #e9f1f2 !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Owner dashboard shell — dark ink background with gold accents.
+   Scoped to .owner-shell (added on the owner layout root) so the public site
+   and the admin console keep their own palettes.
+--------------------------------------------------------------------------- */
+.owner-shell .gold-button {
+  background: linear-gradient(135deg, #e6c075 0%, #d4a853 55%, #c79a3e 100%);
+  color: #2a230f;
+}
+
+.owner-shell .gold-button:hover {
+  background: linear-gradient(135deg, #f0cf8f 0%, #e0b45f 55%, #d4a853 100%);
+  box-shadow: 0 8px 20px rgba(212, 168, 83, 0.35);
+}
+
+.owner-shell .gold-button:focus-visible {
+  outline-color: #d4a853;
+}
+
+.owner-shell .luxury-input:focus,
+.owner-shell .luxury-select:focus {
+  border-color: #d4a853;
+  box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.22);
 }
 

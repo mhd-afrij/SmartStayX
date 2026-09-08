@@ -7,8 +7,11 @@
   "scripts": {
     "server": "node scripts/start-all.js",
     "server:api": "nodemon server.js",
+    "server:ai": "node scripts/start-ai.js",
+    "server:ml": "node scripts/start-ml.js",
     "start": "node server.js",
     "seed": "node utils/seedData.js",
+    "test": "node --test tests/smoke.test.js tests/roles.test.js",
     "test:smoke": "node tests/smoke.test.js"
   },
   "keywords": [],
@@ -25,7 +28,6 @@
     "express-rate-limit": "^8.4.1",
     "helmet": "^8.1.0",
     "ioredis": "^5.10.1",
-    "lodash": "^4.17.21",
     "mongoose": "^9.0.2",
     "multer": "^2.0.2",
     "stripe": "^18.5.0",

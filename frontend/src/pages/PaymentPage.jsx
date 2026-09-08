@@ -73,10 +73,10 @@ const PaymentPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white pt-32">
+      <div className="min-h-screen bg-[#F3ECDE] dark:bg-[#122A32] pt-32">
         <div className="mx-auto max-w-lg px-4 animate-pulse space-y-6">
-          <div className="h-8 w-48 rounded bg-[#f4f2ef]" />
-          <div className="h-64 rounded-2xl bg-[#f4f2ef]" />
+          <div className="h-8 w-48 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
+          <div className="h-64 rounded-2xl bg-[#f4f2ef] dark:bg-[#16303A]" />
         </div>
       </div>
     );
@@ -84,9 +84,9 @@ const PaymentPage = () => {
 
   if (!booking) {
     return (
-      <div className="min-h-screen bg-white pt-32">
+      <div className="min-h-screen bg-[#F3ECDE] dark:bg-[#122A32] pt-32">
         <div className="mx-auto max-w-lg px-4 text-center">
-          <p className="text-slate-400">Booking not found.</p>
+          <p className="text-slate-400 dark:text-[#6B828A]">Booking not found.</p>
           <button onClick={() => navigate("/my-bookings")} className="gold-button inline-flex px-6 py-2.5 mt-4 text-sm">Go to Bookings</button>
         </div>
       </div>
@@ -94,49 +94,49 @@ const PaymentPage = () => {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white pt-24 pb-16">
+    <div className="relative min-h-screen overflow-hidden bg-[#F3ECDE] dark:bg-[#122A32] pt-24 pb-16">
       <div className="absolute inset-0 mesh-glow opacity-60" />
 
       <div className="relative mx-auto max-w-xl px-4 md:px-8">
         <div className="luxury-card overflow-hidden p-6 md:p-8 space-y-6">
           <div className="text-center">
-            <div className="mx-auto mb-4 h-14 w-14 rounded-2xl bg-[#2563EB]/10 border border-[#2563EB]/20 flex items-center justify-center">
-              <CreditCard className="w-7 h-7 text-[#2563EB]" />
+            <div className="mx-auto mb-4 h-14 w-14 rounded-2xl bg-[#5077B3]/10 border border-[#5077B3]/20 flex items-center justify-center">
+              <CreditCard className="w-7 h-7 text-[#5077B3] dark:text-[#93B3E0]" />
             </div>
-            <h1 className="text-2xl font-playfair text-slate-900">Complete Payment</h1>
-            <p className="text-sm text-slate-400 mt-1">Choose how you'd like to pay to finalize the booking.</p>
+            <h1 className="text-2xl font-playfair text-slate-900 dark:text-[#E9F1F2]">Complete Payment</h1>
+            <p className="text-sm text-slate-400 dark:text-[#6B828A] mt-1">Choose how you'd like to pay to finalize the booking.</p>
           </div>
 
-          <div className="rounded-xl border border-black/[0.06] bg-[#f4f2ef] p-5 space-y-3">
+          <div className="rounded-xl border border-black/[0.06] dark:border-[#1D3842] bg-[#f4f2ef] dark:bg-[#16303A] p-5 space-y-3">
             <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Hotel</span>
-              <span className="text-slate-900 font-medium">{booking.hotel?.name || "Hotel"}</span>
+              <span className="text-slate-500 dark:text-[#8299A0]">Hotel</span>
+              <span className="text-slate-900 dark:text-[#E9F1F2] font-medium">{booking.hotel?.name || "Hotel"}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Room</span>
-              <span className="text-slate-900">{booking.room?.roomType || "Room"}</span>
+              <span className="text-slate-500 dark:text-[#8299A0]">Room</span>
+              <span className="text-slate-900 dark:text-[#E9F1F2]">{booking.room?.roomType || "Room"}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Check-in</span>
-              <span className="text-slate-900">{new Date(booking.checkInDate).toDateString()}</span>
+              <span className="text-slate-500 dark:text-[#8299A0]">Check-in</span>
+              <span className="text-slate-900 dark:text-[#E9F1F2]">{new Date(booking.checkInDate).toDateString()}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Check-out</span>
-              <span className="text-slate-900">{new Date(booking.checkOutDate).toDateString()}</span>
+              <span className="text-slate-500 dark:text-[#8299A0]">Check-out</span>
+              <span className="text-slate-900 dark:text-[#E9F1F2]">{new Date(booking.checkOutDate).toDateString()}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Guests</span>
-              <span className="text-slate-900">{booking.guests}</span>
+              <span className="text-slate-500 dark:text-[#8299A0]">Guests</span>
+              <span className="text-slate-900 dark:text-[#E9F1F2]">{booking.guests}</span>
             </div>
-            <div className="flex justify-between text-lg font-semibold pt-3 border-t border-black/[0.06]">
-              <span className="text-slate-900">Total</span>
-              <span className="text-[#2563EB]">{formatPrice(booking.totalPrice)}</span>
+            <div className="flex justify-between text-lg font-semibold pt-3 border-t border-black/[0.06] dark:border-[#1D3842]">
+              <span className="text-slate-900 dark:text-[#E9F1F2]">Total</span>
+              <span className="text-[#5077B3] dark:text-[#93B3E0]">{formatPrice(booking.totalPrice)}</span>
             </div>
           </div>
 
           <div className="space-y-2.5">
             {gateways.length === 0 ? (
-              <p className="text-sm text-center text-slate-400">No payment methods are currently available.</p>
+              <p className="text-sm text-center text-slate-400 dark:text-[#6B828A]">No payment methods are currently available.</p>
             ) : (
               gateways.map((g) => {
                 const Icon = GATEWAY_ICONS[g] || CreditCard;
@@ -149,10 +149,10 @@ const PaymentPage = () => {
                     className="ghost-button w-full py-3.5 text-sm justify-between px-5 disabled:opacity-60"
                   >
                     <span className="flex items-center gap-3">
-                      <Icon className="w-4 h-4 text-[#2563EB]" />
+                      <Icon className="w-4 h-4 text-[#5077B3] dark:text-[#93B3E0]" />
                       {GATEWAY_LABELS[g] || g}
                     </span>
-                    <span className="text-xs text-slate-400">{g === "pay_at_hotel" ? "" : formatPrice(booking.totalPrice)}</span>
+                    <span className="text-xs text-slate-400 dark:text-[#6B828A]">{g === "pay_at_hotel" ? "" : formatPrice(booking.totalPrice)}</span>
                   </button>
                 );
               })
@@ -162,7 +162,7 @@ const PaymentPage = () => {
           <button
             type="button"
             onClick={() => navigate("/my-bookings")}
-            className="w-full text-center text-xs text-slate-400 hover:text-slate-600 transition-colors"
+            className="w-full text-center text-xs text-slate-400 dark:text-[#6B828A] hover:text-slate-600 dark:hover:text-[#9FB2B8] transition-colors"
           >
             Back to My Bookings
           </button>

@@ -148,6 +148,7 @@ app.use('/api/maintenance', maintenanceRouter)
 app.use('/api/refunds', refundRouter)
 app.use('/api/roles', roleRouter)
 app.use('/api/admin', adminRouter)
+app.use('/api/super-admin', adminRouter)
 app.use('/api/orgs', orgRouter)
 
 // ---------------------------------------------------------------------------

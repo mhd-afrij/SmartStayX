@@ -145,27 +145,27 @@ const AddRoom = () => {
       className="space-y-6 pb-10"
     >
       <div>
-        <h1 className="text-xl font-bold text-slate-900 tracking-tight">Add Room</h1>
-        <p className="text-sm text-slate-500 mt-1">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Add Room</h1>
+        <p className="text-sm text-slate-500 dark:text-[#8299A0] mt-1">
           Add photos, set pricing, and choose amenities to create a great listing.
         </p>
       </div>
 
-      <form onSubmit={onSubmitHandler} className="rounded-2xl border border-black/[0.06] bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)] p-6">
+      <form onSubmit={onSubmitHandler} className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] p-6">
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-2">Images</p>
-              <p className="text-xs text-slate-400 mb-3">Upload up to 4 photos (first will be the cover).</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-2">Images</p>
+              <p className="text-xs text-slate-400 dark:text-[#6B828A] mb-3">Upload up to 4 photos (first will be the cover).</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {Object.keys(images).map((key) => (
                   <label
                     htmlFor={`roomImage${key}`}
                     key={key}
-                    className="relative border border-dashed border-black/[0.15] rounded-xl aspect-video flex items-center justify-center bg-[#f4f2ef] hover:border-[#2563EB]/40 transition cursor-pointer overflow-hidden group"
+                    className="relative border border-dashed border-black/[0.15] dark:border-[#232737] rounded-xl aspect-video flex items-center justify-center bg-[#f4f2ef] dark:bg-[#10131D] hover:border-[#D4A853]/50 transition cursor-pointer overflow-hidden group"
                   >
                     {key === "1" && (
-                      <span className="absolute top-2 left-2 z-10 text-[9px] uppercase tracking-wide bg-[#2563EB] text-white px-2 py-0.5 rounded-full font-medium">
+                      <span className="absolute top-2 left-2 z-10 text-[9px] uppercase tracking-wide bg-[#D4A853] dark:bg-[#E6C075] text-[#2A230F] px-2 py-0.5 rounded-full font-medium">
                         Cover
                       </span>
                     )}
@@ -185,7 +185,7 @@ const AddRoom = () => {
                         </button>
                       </>
                     ) : (
-                      <div className="flex flex-col items-center gap-1 text-slate-400 group-hover:text-slate-600 transition-colors">
+                      <div className="flex flex-col items-center gap-1 text-slate-400 dark:text-[#6B828A] group-hover:text-slate-600 dark:group-hover:text-[#9FB2B8] transition-colors">
                         <Image className="w-5 h-5" />
                         <span className="text-[10px]">Upload</span>
                       </div>
@@ -200,7 +200,7 @@ const AddRoom = () => {
 
             <div className="grid gap-4 md:grid-cols-3">
               <div className="md:col-span-2">
-                <p className="text-sm font-medium text-slate-600 mb-1.5">Hotel Name</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Hotel Name</p>
                 <div className="relative">
                   <select
                     value={selectedHotel || ''}
@@ -212,16 +212,16 @@ const AddRoom = () => {
                       <option key={hotel._id} value={hotel._id}>{hotel.name}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600 mb-1.5">City</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">City</p>
                 <input
                   type="text"
                   value={hotels.find(h => h._id === selectedHotel)?.city || ''}
                   disabled
-                  className="luxury-input bg-[#f4f2ef] text-slate-400"
+                  className="luxury-input bg-[#f4f2ef] dark:bg-[#10131D] text-slate-400 dark:text-[#6B828A]"
                   placeholder="Auto-filled"
                 />
               </div>
@@ -229,7 +229,7 @@ const AddRoom = () => {
 
             <div className="grid gap-4 md:grid-cols-3">
               <div>
-                <p className="text-sm font-medium text-slate-600 mb-1.5">Room Number</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Room Number</p>
                 <input
                   type="text"
                   placeholder='e.g. R101'
@@ -239,7 +239,7 @@ const AddRoom = () => {
                 />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600 mb-1.5">Room Type</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Room Type</p>
                 <div className="relative">
                   <select
                     value={inputs.roomType}
@@ -252,11 +252,11 @@ const AddRoom = () => {
                     <option value="Luxury Room">Luxury Room</option>
                     <option value="Family Suite">Family Suite</option>
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600 mb-1.5">Price / night</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Price / night</p>
                 <input
                   type="number"
                   min={0}
@@ -269,9 +269,9 @@ const AddRoom = () => {
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-2">Amenities</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-2">Amenities</p>
               {!selectedHotel ? (
-                <p className="text-xs text-slate-400">Select a hotel first to see its amenity options.</p>
+                <p className="text-xs text-slate-400 dark:text-[#6B828A]">Select a hotel first to see its amenity options.</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {amenityOptions.map((amenity) => {
@@ -288,8 +288,8 @@ const AddRoom = () => {
                         }
                         className={`px-3 py-2 rounded-lg border text-xs font-medium transition-all ${
                           selected
-                            ? "border-[#2563EB]/30 bg-[#fbf2e1] text-[#2563EB]"
-                            : "border-black/[0.08] bg-white text-slate-500 hover:text-slate-700"
+                            ? "border-[#D4A853]/40 bg-[#fbf2e1] dark:bg-[#2E2A1F] text-[#B58A2E] dark:text-[#E6C075]"
+                            : "border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#161925] text-slate-500 dark:text-[#8299A0] hover:text-slate-700 dark:hover:text-[#C1D2D6]"
                         }`}
                       >
                         {amenity}
@@ -309,13 +309,13 @@ const AddRoom = () => {
                 <Plus className="w-4 h-4" />
                 {loading ? "Adding..." : "Add Room"}
               </button>
-              <p className="text-xs text-slate-400">Ensure pricing and amenities are accurate before publishing.</p>
+              <p className="text-xs text-slate-400 dark:text-[#6B828A]">Ensure pricing and amenities are accurate before publishing.</p>
             </div>
           </div>
 
-          <div className="rounded-xl border border-black/[0.06] bg-[#f4f2ef] p-4 space-y-3">
-            <p className="text-sm font-medium text-slate-600">Quick tips</p>
-            <ul className="space-y-1.5 text-xs text-slate-500">
+          <div className="rounded-xl border border-black/[0.06] dark:border-[#232737] bg-[#f4f2ef] dark:bg-[#10131D] p-4 space-y-3">
+            <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8]">Quick tips</p>
+            <ul className="space-y-1.5 text-xs text-slate-500 dark:text-[#8299A0]">
               {[
                 "Use bright cover photos.",
                 "Match price to room size and amenities.",
@@ -323,7 +323,7 @@ const AddRoom = () => {
                 "Keep at least one image under 1MB for speed.",
               ].map((tip, i) => (
                 <li key={i} className="flex items-start gap-2">
-                  <span className="text-[#2563EB] mt-0.5">•</span>
+                  <span className="text-[#B58A2E] dark:text-[#E6C075] mt-0.5">•</span>
                   {tip}
                 </li>
               ))}

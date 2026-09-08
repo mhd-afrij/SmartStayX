@@ -338,13 +338,14 @@ export const createCheckoutSession = async (req, res, next) => {
     const frontendBaseUrl = process.env.FRONTEND_URL || req.headers.origin;
     if (!frontendBaseUrl) return res.status(500).json({ success: false, message: BOOKING_ERRORS.FRONTEND_URL_NOT_CONFIGURED });
 
+    const currency = (booking.hotel?.currency || bookingConfig.defaultCurrency || "USD").toLowerCase();
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [
         {
           quantity: 1,
           price_data: {
-            currency: "usd",
+            currency,
             unit_amount: Math.round(Number(booking.totalPrice || 0) * 100),
             product_data: {
               name: `${booking.hotel?.name || "Hotel"} - ${booking.room?.roomType || "Room"}`,
@@ -813,7 +814,7 @@ export const getHotelBookings = async (req, res) => {
       { $match: hotelMatch },
       { $group: { _id: null, avgRating: { $avg: "$rating" }, count: { $sum: 1 } } },
     ]);
-    const avgRating = ratingResult ? Number(ratingResult.avgRating.toFixed(1)) : null;
+    const avgRating = ratingResult ? Number(Number(ratingResult.avgRating).toFixed(1)) : null;
 
     ok(res, {
       dashboardData: {
@@ -828,7 +829,7 @@ export const getHotelBookings = async (req, res) => {
           week: metrics.revenueWeek,
           month: metrics.revenueMonth,
         },
-        avgRating: null,
+        avgRating,
         upcomingBookings: metrics.upcomingBookings,
         cancelledBookings: metrics.cancelledBookings,
         lastMinuteBookings: metrics.lastMinuteBookings,

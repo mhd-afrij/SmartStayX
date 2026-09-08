@@ -2,7 +2,24 @@
 import Checkin from "../models/Checkin.js";
 import Booking from "../models/Booking.js";
 import Notification from "../models/Notification.js";
+import Hotel from "../models/Hotel.js";
 import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
+
+// Verifies the acting user may operate on check-ins at `hotelId`.
+// Allowed: super_admin (global), the hotel's owner, or a receptionist/
+// manager assigned to that hotel. Returns true or sends 403 + false.
+const assertCheckinScope = async (req, res, hotelId) => {
+  if (req.user?.role === "super_admin") return true;
+  if (!hotelId) {
+    res.json({ success: false, message: "Hotel not found for this check-in" });
+    return false;
+  }
+  if (String(req.user?.assignedHotel) === String(hotelId)) return true;
+  const hotel = await Hotel.findById(hotelId).select("owner").lean();
+  if (hotel && String(hotel.owner) === String(req.user?._id)) return true;
+  res.json({ success: false, message: "Not authorized for this hotel's check-ins" });
+  return false;
+};
 
 export const initiateCheckin = async (req, res) => {
   try {
@@ -77,6 +94,8 @@ export const approveCheckin = async (req, res) => {
     const checkin = await Checkin.findById(id).populate("booking");
     if (!checkin) return res.json({ success: false, message: "Check-in not found" });
 
+    if (!(await assertCheckinScope(req, res, checkin.hotel))) return;
+
     checkin.status = "approved";
     await checkin.save();
 
@@ -116,8 +135,24 @@ export const completeCheckout = async (req, res) => {
 export const getHotelCheckins = async (req, res) => {
   try {
     const { hotelId, status } = req.query;
+
+    // Scoped staff may only view check-ins for their assigned hotel; the
+    // hotel owner and super_admin may query any of their properties.
+    let scopeHotelId = hotelId;
+    if (req.user?.role !== "super_admin") {
+      const hotel = hotelId
+        ? await Hotel.findById(hotelId).select("owner").lean()
+        : null;
+      const ownsHotel = Boolean(hotel && String(hotel.owner) === String(req.user?._id));
+      const assignedMatches = req.user?.assignedHotel && String(req.user.assignedHotel) === String(hotelId);
+      if (!ownsHotel && !assignedMatches) {
+        return res.json({ success: false, message: "Not authorized for this hotel's check-ins" });
+      }
+      scopeHotelId = hotelId || req.user.assignedHotel;
+    }
+
     const query = {};
-    if (hotelId) query.hotel = hotelId;
+    if (scopeHotelId) query.hotel = scopeHotelId;
     if (status) query.status = status;
 
     const checkins = await Checkin.find(query)

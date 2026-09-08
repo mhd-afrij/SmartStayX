@@ -8,6 +8,8 @@ import { API } from "../configs/apiContracts.js";
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://127.0.0.1:8001";
 const AI_TIMEOUT_MS = Number(process.env.AI_SERVICE_TIMEOUT_MS) || 45000;
+// Shared secret the AI service requires on every request (see app/middleware/auth.py).
+const AI_INTERNAL_TOKEN = process.env.AI_INTERNAL_TOKEN || "";
 
 const readQueryLocation = (query) => {
   const lat = Number(query.lat);
@@ -413,7 +415,13 @@ export const generateItinerary = async (req, res) => {
       const { data } = await axios.post(
         `${AI_SERVICE_URL}${API.ai.chat}`,
         { message: prompt, conversationId: null, language: null, languageName: null },
-        { timeout: AI_TIMEOUT_MS, headers: req.user?._id ? { "user-id": req.user._id } : {} }
+        {
+          timeout: AI_TIMEOUT_MS,
+          headers: {
+            ...(req.user?._id ? { "user-id": req.user._id } : {}),
+            ...(AI_INTERNAL_TOKEN ? { "x-internal-token": AI_INTERNAL_TOKEN } : {}),
+          },
+        }
       );
       parsed = extractJson(data?.message || "");
     } catch (aiError) {

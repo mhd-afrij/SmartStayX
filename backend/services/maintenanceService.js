@@ -55,6 +55,11 @@ const listReports = async ({ hotelIds, status, priority, page = 1, limit = 20 })
   return { reports, page: p, limit: l, total };
 };
 
+// Fetch a single report (used by controllers for scope checks)
+const getReport = async (reportId) => {
+  return MaintenanceReport.findById(reportId).select('hotel status').lean();
+};
+
 // Update a maintenance report status
 const updateStatus = async ({ reportId, status, assignedTo, notes, actor }) => {
   const report = await MaintenanceReport.findById(reportId);
@@ -86,4 +91,4 @@ const updateStatus = async ({ reportId, status, assignedTo, notes, actor }) => {
   return report;
 };
 
-export default { createReport, listReports, updateStatus };
+export default { createReport, listReports, updateStatus, getReport };

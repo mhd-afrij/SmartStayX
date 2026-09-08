@@ -71,7 +71,20 @@ export const updateMaintenanceReport = async (req, res, next) => {
     const { status, assignedTo, notes } = req.body;
     const actor = req.user?._id || req.user?.id;
 
-    const report = await maintenanceService.updateStatus({
+    // Scope check: only staff attached to the report's hotel may update it.
+    const report = await maintenanceService.getReport(reportId);
+    if (!report) return notFound(res, 'Maintenance report not found');
+
+    const role = req.user?.role;
+    const hotelId = String(report.hotel || '');
+    const ownedHotels = await Hotel.find({ owner: actor }).select('_id').lean();
+    const ownsHotel = ownedHotels.some((h) => String(h._id) === hotelId);
+    const assignedMatch = req.user?.assignedHotel && String(req.user.assignedHotel) === hotelId;
+    if (role !== 'super_admin' && !ownsHotel && !assignedMatch) {
+      return forbidden(res, 'Not authorized for this hotel');
+    }
+
+    const updated = await maintenanceService.updateStatus({
       reportId,
       status,
       assignedTo,
@@ -79,7 +92,7 @@ export const updateMaintenanceReport = async (req, res, next) => {
       actor,
     });
 
-    ok(res, { message: 'Maintenance report updated', report });
+    ok(res, { message: 'Maintenance report updated', report: updated });
   } catch (error) {
     if (error.status === 404) return notFound(res, error.message);
     if (error.status === 400) return badRequest(res, error.message);

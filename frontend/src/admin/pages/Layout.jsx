@@ -5,30 +5,29 @@ import Sidebar from '../components/Sidebar';
 import { useAppContext } from '../../context/AppContext';
 
 const Layout = () => {
-  const { user, userLoaded } = useAppContext();
+  const { user, userLoaded, isSuperAdmin } = useAppContext();
   const navigate = useNavigate();
-  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
     if (!userLoaded) return;
-    if (!user || !isAdmin) navigate('/');
-  }, [user, isAdmin, userLoaded, navigate]);
+    if (!user || !isSuperAdmin) navigate('/');
+  }, [user, isSuperAdmin, userLoaded, navigate]);
 
   if (!userLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fbfaf8]">
+      <div className="min-h-screen flex items-center justify-center bg-[#FFFAF4] dark:bg-[#0A1628]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 rounded-full border-2 border-[#2563EB]/30 border-t-[#2563EB] animate-spin" />
-          <span className="text-sm text-slate-400 font-space">Loading admin console...</span>
+          <div className="w-8 h-8 rounded-full border-2 border-[#D4A853]/30 border-t-[#D4A853] animate-spin" />
+          <span className="text-sm text-slate-400 dark:text-[#6B828A] font-space">Loading admin console...</span>
         </div>
       </div>
     );
   }
 
-  if (!user || !isAdmin) return null;
+  if (!user || !isSuperAdmin) return null;
 
   return (
-    <div className="h-screen bg-[#F8FAFC] overflow-hidden flex">
+    <div className="h-screen bg-[#FFFAF4] dark:bg-[#0A1628] overflow-hidden flex">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <Navbar />

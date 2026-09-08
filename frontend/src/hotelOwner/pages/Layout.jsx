@@ -1,41 +1,39 @@
-// OwnerLayout — Dashboard layout wrapper with sidebar, navbar, and nested route outlet
+// ManagerLayout — Dashboard layout wrapper with sidebar, navbar, and nested route outlet
 import { useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext';
 
-// Layout — Owner dashboard layout with sidebar, navbar, and nested route outlet; guards non-owners
 const Layout = () => {
-  const { isOwner, user, userLoaded, ownerResolved } = useAppContext();
+  // Super admins may view any dashboard (route definitions allow it), so the
+  // layout must not bounce them out — only block plain guests.
+  const { isHotelManager, isSuperAdmin, user, userLoaded, roleResolved } = useAppContext();
   const navigate = useNavigate();
+  const canAccess = isHotelManager || isSuperAdmin;
 
-  // Redirect non-owner users away from the owner area.
   useEffect(() => {
-    if (!userLoaded || !ownerResolved) return;
-    if (!user || !isOwner) navigate('/');
-  }, [isOwner, user, navigate, userLoaded, ownerResolved]);
+    if (!userLoaded || !roleResolved) return;
+    if (!user || !canAccess) navigate('/');
+  }, [canAccess, user, navigate, userLoaded, roleResolved]);
 
-  if (!userLoaded || !ownerResolved) {
+  if (!userLoaded || !roleResolved) {
     return (
-      /* Owner layout loading state */
-      <div className="min-h-screen flex items-center justify-center bg-[#fbfaf8]">
+      <div className="min-h-screen flex items-center justify-center bg-[#fffaf4] dark:bg-[#003844]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 rounded-full border-2 border-[#2563EB]/30 border-t-[#2563EB] animate-spin" />
-          <span className="text-sm text-slate-400 font-space">Loading dashboard...</span>
+          <div className="w-8 h-8 rounded-full border-2 border-[#D4A853]/30 border-t-[#D4A853] animate-spin" />
+          <span className="text-sm text-slate-400 dark:text-[#6B828A] font-space">Loading dashboard...</span>
         </div>
       </div>
     );
   }
 
-  if (!user || !isOwner) return null;
+  if (!user || !canAccess) return null;
 
   return (
-    /* Owner shell */
-    <div className="h-screen bg-[#fbfaf8] overflow-hidden flex">
-      <Sidebar basePath="/Owner" />
+    <div className="owner-shell h-screen bg-[#fffaf4] dark:bg-[#003844] overflow-hidden flex">
+      <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Owner top bar and routed content */}
         <Navbar />
         <main className="flex-1 overflow-y-auto scrollbar-hide">
           <div className="p-6 lg:p-8">

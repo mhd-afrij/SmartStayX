@@ -1,7 +1,7 @@
 import Role from "../models/Role.js";
 import User from "../models/User.js";
 
-const PROTECTED_ROLES = ["owner", "receptionist", "admin", "none"];
+const PROTECTED_ROLES = ["super_admin", "hotel_manager", "receptionist", "guest", "none"];
 
 export const getRoles = async (req, res) => {
   try {
@@ -25,7 +25,7 @@ export const getRoles = async (req, res) => {
 
 export const createRole = async (req, res) => {
   try {
-    if (req.user.role !== "owner" && req.user.role !== "admin") {
+    if (!["super_admin", "hotel_manager"].includes(req.user.role)) {
       return res.json({ success: false, message: "Unauthorized" });
     }
     const { name, description, dashboardAccess } = req.body;
@@ -40,7 +40,9 @@ export const createRole = async (req, res) => {
     const role = await Role.create({
       name: slug,
       description: description || "",
-      dashboardAccess: ["owner", "receptionist", "none"].includes(dashboardAccess) ? dashboardAccess : "none",
+      dashboardAccess: ["super_admin", "hotel_manager", "receptionist", "none"].includes(dashboardAccess)
+        ? dashboardAccess
+        : "none",
     });
     res.json({ success: true, message: "Role created", role });
   } catch (error) {
@@ -50,7 +52,7 @@ export const createRole = async (req, res) => {
 
 export const updateRole = async (req, res) => {
   try {
-    if (req.user.role !== "owner" && req.user.role !== "admin") {
+    if (!["super_admin", "hotel_manager"].includes(req.user.role)) {
       return res.json({ success: false, message: "Unauthorized" });
     }
     const { id } = req.params;
@@ -58,7 +60,7 @@ export const updateRole = async (req, res) => {
     const updates = {};
     if (name) updates.name = name.trim().toLowerCase().replace(/\s+/g, "");
     if (description !== undefined) updates.description = description;
-    if (dashboardAccess !== undefined && ["owner", "receptionist", "none"].includes(dashboardAccess)) {
+    if (dashboardAccess !== undefined && ["super_admin", "hotel_manager", "receptionist", "none"].includes(dashboardAccess)) {
       updates.dashboardAccess = dashboardAccess;
     }
     const role = await Role.findByIdAndUpdate(id, { $set: updates }, { new: true });
@@ -71,7 +73,7 @@ export const updateRole = async (req, res) => {
 
 export const deleteRole = async (req, res) => {
   try {
-    if (req.user.role !== "owner" && req.user.role !== "admin") {
+    if (!["super_admin"].includes(req.user.role)) {
       return res.json({ success: false, message: "Unauthorized" });
     }
     const { id } = req.params;
@@ -80,9 +82,9 @@ export const deleteRole = async (req, res) => {
     if (PROTECTED_ROLES.includes(role.name)) {
       return res.json({ success: false, message: `Cannot delete protected role "${role.name}"` });
     }
-    await User.updateMany({ role: role.name }, { role: "user" });
+    await User.updateMany({ role: role.name }, { role: "guest" });
     await Role.findByIdAndDelete(id);
-    res.json({ success: true, message: `Role deleted. ${role.name} users reset to "user".` });
+    res.json({ success: true, message: `Role deleted. ${role.name} users reset to "guest".` });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }

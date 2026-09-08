@@ -1,5 +1,6 @@
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
+import { requireRole, requireHotelScope } from "../middleware/authorization.js";
 import {
   getReservations,
   updateReservationStatus,
@@ -23,32 +24,38 @@ import {
 
 const receptionistRouter = express.Router();
 
+// All receptionist routes require receptionist, hotel_manager, or super_admin.
+// Non-super-admin users are additionally scoped to their assigned hotel
+// (see requireHotelScope): a receptionist at hotel A cannot read or modify
+// bookings/rooms/services of hotel B.
+receptionistRouter.use(protect, requireRole("receptionist", "hotel_manager", "super_admin"), requireHotelScope);
+
 // Reservations
-receptionistRouter.get("/reservations", protect, getReservations);
-receptionistRouter.patch("/reservations/:id/status", protect, updateReservationStatus);
-receptionistRouter.post("/reservations/:id/payment", protect, markPaymentReceived);
+receptionistRouter.get("/reservations", getReservations);
+receptionistRouter.patch("/reservations/:id/status", updateReservationStatus);
+receptionistRouter.post("/reservations/:id/payment", markPaymentReceived);
 
 // Rooms
-receptionistRouter.get("/rooms", protect, getAllRooms);
-receptionistRouter.post("/rooms", protect, createRoom);
-receptionistRouter.put("/rooms/:id", protect, updateRoom);
-receptionistRouter.patch("/rooms/:id/toggle", protect, toggleRoomAvailability);
-receptionistRouter.patch("/rooms/:id/status", protect, updateRoomStatus);
-receptionistRouter.delete("/rooms/:id", protect, deleteRoom);
+receptionistRouter.get("/rooms", getAllRooms);
+receptionistRouter.post("/rooms", createRoom);
+receptionistRouter.put("/rooms/:id", updateRoom);
+receptionistRouter.patch("/rooms/:id/toggle", toggleRoomAvailability);
+receptionistRouter.patch("/rooms/:id/status", updateRoomStatus);
+receptionistRouter.delete("/rooms/:id", deleteRoom);
 
 // Services
-receptionistRouter.get("/services", protect, getAllServices);
-receptionistRouter.patch("/services/:id/status", protect, updateServiceStatus);
-receptionistRouter.patch("/services/:id/assign", protect, assignService);
+receptionistRouter.get("/services", getAllServices);
+receptionistRouter.patch("/services/:id/status", updateServiceStatus);
+receptionistRouter.patch("/services/:id/assign", assignService);
 
 // Offers
-receptionistRouter.get("/offers", protect, getAllOffers);
-receptionistRouter.post("/offers", protect, createOffer);
-receptionistRouter.put("/offers/:id", protect, updateOffer);
-receptionistRouter.delete("/offers/:id", protect, deleteOffer);
+receptionistRouter.get("/offers", getAllOffers);
+receptionistRouter.post("/offers", createOffer);
+receptionistRouter.put("/offers/:id", updateOffer);
+receptionistRouter.delete("/offers/:id", deleteOffer);
 
 // Reviews
-receptionistRouter.get("/reviews", protect, getAllReviews);
-receptionistRouter.patch("/reviews/:id/toggle", protect, toggleReviewVisibility);
+receptionistRouter.get("/reviews", getAllReviews);
+receptionistRouter.patch("/reviews/:id/toggle", toggleReviewVisibility);
 
 export default receptionistRouter;

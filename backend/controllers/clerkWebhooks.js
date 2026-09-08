@@ -1,18 +1,27 @@
 import User from "../models/User.js";
 import Organization from "../models/Organization.js";
 import { Webhook } from "svix";
+import { isAdminEmail, normalizeRole } from "../configs/adminAccess.js";
 import { PLACEHOLDER_IMAGE_URL } from "../configs/runtimeDefaults.js";
 
 const upsertUser = async (data) => {
+  const email = data.email_addresses?.[0]?.email_address || "";
+  const rawRole = data.public_metadata?.role || null;
+  const role = isAdminEmail(email) ? "super_admin" : normalizeRole(rawRole);
+  const hotelId = data.public_metadata?.hotelId || null;
   const userData = {
-    _id: data.id,
-    email: data.email_addresses?.[0]?.email_address || "",
+    email,
     username: [data.first_name, data.last_name].filter(Boolean).join(" ") || data.username || "Guest",
     name: [data.first_name, data.last_name].filter(Boolean).join(" ") || data.username || "Guest",
     image: data.image_url || PLACEHOLDER_IMAGE_URL,
-    ...(data.public_metadata?.role ? { role: data.public_metadata.role } : {}),
+    role,
+    assignedHotel: hotelId || undefined,
   };
-  await User.findByIdAndUpdate(data.id, userData, { upsert: true, new: true });
+  await User.findByIdAndUpdate(
+    data.id,
+    { $set: userData, $setOnInsert: { status: "active" } },
+    { upsert: true, new: true }
+  );
 };
 
 const deleteUser = async (data) => {

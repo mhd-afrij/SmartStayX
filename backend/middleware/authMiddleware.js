@@ -1,6 +1,7 @@
 import { getAuth } from "@clerk/express";
 import User from "../models/User.js";
 import Organization from "../models/Organization.js";
+import { isAdminEmail, normalizeRole } from "../configs/adminAccess.js";
 import logger from "../utils/logger.js";
 
 export const protect = async (req, res, next) => {
@@ -11,22 +12,57 @@ export const protect = async (req, res, next) => {
     }
 
     const clerkRole = sessionClaims?.publicMetadata?.role || sessionClaims?.public_metadata?.role || null;
+    const clerkHotelId = sessionClaims?.publicMetadata?.hotelId || sessionClaims?.public_metadata?.hotelId || null;
 
     let user = await User.findById(userId);
+
+    // Derive email from the session token first, then fall back to the stored
+    // user doc (Clerk JWTs don't always carry the email claim). This keeps the
+    // ADMIN_EMAILS match reliable for existing users.
+    const email =
+      sessionClaims?.email ||
+      sessionClaims?.emailAddress ||
+      user?.email ||
+      `${userId}@placeholder.local`;
+    const name = sessionClaims?.name || sessionClaims?.firstName || user?.name || "Guest";
+
+    // Configured admin emails ALWAYS resolve to the "super_admin" role, overriding any
+    // stale Clerk public metadata (e.g. the legacy "hotelOwner" or "admin" role).
+    const effectiveRole = isAdminEmail(email) ? "super_admin" : normalizeRole(clerkRole);
+
     if (!user) {
-      const email = sessionClaims?.email || sessionClaims?.emailAddress || `${userId}@placeholder.local`;
-      const name = sessionClaims?.name || sessionClaims?.firstName || "Guest";
       user = await User.create({
         _id: userId,
         name,
         username: userId,
         email,
-        role: clerkRole || "guest",
+        role: effectiveRole,
         status: "active",
+        assignedHotel: clerkHotelId || null,
       });
-    } else if (clerkRole && user.role !== clerkRole) {
-      user.role = clerkRole;
-      await user.save();
+    } else {
+      let changed = false;
+      if (user.role !== effectiveRole) {
+        user.role = effectiveRole;
+        changed = true;
+      }
+      // Sync assignedHotel from Clerk metadata for hotel_manager / receptionist
+      if (
+        (effectiveRole === "hotel_manager" || effectiveRole === "receptionist") &&
+        clerkHotelId &&
+        String(user.assignedHotel) !== String(clerkHotelId)
+      ) {
+        user.assignedHotel = clerkHotelId;
+        changed = true;
+      }
+      // Repair legacy docs that predate the status field so they aren't 401'd.
+      if (!user.status) {
+        user.status = "active";
+        changed = true;
+      }
+      if (changed) {
+        await user.save();
+      }
     }
 
     if (!user || user.status !== "active") {

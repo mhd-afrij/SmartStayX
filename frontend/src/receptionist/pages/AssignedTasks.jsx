@@ -100,59 +100,59 @@ const AssignedTasks = () => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pb-10">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Assigned Tasks</h1>
-          <p className="text-sm text-slate-500 mt-1">Service and maintenance tasks assigned to you</p>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Assigned Tasks</h1>
+          <p className="text-sm text-slate-500 dark:text-[#8299A0] mt-1">Service and maintenance tasks assigned to you</p>
         </div>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A]" />
           <input type="text" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)}
             className="luxury-input w-48 h-auto py-2 pl-9 pr-3 text-xs" />
         </div>
       </div>
 
-      <div className="flex items-center gap-2 bg-[#f4f2ef] rounded-xl p-1 border border-black/[0.06] w-fit">
+      <div className="flex items-center gap-2 bg-[#f4f2ef] dark:bg-[#16303A] rounded-xl p-1 border border-black/[0.06] dark:border-[#1D3842] w-fit">
         <button onClick={() => setMode("mine")}
-          className={`px-4 py-1.5 text-sm rounded-lg transition-all ${mode === "mine" ? "bg-amber-100 text-[#2563EB] border border-amber-200" : "text-slate-500 hover:text-slate-800"}`}>
+          className={`px-4 py-1.5 text-sm rounded-lg transition-all ${mode === "mine" ? "bg-[#EFEDF7] dark:bg-[#1B2436] text-[#5077B3] dark:text-[#93B3E0] border border-[#B9B4CE]/45 dark:border-[#3D4660]/45" : "text-slate-500 dark:text-[#8299A0] hover:text-slate-800 dark:hover:text-[#D3DFE2]"}`}>
           My Tasks
         </button>
         <button onClick={() => setMode("open")}
-          className={`px-4 py-1.5 text-sm rounded-lg transition-all ${mode === "open" ? "bg-amber-100 text-[#2563EB] border border-amber-200" : "text-slate-500 hover:text-slate-800"}`}>
+          className={`px-4 py-1.5 text-sm rounded-lg transition-all ${mode === "open" ? "bg-[#EFEDF7] dark:bg-[#1B2436] text-[#5077B3] dark:text-[#93B3E0] border border-[#B9B4CE]/45 dark:border-[#3D4660]/45" : "text-slate-500 dark:text-[#8299A0] hover:text-slate-800 dark:hover:text-[#D3DFE2]"}`}>
           All Open Tasks
         </button>
       </div>
 
-      <div className="rounded-2xl border border-black/[0.06] bg-white shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-black/[0.06]">
+      <div className="rounded-2xl border border-black/[0.06] dark:border-[#1D3842] bg-white dark:bg-[#122A32] shadow-sm overflow-hidden">
+        <div className="p-5 border-b border-black/[0.06] dark:border-[#1D3842]">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-violet-50 border border-violet-200 flex items-center justify-center">
               <ClipboardList className="w-4 h-4 text-violet-600" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-slate-900">{mode === "mine" ? "My Tasks" : "All Open Tasks"}</h3>
-              <p className="text-xs text-slate-500">{filtered.length} task{filtered.length !== 1 ? "s" : ""}</p>
+              <h3 className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">{mode === "mine" ? "My Tasks" : "All Open Tasks"}</h3>
+              <p className="text-xs text-slate-500 dark:text-[#8299A0]">{filtered.length} task{filtered.length !== 1 ? "s" : ""}</p>
             </div>
           </div>
         </div>
 
         {loading ? (
           <div className="p-8 flex items-center gap-3">
-            <div className="w-5 h-5 rounded-full border-2 border-[#2563EB]/25 border-t-[#2563EB] animate-spin" />
-            <span className="text-sm text-slate-500">Loading...</span>
+            <div className="w-5 h-5 rounded-full border-2 border-[#5077B3]/25 border-t-[#5077B3] animate-spin" />
+            <span className="text-sm text-slate-500 dark:text-[#8299A0]">Loading...</span>
           </div>
         ) : error ? (
           <div className="p-8 text-center">
-            <p className="text-sm text-slate-500 mb-3">Could not load tasks.</p>
+            <p className="text-sm text-slate-500 dark:text-[#8299A0] mb-3">Could not load tasks.</p>
             <button onClick={() => loadTasks()} className="ghost-button px-4 py-1.5 text-xs">Try again</button>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 text-sm">No tasks found.</div>
+          <div className="p-8 text-center text-slate-400 dark:text-[#6B828A] text-sm">No tasks found.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#f4f2ef] border-b border-black/[0.06]">
+                <tr className="bg-[#f4f2ef] dark:bg-[#16303A] border-b border-black/[0.06] dark:border-[#1D3842]">
                   {["Type", "Guest", "Room", "Priority", "Requested", "Status", "Assigned To", "Actions"].map((h) => (
-                    <th key={h} className="py-3 px-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">{h}</th>
+                    <th key={h} className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -161,16 +161,16 @@ const AssignedTasks = () => {
                   const st = STATUS_CONFIG[item.status] || STATUS_CONFIG.pending;
                   const pr = PRIORITY_CONFIG[item.priority] || PRIORITY_CONFIG.normal;
                   return (
-                    <tr key={item._id} className="border-b border-black/[0.06] hover:bg-black/[0.02] transition-colors">
-                      <td className="py-3 px-4 text-slate-700">{item.serviceType}</td>
-                      <td className="py-3 px-4 text-slate-500">{item.guest?.name || item.guest?.username || "Guest"}</td>
-                      <td className="py-3 px-4 text-slate-500">Room {item.roomNumber || item.room?.roomNumber || "—"}</td>
+                    <tr key={item._id} className="border-b border-black/[0.06] dark:border-[#1D3842] hover:bg-black/[0.02] dark:hover:bg-white/5 transition-colors">
+                      <td className="py-3 px-4 text-slate-700 dark:text-[#C1D2D6]">{item.serviceType}</td>
+                      <td className="py-3 px-4 text-slate-500 dark:text-[#8299A0]">{item.guest?.name || item.guest?.username || "Guest"}</td>
+                      <td className="py-3 px-4 text-slate-500 dark:text-[#8299A0]">Room {item.roomNumber || item.room?.roomNumber || "—"}</td>
                       <td className="py-3 px-4"><Badge tone={pr.tone}>{pr.label}</Badge></td>
-                      <td className="py-3 px-4 text-slate-400 text-xs">
+                      <td className="py-3 px-4 text-slate-400 dark:text-[#6B828A] text-xs">
                         {new Date(item.requestedAt || item.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                       </td>
                       <td className="py-3 px-4"><Badge tone={st.tone}>{st.label}</Badge></td>
-                      <td className="py-3 px-4 text-slate-500 text-xs">
+                      <td className="py-3 px-4 text-slate-500 dark:text-[#8299A0] text-xs">
                         {item.assignedTo?.name || item.assignedTo?.username || "Unassigned"}
                       </td>
                       <td className="py-3 px-4">
@@ -189,13 +189,13 @@ const AssignedTasks = () => {
                           )}
                           {["pending", "assigned"].includes(item.status) && (
                             <button onClick={() => handleStatusUpdate(item._id, "completed")} disabled={updatingId === item._id}
-                              className="px-2 py-1 text-[10px] rounded-lg border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-all disabled:opacity-50">
+                              className="px-2 py-1 text-[10px] rounded-lg border border-green-200 dark:border-green-500/25 bg-green-50 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-500/10 transition-all disabled:opacity-50">
                               Complete
                             </button>
                           )}
                           {["pending", "assigned"].includes(item.status) && (
                             <button onClick={() => handleStatusUpdate(item._id, "cancelled")} disabled={updatingId === item._id}
-                              className="px-2 py-1 text-[10px] rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-all disabled:opacity-50">
+                              className="px-2 py-1 text-[10px] rounded-lg border border-red-200 dark:border-red-500/25 text-red-600 dark:text-red-300 hover:bg-red-50 transition-all disabled:opacity-50">
                               Cancel
                             </button>
                           )}
