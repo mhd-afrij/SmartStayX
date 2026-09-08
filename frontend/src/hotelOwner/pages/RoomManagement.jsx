@@ -17,19 +17,19 @@ const RoomManagement = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Room Management</h1>
-        <p className="text-sm text-slate-500 dark:text-[#8299A0] mt-1">Manage rooms, add new listings, and handle reservations.</p>
+        <h1 className="text-xl font-bold text-slate-900 dark:text-[#F2EFE8] tracking-tight">Room Management</h1>
+        <p className="text-sm text-slate-500 dark:text-[#A9AEA7] mt-1">Manage rooms, add new listings, and handle reservations.</p>
       </div>
 
-      <div className="flex gap-1 bg-[#f4f2ef] dark:bg-[#10131D] rounded-xl p-1 border border-black/[0.06] dark:border-[#232737] w-fit">
+      <div className="flex gap-1 bg-[#EFEEE8] dark:bg-[#111412] rounded-xl p-1 border border-black/[0.06] dark:border-[#303631] w-fit">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               activeTab === tab.key
-                ? "bg-[#D4A853] dark:bg-[#E6C075] text-[#2A230F] shadow-lg shadow-[#D4A853]/30"
-                : "text-slate-500 dark:text-[#8299A0] hover:text-slate-900 dark:hover:text-[#E9F1F2] hover:bg-white dark:hover:bg-[#122A32]"
+                ? "bg-[#A67C52] dark:bg-[#C5A47E] text-[#1A1E1B] shadow-lg shadow-[#A67C52]/30"
+                : "text-slate-500 dark:text-[#A9AEA7] hover:text-slate-900 dark:hover:text-[#F2EFE8] hover:bg-white dark:hover:bg-[#1A1E1B]"
             }`}
           >
             <tab.icon className="w-4 h-4" />

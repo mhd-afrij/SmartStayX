@@ -37,7 +37,7 @@ const About = () => {
         </div>
 
         {/* Contact card */}
-        <aside className="bg-white dark:bg-[#122A32] shadow p-6 rounded-lg">
+        <aside className="bg-white dark:bg-[#1A1E1B] shadow p-6 rounded-lg">
           <img src={assets.regImage} alt="About" className="w-full h-56 object-cover rounded mb-4" />
           <div>
             <h3 className="text-lg font-semibold">Contact</h3>

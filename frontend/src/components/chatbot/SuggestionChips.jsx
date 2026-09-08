@@ -14,7 +14,7 @@ const SuggestionChips = ({ onSelect }) => {
         <button
           key={text}
           onClick={() => onSelect(text)}
-          className="flex items-center gap-1.5 rounded-full border border-black/[0.08] dark:border-[#1D3842] bg-white dark:bg-[#122A32] px-3 py-1.5 text-xs text-slate-600 dark:text-[#9FB2B8] transition-all hover:border-[#5077B3]/30 hover:bg-[#5077B3]/10 hover:text-[#5077B3] dark:hover:text-[#93B3E0]"
+          className="flex items-center gap-1.5 rounded-full border border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] px-3 py-1.5 text-xs text-slate-600 dark:text-[#A9AEA7] transition-all hover:border-[#183B35]/30 hover:bg-[#183B35]/10 hover:text-[#183B35] dark:hover:text-[#8FB8A8]"
         >
           <Icon className="h-3 w-3" />
           {text}

@@ -39,17 +39,17 @@ const ServicePortal = ({ roomId, hotelId, onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-[#122A32] rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in zoom-in duration-300">
+            <div className="bg-white dark:bg-[#1A1E1B] rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in zoom-in duration-300">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-slate-800 dark:text-[#D3DFE2]">Room Service</h2>
-                    <button onClick={onClose} className="text-slate-400 dark:text-[#6B828A] hover:text-slate-600 dark:hover:text-[#9FB2B8] transition">
+                    <h2 className="text-2xl font-bold text-slate-800 dark:text-[#E8EDE6]">Room Service</h2>
+                    <button onClick={onClose} className="text-slate-400 dark:text-[#A9AEA7] hover:text-slate-600 dark:hover:text-[#A9AEA7] transition">
                         <X className="w-6 h-6" />
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
-                        <label className="block text-sm font-semibold text-slate-700 dark:text-[#C1D2D6] mb-2">How can we help you?</label>
+                        <label className="block text-sm font-semibold text-slate-700 dark:text-[#F2EFE8] mb-2">How can we help you?</label>
                         <div className="grid grid-cols-2 gap-3">
                             {['Housekeeping', 'Maintenance', 'Room Service', 'Other'].map((type) => (
                                 <button
@@ -58,8 +58,8 @@ const ServicePortal = ({ roomId, hotelId, onClose }) => {
                                     onClick={() => setServiceType(type)}
                                     className={`py-3 px-4 rounded-xl text-sm font-medium transition-all ${
                                         serviceType === type 
-                                        ? 'bg-[#5077b3] text-white shadow-[#5077b3]/20 shadow-lg' 
-                                        : 'bg-slate-50 dark:bg-[#0E242C] text-slate-600 dark:text-[#9FB2B8] border border-slate-100 dark:border-[#16303A] hover:bg-slate-100 dark:hover:bg-[#16303A]'
+                                        ? 'bg-[#183B35] text-white shadow-[#183B35]/20 shadow-lg' 
+                                        : 'bg-slate-50 dark:bg-[#111412] text-slate-600 dark:text-[#A9AEA7] border border-slate-100 dark:border-[#222823] hover:bg-slate-100 dark:hover:bg-[#222823]'
                                     }`}
                                 >
                                     {type}
@@ -69,19 +69,19 @@ const ServicePortal = ({ roomId, hotelId, onClose }) => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-semibold text-slate-700 dark:text-[#C1D2D6] mb-2">Additional Details (Optional)</label>
+                        <label className="block text-sm font-semibold text-slate-700 dark:text-[#F2EFE8] mb-2">Additional Details (Optional)</label>
                         <textarea
                             value={requestDetails}
                             onChange={(e) => setRequestDetails(e.target.value)}
                             placeholder="e.g. Please bring extra towels or the AC is not cooling..."
-                            className="w-full h-32 px-4 py-3 rounded-xl border border-slate-200 dark:border-[#1D3842] focus:border-[#5077b3] focus:ring-2 focus:ring-[#5077b3]/20 outline-none transition resize-none text-slate-700 dark:text-[#C1D2D6]"
+                            className="w-full h-32 px-4 py-3 rounded-xl border border-slate-200 dark:border-[#303631] focus:border-[#183B35] focus:ring-2 focus:ring-[#183B35]/20 outline-none transition resize-none text-slate-700 dark:text-[#F2EFE8]"
                         />
                     </div>
 
                     <button
                         disabled={loading}
                         className={`w-full py-4 rounded-xl font-bold text-white transition-all shadow-lg ${
-                            loading ? 'bg-slate-300 dark:bg-[#27434D]' : 'bg-[#5077b3] hover:brightness-105 shadow-[#5077b3]/20 active:scale-[0.98]'
+                            loading ? 'bg-slate-300 dark:bg-[#303631]' : 'bg-[#183B35] hover:brightness-105 shadow-[#183B35]/20 active:scale-[0.98]'
                         }`}
                     >
                         {loading ? 'Submitting...' : 'Submit Request'}

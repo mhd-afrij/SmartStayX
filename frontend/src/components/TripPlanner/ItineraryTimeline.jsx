@@ -44,7 +44,7 @@ const ItineraryTimeline = ({ items = [], onRemove, onReplace }) => {
   if (days.length === 0) {
     return (
       <div className="luxury-card-soft p-8 text-center">
-        <p className="text-[#4D6166] dark:text-[#9FB2B8] text-sm">No itinerary items yet.</p>
+        <p className="text-[#5C6B64] dark:text-[#A9AEA7] text-sm">No itinerary items yet.</p>
       </div>
     )
   }
@@ -59,17 +59,17 @@ const ItineraryTimeline = ({ items = [], onRemove, onReplace }) => {
             <button
               type="button"
               onClick={() => setOpenDay(isOpen ? null : day)}
-              className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#FFFAF4] dark:hover:bg-[#0B1D24] transition-colors"
+              className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#F7F5F0] dark:hover:bg-[#111412] transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-space font-bold ${isOpen ? 'bg-[#D4A853] text-[#003844] dark:text-[#E9F1F2]' : 'bg-[#F3ECDE] dark:bg-[#16303A] text-[#4D6166] dark:text-[#9FB2B8]'}`}>
+                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-space font-bold ${isOpen ? 'bg-[#A67C52] text-[#183B35] dark:text-[#F2EFE8]' : 'bg-[#EFEEE8] dark:bg-[#222823] text-[#5C6B64] dark:text-[#A9AEA7]'}`}>
                   {day}
                 </div>
-                <p className="text-sm font-playfair font-bold text-[#003844] dark:text-[#E9F1F2]">Day {day}</p>
+                <p className="text-sm font-playfair font-bold text-[#183B35] dark:text-[#F2EFE8]">Day {day}</p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#879497] dark:text-[#6B828A] font-space">{dayItems.length} items</span>
-                <ChevronDown className={`h-4 w-4 text-[#4D6166] dark:text-[#9FB2B8] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                <span className="text-xs text-[#72766F] dark:text-[#A9AEA7] font-space">{dayItems.length} items</span>
+                <ChevronDown className={`h-4 w-4 text-[#5C6B64] dark:text-[#A9AEA7] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
               </div>
             </button>
 
@@ -82,9 +82,9 @@ const ItineraryTimeline = ({ items = [], onRemove, onReplace }) => {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <div className="px-5 pb-5 space-y-3 border-t border-[#E8E0D1] dark:border-[#1D3842] pt-4">
+                  <div className="px-5 pb-5 space-y-3 border-t border-[#E3E0D8] dark:border-[#303631] pt-4">
                     {dayItems.map((item) => (
-                      <div key={item._id} className="rounded-xl border border-[#E8E0D1] dark:border-[#1D3842] bg-white dark:bg-[#122A32] p-4">
+                      <div key={item._id} className="rounded-xl border border-[#E3E0D8] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] p-4">
                         {editingId === item._id ? (
                           <div className="space-y-2">
                             <Input label="Title" value={editForm.title} onChange={(e) => setEditForm((f) => ({ ...f, title: e.target.value }))} />
@@ -103,47 +103,47 @@ const ItineraryTimeline = ({ items = [], onRemove, onReplace }) => {
                           </div>
                         ) : (
                           <div className="flex items-start gap-3">
-                            <div className="h-14 w-14 shrink-0 rounded-lg bg-[#F3ECDE] dark:bg-[#16303A] overflow-hidden flex items-center justify-center">
+                            <div className="h-14 w-14 shrink-0 rounded-lg bg-[#EFEEE8] dark:bg-[#222823] overflow-hidden flex items-center justify-center">
                               {item.photoUrl ? (
                                 <img src={item.photoUrl} alt={item.title} className="h-full w-full object-cover" />
                               ) : (
-                                <MapPin className="h-5 w-5 text-[#879497] dark:text-[#6B828A]" />
+                                <MapPin className="h-5 w-5 text-[#72766F] dark:text-[#A9AEA7]" />
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-[#F3ECDE] dark:bg-[#16303A] text-[#4D6166] dark:text-[#9FB2B8]">
+                                <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-[#EFEEE8] dark:bg-[#222823] text-[#5C6B64] dark:text-[#A9AEA7]">
                                   {TYPE_LABEL[item.type] || item.type}
                                 </span>
                                 {item.rating > 0 && (
-                                  <span className="flex items-center gap-0.5 text-[10px] text-[#92660f] dark:text-[#E6C075]">
+                                  <span className="flex items-center gap-0.5 text-[10px] text-[#8A643F] dark:text-[#C5A47E]">
                                     <Star className="h-3 w-3 fill-current" /> {item.rating}
                                   </span>
                                 )}
                               </div>
-                              <p className="text-sm font-semibold text-[#003844] dark:text-[#E9F1F2] mt-1">{item.title}</p>
-                              {item.address && <p className="text-xs text-[#4D6166] dark:text-[#9FB2B8] mt-0.5">{item.address}</p>}
-                              {item.notes && <p className="text-xs text-[#879497] dark:text-[#6B828A] mt-1">{item.notes}</p>}
+                              <p className="text-sm font-semibold text-[#183B35] dark:text-[#F2EFE8] mt-1">{item.title}</p>
+                              {item.address && <p className="text-xs text-[#5C6B64] dark:text-[#A9AEA7] mt-0.5">{item.address}</p>}
+                              {item.notes && <p className="text-xs text-[#72766F] dark:text-[#A9AEA7] mt-1">{item.notes}</p>}
                               <div className="flex items-center gap-3 mt-2">
                                 <a
                                   href={directionsUrl(item)}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="inline-flex items-center gap-1 text-xs text-[#5077B3] dark:text-[#93B3E0] font-medium hover:underline"
+                                  className="inline-flex items-center gap-1 text-xs text-[#183B35] dark:text-[#8FB8A8] font-medium hover:underline"
                                 >
                                   <Navigation className="h-3 w-3" /> Directions
                                 </a>
                                 <button
                                   type="button"
                                   onClick={() => startEdit(item)}
-                                  className="inline-flex items-center gap-1 text-xs text-[#4D6166] dark:text-[#9FB2B8] hover:text-[#003844] dark:hover:text-[#E9F1F2]"
+                                  className="inline-flex items-center gap-1 text-xs text-[#5C6B64] dark:text-[#A9AEA7] hover:text-[#183B35] dark:hover:text-[#F2EFE8]"
                                 >
                                   <Pencil className="h-3 w-3" /> Replace
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => onRemove?.(item)}
-                                  className="inline-flex items-center gap-1 text-xs text-[#DC2626] hover:text-[#B91C1C]"
+                                  className="inline-flex items-center gap-1 text-xs text-[#B14646] hover:text-[#DD7070]"
                                 >
                                   <X className="h-3 w-3" /> Remove
                                 </button>

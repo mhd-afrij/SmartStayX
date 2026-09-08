@@ -114,29 +114,29 @@ const cards = [
     key: "bookings",
     icon: CalendarCheck,
     label: "Total Bookings",
-    color: "#4F46E5",
-    glow: "rgba(79,70,229,0.10)",
+    color: "#183B35",
+    glow: "rgba(24,59,53,0.10)",
   },
   {
     key: "revenue",
     icon: DollarSign,
     label: "Revenue",
-    color: "#22C55E",
-    glow: "rgba(34,197,94,0.10)",
+    color: "#7EA88B",
+    glow: "rgba(126,168,139,0.10)",
   },
   {
     key: "occupancy",
     icon: Percent,
     label: "Occupancy",
-    color: "#F59E0B",
-    glow: "rgba(245,158,11,0.10)",
+    color: "#C5A47E",
+    glow: "rgba(197,164,126,0.10)",
   },
   {
     key: "rating",
     icon: Star,
     label: "Guest Rating",
-    color: "#D4A853",
-    glow: "rgba(80, 119, 179,0.10)",
+    color: "#C98F65",
+    glow: "rgba(201,143,101,0.10)",
   },
 ];
 
@@ -207,7 +207,7 @@ const KpiCards = ({ data, currency, formatPrice }) => {
           <motion.div
             key={card.key}
             variants={cardVariants}
-            className="group relative rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] overflow-hidden transition-all duration-300 hover:border-black/[0.1] dark:hover:border-[#232737] hover:shadow-[0_20px_60px_rgba(0,56,68,0.06)]"
+            className="group relative rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] overflow-hidden transition-all duration-300 hover:border-black/[0.1] dark:hover:border-[#303631] hover:shadow-[0_20px_60px_rgba(24,59,53,0.06)]"
           >
             <div
               className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
@@ -245,10 +245,10 @@ const KpiCards = ({ data, currency, formatPrice }) => {
 
               <div className="flex items-end justify-between">
                 <div>
-                  <p className="text-xs font-medium text-slate-400 dark:text-[#6B828A] uppercase tracking-wider mb-1">
+                  <p className="text-xs font-medium text-slate-400 dark:text-[#A9AEA7] uppercase tracking-wider mb-1">
                     {card.label}
                   </p>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-[#E9F1F2] font-space tracking-tight">
+                  <p className="text-2xl font-bold text-slate-900 dark:text-[#F2EFE8] font-space tracking-tight">
                     {metric.prefix || ""}
                     {card.key === 'revenue' ? (
                       formatCurrency(metric.value)

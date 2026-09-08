@@ -22,16 +22,16 @@ const filters = [
 const CustomTooltip = ({ active, payload, label, currency }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] px-4 py-3 shadow-2xl">
-      <p className="text-xs text-slate-400 dark:text-[#6B828A] mb-2">{label}</p>
+    <div className="rounded-xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] px-4 py-3 shadow-2xl">
+      <p className="text-xs text-slate-400 dark:text-[#A9AEA7] mb-2">{label}</p>
       {payload.map((entry, i) => (
         <div key={i} className="flex items-center gap-2 text-sm">
           <div
             className="w-2 h-2 rounded-full"
             style={{ backgroundColor: entry.color }}
           />
-          <span className="text-slate-500 dark:text-[#8299A0]">{entry.name}:</span>
-          <span className="text-slate-900 dark:text-[#E9F1F2] font-medium font-space">
+          <span className="text-slate-500 dark:text-[#A9AEA7]">{entry.name}:</span>
+          <span className="text-slate-900 dark:text-[#F2EFE8] font-medium font-space">
             {entry.name === "Revenue" ? `${currency}${entry.value.toLocaleString()}` : entry.value}
           </span>
         </div>
@@ -61,18 +61,18 @@ const RevenueChart = ({ revenueData, currency = '$', formatPrice }) => {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="relative rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] overflow-hidden"
+        className="relative rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-[0_20px_60px_rgba(24,59,53,0.06)] overflow-hidden"
       >
         <div className="relative z-10 p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center">
-              <DollarSign className="w-4 h-4 text-indigo-600" />
+            <div className="w-8 h-8 rounded-lg bg-[#A67C52]/10 border border-[#A67C52]/40 flex items-center justify-center">
+              <DollarSign className="w-4 h-4 text-[#8A643F] dark:text-[#C5A47E]" />
             </div>
-            <h3 className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">Revenue Overview</h3>
+            <h3 className="text-sm font-medium text-slate-900 dark:text-[#F2EFE8]">Revenue Overview</h3>
           </div>
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <DollarSign className="w-10 h-10 text-slate-300 dark:text-[#4E646B] mb-3" />
-            <p className="text-sm text-slate-400 dark:text-[#6B828A]">No revenue data yet</p>
+            <DollarSign className="w-10 h-10 text-slate-300 dark:text-[#A9AEA7] mb-3" />
+            <p className="text-sm text-slate-400 dark:text-[#A9AEA7]">No revenue data yet</p>
           </div>
         </div>
       </motion.div>
@@ -84,35 +84,35 @@ const RevenueChart = ({ revenueData, currency = '$', formatPrice }) => {
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
-      className="relative rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] overflow-hidden"
+      className="relative rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-[0_20px_60px_rgba(24,59,53,0.06)] overflow-hidden"
     >
-      <div className="absolute top-0 left-1/4 right-0 h-px bg-gradient-to-r from-transparent via-indigo-300/40 to-transparent" />
+      <div className="absolute top-0 left-1/4 right-0 h-px bg-gradient-to-r from-transparent via-[#183B35]/30 to-transparent" />
 
       <div className="relative z-10 p-6">
         <div className="flex items-start justify-between mb-6">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center">
-                <DollarSign className="w-4 h-4 text-indigo-600" />
+              <div className="w-8 h-8 rounded-lg bg-[#A67C52]/10 border border-[#A67C52]/40 flex items-center justify-center">
+                <DollarSign className="w-4 h-4 text-[#8A643F] dark:text-[#C5A47E]" />
               </div>
               <div>
-                <h3 className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">Revenue Overview</h3>
-                <p className="text-2xl font-bold text-slate-900 dark:text-[#E9F1F2] font-space tracking-tight">
+                <h3 className="text-sm font-medium text-slate-900 dark:text-[#F2EFE8]">Revenue Overview</h3>
+                <p className="text-2xl font-bold text-slate-900 dark:text-[#F2EFE8] font-space tracking-tight">
                   {formatPrice ? formatPrice(totalRevenue) : `${currency}${totalRevenue.toLocaleString()}`}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="flex gap-1 p-1 rounded-lg border border-black/[0.06] dark:border-[#232737] bg-[#f4f2ef] dark:bg-[#10131D]">
+          <div className="flex gap-1 p-1 rounded-lg border border-black/[0.06] dark:border-[#303631] bg-[#efeee8] dark:bg-[#111412]">
             {filters.map((f) => (
               <button
                 key={f.key}
                 onClick={() => setActiveFilter(f.key)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 ${
                   activeFilter === f.key
-                    ? "bg-indigo-600 text-white shadow-sm"
-                    : "text-slate-500 dark:text-[#8299A0] hover:text-slate-800 dark:hover:text-[#D3DFE2] hover:bg-white dark:hover:bg-[#122A32]"
+                    ? "bg-[#183B35] text-white shadow-sm"
+                    : "text-slate-500 dark:text-[#A9AEA7] hover:text-slate-800 dark:hover:text-[#F2EFE8] hover:bg-white dark:hover:bg-[#222823]"
                 }`}
               >
                 {f.label}
@@ -133,9 +133,9 @@ const RevenueChart = ({ revenueData, currency = '$', formatPrice }) => {
             >
               <defs>
                 <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#4F46E5" stopOpacity={0.28} />
-                  <stop offset="50%" stopColor="#4F46E5" stopOpacity={0.08} />
-                  <stop offset="100%" stopColor="#4F46E5" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#183B35" stopOpacity={0.28} />
+                  <stop offset="50%" stopColor="#183B35" stopOpacity={0.08} />
+                  <stop offset="100%" stopColor="#183B35" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -147,13 +147,13 @@ const RevenueChart = ({ revenueData, currency = '$', formatPrice }) => {
                 dataKey="date"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#879497", fontSize: 11 }}
+                tick={{ fill: "#A9AEA7", fontSize: 11 }}
                 dy={10}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#879497", fontSize: 11 }}
+                tick={{ fill: "#A9AEA7", fontSize: 11 }}
                 dx={-10}
                 tickFormatter={(v) => `${currency}${(v / 1000).toFixed(0)}k`}
               />
@@ -162,13 +162,13 @@ const RevenueChart = ({ revenueData, currency = '$', formatPrice }) => {
                 type="monotone"
                 dataKey="revenue"
                 name="Revenue"
-                stroke="#4F46E5"
+                stroke="#183B35"
                 strokeWidth={2}
                 fill="url(#revenueGradient)"
                 dot={false}
                 activeDot={{
                   r: 5,
-                  fill: "#4F46E5",
+                  fill: "#183B35",
                   stroke: "#ffffff",
                   strokeWidth: 2,
                 }}

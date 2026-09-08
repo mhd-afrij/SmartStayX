@@ -32,7 +32,7 @@ const SocialWall = () => {
             >
               <TiltCard
                 maxTilt={4}
-                className="group relative overflow-hidden rounded-[16px] border border-black/[0.06] dark:border-[#1D3842] shadow-[0_20px_60px_rgba(0,56,68,0.06)] h-full"
+                className="group relative overflow-hidden rounded-[16px] border border-black/[0.06] dark:border-[#303631] shadow-[0_20px_60px_rgba(24,59,53,0.06)] h-full"
               >
                 <img
                   src={dest.image}
@@ -42,7 +42,7 @@ const SocialWall = () => {
                 />
 
                 {/* Gradient overlay + destination label on hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#07111f]/75 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#111412]/75 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <p className="text-sm font-playfair text-white">
                     {dest.name}

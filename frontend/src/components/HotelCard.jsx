@@ -39,7 +39,7 @@ const HotelCard = ({ room, index }) => {
           />
 
           {index % 2 === 0 && (
-            <div className="absolute left-3 top-3 rounded-full border border-black/[0.06] dark:border-[#1D3842] bg-[#5077B3] px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white">
+            <div className="absolute left-3 top-3 rounded-full border border-black/[0.06] dark:border-[#303631] bg-[#183B35] px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white">
               Best Seller
             </div>
           )}
@@ -47,21 +47,21 @@ const HotelCard = ({ room, index }) => {
 
         {/* Card body */}
         <div className="flex flex-1 flex-col gap-3 p-5">
-          <h3 className="font-playfair text-base text-slate-900 dark:text-[#E9F1F2] leading-tight line-clamp-2">
+          <h3 className="font-playfair text-base text-slate-900 dark:text-[#F2EFE8] leading-tight line-clamp-2">
             {room.hotel?.name || 'Hotel Name'}
           </h3>
 
-          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-[#8299A0]">
+          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-[#A9AEA7]">
             <MapPin className="w-3.5 h-3.5" />
             <span className="truncate">
               {room.hotel?.address || 'Location'}
             </span>
           </div>
 
-          <div className="flex items-center justify-between pt-3 border-t border-black/[0.06] dark:border-[#1D3842] mt-auto">
-            <div className="text-lg font-semibold text-slate-900 dark:text-[#E9F1F2]">
+          <div className="flex items-center justify-between pt-3 border-t border-black/[0.06] dark:border-[#303631] mt-auto">
+            <div className="text-lg font-semibold text-slate-900 dark:text-[#F2EFE8]">
               {formatPrice(room.pricePerNight)}
-              <span className="ml-1 text-xs text-slate-400 dark:text-[#6B828A] font-normal">
+              <span className="ml-1 text-xs text-slate-400 dark:text-[#A9AEA7] font-normal">
                 /night
               </span>
             </div>

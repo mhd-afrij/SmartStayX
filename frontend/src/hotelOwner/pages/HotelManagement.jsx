@@ -172,8 +172,8 @@ const HotelManagement = () => {
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Hotel Management</h1>
-          <p className="text-sm text-slate-500 dark:text-[#8299A0] mt-1">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-[#F2EFE8] tracking-tight">Hotel Management</h1>
+          <p className="text-sm text-slate-500 dark:text-[#A9AEA7] mt-1">
             Register new properties and update hotel image/details from one place.
           </p>
         </div>
@@ -188,18 +188,18 @@ const HotelManagement = () => {
 
       {/* Hotel editor content */}
       {loading ? (
-        <div className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] p-8">
+        <div className="rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-[0_20px_60px_rgba(24,59,53,0.06)] p-8">
           <div className="flex items-center gap-3">
-            <div className="w-5 h-5 rounded-full border-2 border-[#D4A853]/30 border-t-[#D4A853] animate-spin" />
-            <span className="text-sm text-slate-500 dark:text-[#8299A0]">Loading hotel details...</span>
+            <div className="w-5 h-5 rounded-full border-2 border-[#A67C52]/30 border-t-[#A67C52] animate-spin" />
+            <span className="text-sm text-slate-500 dark:text-[#A9AEA7]">Loading hotel details...</span>
           </div>
         </div>
       ) : hotels.length === 0 ? (
-        <div className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] p-12 text-center">
-          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#fbf2e1] dark:bg-[#2E2A1F] border border-[#D4A853]/40 flex items-center justify-center">
-            <Building2 className="w-6 h-6 text-[#B58A2E] dark:text-[#E6C075]" />
+        <div className="rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-[0_20px_60px_rgba(24,59,53,0.06)] p-12 text-center">
+          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#F6EFE3] dark:bg-[#1A1E1B] border border-[#A67C52]/40 flex items-center justify-center">
+            <Building2 className="w-6 h-6 text-[#8A643F] dark:text-[#C5A47E]" />
           </div>
-          <p className="text-slate-500 dark:text-[#8299A0] mb-4">No properties found. Register your first hotel to start management.</p>
+          <p className="text-slate-500 dark:text-[#A9AEA7] mb-4">No properties found. Register your first hotel to start management.</p>
           <button
             onClick={() => setShowHotelReg(true)}
             className="gold-button px-5 py-2 text-xs"
@@ -211,9 +211,9 @@ const HotelManagement = () => {
         <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[1fr_2fr]">
           {/* Property preview column */}
           <div className="space-y-4">
-            <div className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] p-5 space-y-4">
+            <div className="rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-[0_20px_60px_rgba(24,59,53,0.06)] p-5 space-y-4">
               <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Select Property</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-1.5">Select Property</p>
                 <div className="relative">
                   <select
                     value={selectedHotelId}
@@ -226,20 +226,20 @@ const HotelManagement = () => {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7] pointer-events-none" />
                 </div>
               </div>
 
               <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Hotel Image</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-1.5">Hotel Image</p>
                 <label
                   htmlFor="hotel-image"
-                  className="block border border-dashed border-black/[0.15] dark:border-[#232737] rounded-xl p-2 cursor-pointer hover:bg-[#f4f2ef] dark:hover:bg-[#16303A] transition"
+                  className="block border border-dashed border-black/[0.15] dark:border-[#303631] rounded-xl p-2 cursor-pointer hover:bg-[#EFEEE8] dark:hover:bg-[#222823] transition"
                 >
                   {preview ? (
                     <img src={preview} alt="hotel preview" className="w-full h-48 object-cover rounded-lg" />
                   ) : (
-                    <div className="w-full h-48 rounded-lg bg-[#f4f2ef] dark:bg-[#10131D] flex items-center justify-center text-slate-400 dark:text-[#6B828A] text-xs">No image</div>
+                    <div className="w-full h-48 rounded-lg bg-[#EFEEE8] dark:bg-[#111412] flex items-center justify-center text-slate-400 dark:text-[#A9AEA7] text-xs">No image</div>
                   )}
                 </label>
                 <input id="hotel-image" type="file" accept="image/*" hidden onChange={handleImageChange} />
@@ -248,9 +248,9 @@ const HotelManagement = () => {
           </div>
 
           {/* Editable details column */}
-          <div className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] p-5 space-y-4">
+          <div className="rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-[0_20px_60px_rgba(24,59,53,0.06)] p-5 space-y-4">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Hotel Name</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-1.5">Hotel Name</p>
               <input
                 type="text"
                 value={form.name}
@@ -261,7 +261,7 @@ const HotelManagement = () => {
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Address</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-1.5">Address</p>
               <input
                 type="text"
                 value={form.address}
@@ -273,7 +273,7 @@ const HotelManagement = () => {
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Phone</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-1.5">Phone</p>
                 <input
                   type="tel"
                   value={form.contact}
@@ -284,7 +284,7 @@ const HotelManagement = () => {
                 />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Destination</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-1.5">Destination</p>
                 <div className="relative">
                   <select
                     value={form.city}
@@ -297,13 +297,13 @@ const HotelManagement = () => {
                       <option key={city} value={city}>{city}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7] pointer-events-none" />
                 </div>
               </div>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Hotel Details</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-1.5">Hotel Details</p>
               <textarea
                 value={form.description}
                 onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
@@ -326,33 +326,33 @@ const HotelManagement = () => {
 
       {/* Feature cards management */}
       {hotels.length > 0 && (
-        <div className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] p-5 space-y-4">
+        <div className="rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-[0_20px_60px_rgba(24,59,53,0.06)] p-5 space-y-4">
           <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-[#E9F1F2]">Feature Cards</h3>
-            <p className="text-sm text-slate-500 dark:text-[#8299A0] mt-1">Custom feature cards displayed on your room detail pages.</p>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F2EFE8]">Feature Cards</h3>
+            <p className="text-sm text-slate-500 dark:text-[#A9AEA7] mt-1">Custom feature cards displayed on your room detail pages.</p>
           </div>
 
           {features.length > 0 && (
             <div className="space-y-2">
               {features.map((feat, index) => (
-                <div key={index} className="flex items-center gap-3 bg-[#f4f2ef] dark:bg-[#10131D] rounded-xl p-3 border border-black/[0.06] dark:border-[#232737]">
-                  <GripVertical className="w-4 h-4 text-slate-300 dark:text-[#4E646B] shrink-0" />
+                <div key={index} className="flex items-center gap-3 bg-[#EFEEE8] dark:bg-[#111412] rounded-xl p-3 border border-black/[0.06] dark:border-[#303631]">
+                  <GripVertical className="w-4 h-4 text-slate-300 dark:text-[#A9AEA7] shrink-0" />
                   {(() => {
                     const Icon = ICON_MAP[feat.icon]
                     return Icon ? (
-                      <Icon className="w-8 h-8 text-[#B58A2E] dark:text-[#E6C075] shrink-0" />
+                      <Icon className="w-8 h-8 text-[#8A643F] dark:text-[#C5A47E] shrink-0" />
                     ) : (
-                      <div className="w-8 h-8 rounded-lg bg-white dark:bg-[#161925] shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-white dark:bg-[#1A1E1B] shrink-0" />
                     )
                   })()}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2] truncate">{feat.title}</p>
-                    <p className="text-xs text-slate-500 dark:text-[#8299A0] truncate">{feat.description || "No description"}</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-[#F2EFE8] truncate">{feat.title}</p>
+                    <p className="text-xs text-slate-500 dark:text-[#A9AEA7] truncate">{feat.description || "No description"}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setFeatures((prev) => prev.filter((_, i) => i !== index))}
-                    className="p-1.5 rounded-lg text-slate-400 dark:text-[#6B828A] hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 transition-all shrink-0"
+                    className="p-1.5 rounded-lg text-slate-400 dark:text-[#A9AEA7] hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 transition-all shrink-0"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -363,7 +363,7 @@ const HotelManagement = () => {
 
           <div className="grid gap-3 sm:grid-cols-[120px_1fr_1fr_auto] items-end">
             <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-[#8299A0] mb-1">Icon</p>
+              <p className="text-xs font-medium text-slate-500 dark:text-[#A9AEA7] mb-1">Icon</p>
               <select
                 value={newFeature.icon}
                 onChange={(e) => setNewFeature((prev) => ({ ...prev, icon: e.target.value }))}
@@ -375,7 +375,7 @@ const HotelManagement = () => {
               </select>
             </div>
             <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-[#8299A0] mb-1">Title</p>
+              <p className="text-xs font-medium text-slate-500 dark:text-[#A9AEA7] mb-1">Title</p>
               <input
                 type="text"
                 value={newFeature.title}
@@ -385,7 +385,7 @@ const HotelManagement = () => {
               />
             </div>
             <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-[#8299A0] mb-1">Description</p>
+              <p className="text-xs font-medium text-slate-500 dark:text-[#A9AEA7] mb-1">Description</p>
               <input
                 type="text"
                 value={newFeature.description}
@@ -415,10 +415,10 @@ const HotelManagement = () => {
 
       {/* Amenity options management */}
       {hotels.length > 0 && (
-        <div className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] p-5 space-y-4">
+        <div className="rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-[0_20px_60px_rgba(24,59,53,0.06)] p-5 space-y-4">
           <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-[#E9F1F2]">Amenity Options</h3>
-            <p className="text-sm text-slate-500 dark:text-[#8299A0] mt-1">Amenity choices available when adding or editing rooms for this hotel.</p>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F2EFE8]">Amenity Options</h3>
+            <p className="text-sm text-slate-500 dark:text-[#A9AEA7] mt-1">Amenity choices available when adding or editing rooms for this hotel.</p>
           </div>
 
           {amenityOptions.length > 0 && (
@@ -426,13 +426,13 @@ const HotelManagement = () => {
               {amenityOptions.map((opt, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-[#232737] bg-[#f4f2ef] dark:bg-[#10131D]"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-black/[0.06] dark:border-[#303631] bg-[#EFEEE8] dark:bg-[#111412]"
                 >
-                  <span className="text-xs text-slate-600 dark:text-[#9FB2B8]">{opt}</span>
+                  <span className="text-xs text-slate-600 dark:text-[#A9AEA7]">{opt}</span>
                   <button
                     type="button"
                     onClick={() => setAmenityOptions((prev) => prev.filter((_, i) => i !== index))}
-                    className="text-slate-400 dark:text-[#6B828A] hover:text-red-600 dark:hover:text-red-300 transition-colors"
+                    className="text-slate-400 dark:text-[#A9AEA7] hover:text-red-600 dark:hover:text-red-300 transition-colors"
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>

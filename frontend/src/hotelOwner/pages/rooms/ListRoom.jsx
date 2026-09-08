@@ -219,8 +219,8 @@ const ListRoom = () => {
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Room Listings</h1>
-          <p className="text-sm text-slate-500 dark:text-[#8299A0] mt-1">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-[#F2EFE8] tracking-tight">Room Listings</h1>
+          <p className="text-sm text-slate-500 dark:text-[#A9AEA7] mt-1">
             Manage all your room listings, update pricing, and control availability.
           </p>
         </div>
@@ -236,20 +236,20 @@ const ListRoom = () => {
               </option>
             ))}
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7] pointer-events-none" />
         </div>
       </div>
 
       {rooms.length === 0 && !isLoading ? (
-        <div className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] p-12 text-center">
-          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#fbf2e1] dark:bg-[#2E2A1F] border border-[#D4A853]/40 flex items-center justify-center">
-            <List className="w-6 h-6 text-[#B58A2E] dark:text-[#E6C075]" />
+        <div className="rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-[0_20px_60px_rgba(24,59,53,0.06)] p-12 text-center">
+          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#F6EFE3] dark:bg-[#1A1E1B] border border-[#A67C52]/40 flex items-center justify-center">
+            <List className="w-6 h-6 text-[#8A643F] dark:text-[#C5A47E]" />
           </div>
-          <p className="text-slate-500 dark:text-[#8299A0]">No rooms listed yet. Add your first room to get started.</p>
+          <p className="text-slate-500 dark:text-[#A9AEA7]">No rooms listed yet. Add your first room to get started.</p>
         </div>
       ) : filteredRooms.length === 0 ? (
-        <div className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] p-12 text-center">
-          <p className="text-slate-500 dark:text-[#8299A0]">No rooms match the selected room type.</p>
+        <div className="rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-[0_20px_60px_rgba(24,59,53,0.06)] p-12 text-center">
+          <p className="text-slate-500 dark:text-[#A9AEA7]">No rooms match the selected room type.</p>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -258,33 +258,33 @@ const ListRoom = () => {
               key={room._id}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              className="group rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] overflow-hidden hover:border-[#D4A853]/40 transition-all"
+              className="group rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-[0_20px_60px_rgba(24,59,53,0.06)] overflow-hidden hover:border-[#A67C52]/40 transition-all"
             >
               {room.images && room.images[0] ? (
-                <div className="aspect-video bg-[#f4f2ef] dark:bg-[#10131D] overflow-hidden">
+                <div className="aspect-video bg-[#EFEEE8] dark:bg-[#111412] overflow-hidden">
                   <img src={room.images[0]} alt={room.roomType} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 </div>
               ) : (
-                <div className="aspect-video bg-[#f4f2ef] dark:bg-[#10131D] flex items-center justify-center">
-                  <span className="text-slate-400 dark:text-[#6B828A] text-sm">No image</span>
+                <div className="aspect-video bg-[#EFEEE8] dark:bg-[#111412] flex items-center justify-center">
+                  <span className="text-slate-400 dark:text-[#A9AEA7] text-sm">No image</span>
                 </div>
               )}
 
               <div className="p-4 space-y-3">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-slate-900 dark:text-[#E9F1F2]">{room.roomType}</h3>
+                    <h3 className="font-semibold text-slate-900 dark:text-[#F2EFE8]">{room.roomType}</h3>
                     {room.hotel?.name && (
-                      <p className="text-xs text-slate-500 dark:text-[#8299A0]">{room.hotel.name}</p>
+                      <p className="text-xs text-slate-500 dark:text-[#A9AEA7]">{room.hotel.name}</p>
                     )}
                     {room.roomNumber && (
-                      <span className="inline-block mt-1 text-[10px] font-medium text-[#B58A2E] dark:text-[#E6C075] bg-[#fbf2e1] dark:bg-[#2E2A1F] px-2 py-0.5 rounded-full border border-[#D4A853]/40">
+                      <span className="inline-block mt-1 text-[10px] font-medium text-[#8A643F] dark:text-[#C5A47E] bg-[#F6EFE3] dark:bg-[#1A1E1B] px-2 py-0.5 rounded-full border border-[#A67C52]/40">
                         Room {room.roomNumber}
                       </span>
                     )}
-                    <p className="text-lg font-bold text-[#B58A2E] dark:text-[#E6C075] font-space mt-1">
+                    <p className="text-lg font-bold text-[#8A643F] dark:text-[#C5A47E] font-space mt-1">
                       {formatPrice(room.pricePerNight)}
-                      <span className="text-xs text-slate-400 dark:text-[#6B828A] font-normal"> / night</span>
+                      <span className="text-xs text-slate-400 dark:text-[#A9AEA7] font-normal"> / night</span>
                     </p>
                   </div>
                   <span
@@ -301,21 +301,21 @@ const ListRoom = () => {
                 {room.amenities && room.amenities.length > 0 && (
                   <div className="flex flex-wrap gap-1">
                     {room.amenities.slice(0, 3).map((amenity, idx) => (
-                      <span key={idx} className="text-[10px] bg-[#f4f2ef] dark:bg-[#10131D] text-slate-600 dark:text-[#9FB2B8] px-2 py-0.5 rounded">
+                      <span key={idx} className="text-[10px] bg-[#EFEEE8] dark:bg-[#111412] text-slate-600 dark:text-[#A9AEA7] px-2 py-0.5 rounded">
                         {amenity}
                       </span>
                     ))}
                     {room.amenities.length > 3 && (
-                      <span className="text-[10px] text-slate-400 dark:text-[#6B828A] px-2 py-0.5">
+                      <span className="text-[10px] text-slate-400 dark:text-[#A9AEA7] px-2 py-0.5">
                         +{room.amenities.length - 3} more
                       </span>
                     )}
                   </div>
                 )}
 
-                <div className="pt-3 border-t border-black/[0.06] dark:border-[#232737] flex items-center justify-between">
+                <div className="pt-3 border-t border-black/[0.06] dark:border-[#303631] flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-slate-500 dark:text-[#8299A0]">Available</span>
+                    <span className="text-[11px] text-slate-500 dark:text-[#A9AEA7]">Available</span>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
@@ -324,20 +324,20 @@ const ListRoom = () => {
                         onChange={() => toggleAvailability(room._id)}
                       />
                       <div className="h-5 w-9 rounded-full bg-black/[0.1] dark:bg-white/5 peer peer-checked:bg-emerald-200 transition-colors" />
-                      <span className="absolute left-0.5 top-0.5 w-4 h-4 bg-white dark:bg-[#161925] border border-black/[0.06] dark:border-[#232737] rounded-full transition-transform duration-200 peer-checked:translate-x-4 peer-checked:bg-emerald-600 peer-checked:border-emerald-600" />
+                      <span className="absolute left-0.5 top-0.5 w-4 h-4 bg-white dark:bg-[#1A1E1B] border border-black/[0.06] dark:border-[#303631] rounded-full transition-transform duration-200 peer-checked:translate-x-4 peer-checked:bg-emerald-600 peer-checked:border-emerald-600" />
                     </label>
                   </div>
 
                   <div className="flex items-center gap-1">
                     <button
-                      className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#232737] text-slate-500 dark:text-[#8299A0] hover:text-[#B58A2E] dark:hover:text-[#E6C075] hover:border-[#D4A853]/40 hover:bg-[#fbf2e1] dark:hover:bg-[#2E2A1F] transition-all"
+                      className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#303631] text-slate-500 dark:text-[#A9AEA7] hover:text-[#8A643F] dark:hover:text-[#C5A47E] hover:border-[#A67C52]/40 hover:bg-[#F6EFE3] dark:hover:bg-[#1A1E1B] transition-all"
                       onClick={() => openEditModal(room)}
                       title="Edit"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                     </button>
                     <button
-                      className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#232737] text-slate-500 dark:text-[#8299A0] hover:text-red-600 dark:hover:text-red-300 hover:border-red-200 dark:hover:border-red-500/25 hover:bg-red-50 transition-all"
+                      className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#303631] text-slate-500 dark:text-[#A9AEA7] hover:text-red-600 dark:hover:text-red-300 hover:border-red-200 dark:hover:border-red-500/25 hover:bg-red-50 transition-all"
                       disabled={deletingId === room._id} onClick={() => deleteRoom(room._id)}
                       title="Delete"
                     >
@@ -357,21 +357,21 @@ const ListRoom = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             onSubmit={submitRoomEdit}
-            className="w-full max-w-xl rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] p-6 space-y-5 shadow-2xl"
+            className="w-full max-w-xl rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] p-6 space-y-5 shadow-2xl"
           >
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-[#E9F1F2]">Edit Room</h3>
-                <p className="text-sm text-slate-500 dark:text-[#8299A0]">Update room details and save changes.</p>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F2EFE8]">Edit Room</h3>
+                <p className="text-sm text-slate-500 dark:text-[#A9AEA7]">Update room details and save changes.</p>
               </div>
               <button type="button" onClick={closeEditModal} className="p-1 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/5 transition-colors">
-                <X className="w-4 h-4 text-slate-400 dark:text-[#6B828A]" />
+                <X className="w-4 h-4 text-slate-400 dark:text-[#A9AEA7]" />
               </button>
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
               <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Room Number</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-1.5">Room Number</p>
                 <input
                   type="text"
                   placeholder='e.g. R101'
@@ -381,7 +381,7 @@ const ListRoom = () => {
                 />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Room Type</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-1.5">Room Type</p>
                 <div className="relative">
                   <select
                     value={editForm.roomType}
@@ -394,11 +394,11 @@ const ListRoom = () => {
                     <option value="Luxury Room">Luxury Room</option>
                     <option value="Family Suite">Family Suite</option>
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7] pointer-events-none" />
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Price / night</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-1.5">Price / night</p>
                 <input
                   type="number"
                   min={0}
@@ -410,7 +410,7 @@ const ListRoom = () => {
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-2">Amenities</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-2">Amenities</p>
               <div className="flex flex-wrap gap-2">
                 {editAmenityOptions.map((amenity) => (
                   <button
@@ -424,8 +424,8 @@ const ListRoom = () => {
                     }
                     className={`px-3 py-2 rounded-lg border text-xs font-medium transition-all ${
                       editForm.amenities[amenity]
-                        ? "border-[#D4A853]/40 bg-[#fbf2e1] dark:bg-[#2E2A1F] text-[#B58A2E] dark:text-[#E6C075]"
-                        : "border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#161925] text-slate-500 dark:text-[#8299A0]"
+                        ? "border-[#A67C52]/40 bg-[#F6EFE3] dark:bg-[#1A1E1B] text-[#8A643F] dark:text-[#C5A47E]"
+                        : "border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-slate-500 dark:text-[#A9AEA7]"
                     }`}
                   >
                     {amenity}
@@ -435,8 +435,8 @@ const ListRoom = () => {
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-2">Room Images</p>
-              <label className="border border-dashed border-black/[0.15] dark:border-[#232737] rounded-xl px-3 py-4 block text-center cursor-pointer hover:bg-[#f4f2ef] dark:hover:bg-[#232737] transition">
+              <p className="text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-2">Room Images</p>
+              <label className="border border-dashed border-black/[0.15] dark:border-[#303631] rounded-xl px-3 py-4 block text-center cursor-pointer hover:bg-[#EFEEE8] dark:hover:bg-[#303631] transition">
                 <input type="file" accept="image/*" hidden onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
@@ -444,7 +444,7 @@ const ListRoom = () => {
                     setEditPreview(URL.createObjectURL(file));
                   }
                 }} />
-                <span className="text-xs text-slate-500 dark:text-[#8299A0]">Click to upload new image</span>
+                <span className="text-xs text-slate-500 dark:text-[#A9AEA7]">Click to upload new image</span>
               </label>
               {editPreview && (
                 <div className="mt-2 relative">
@@ -461,12 +461,12 @@ const ListRoom = () => {
                 type="checkbox"
                 checked={editForm.isAvailable}
                 onChange={(e) => setEditForm((prev) => ({ ...prev, isAvailable: e.target.checked }))}
-                className="w-4 h-4 rounded border-black/[0.15] dark:border-[#232737] bg-white dark:bg-[#161925] text-[#B58A2E] dark:text-[#E6C075] focus:ring-[#D4A853]/40"
+                className="w-4 h-4 rounded border-black/[0.15] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-[#8A643F] dark:text-[#C5A47E] focus:ring-[#A67C52]/40"
               />
-              <span className="text-sm text-slate-600 dark:text-[#9FB2B8]">Room is available for booking</span>
+              <span className="text-sm text-slate-600 dark:text-[#A9AEA7]">Room is available for booking</span>
             </label>
 
-            <div className="pt-2 border-t border-black/[0.06] dark:border-[#232737] flex items-center justify-end gap-2">
+            <div className="pt-2 border-t border-black/[0.06] dark:border-[#303631] flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={closeEditModal}

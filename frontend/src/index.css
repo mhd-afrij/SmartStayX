@@ -5,31 +5,71 @@
 /* Class-based dark mode: enables `dark:` utilities when <html class="dark"> */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ============================================================
+   2026 Luxury Hotel design tokens — Deep Forest + Warm Ivory +
+   Champagne + Terracotta. Semantic tokens power both light and
+   dark mode via the corresponding CSS variables below.
+   ============================================================ */
 :root {
-  --color-navy: #003844;
-  --color-primary: #5077b3;
-  --color-primary-hover: #4168a0;
-  --color-accent: #b9b4ce;
-  --color-accent-soft: #efedf7;
-  --color-gold: #d4a853;
-  --color-gold-soft: #fbf2e1;
-  --color-teal: #2f6b70;
-  --color-success: #16a34a;
-  --color-warning: #d97706;
-  --color-danger: #dc2626;
-  --color-info: #0284c7;
-  --color-bg: #fffaf4;
-  --color-surface: #ffffff;
-  --color-bg-alt: #f3ecde;
-  --color-text: #003844;
-  --color-text-secondary: #4d6166;
-  --color-text-muted: #879497;
-  --color-border: #e8e0d1;
+  /* brand */
+  --color-navy: #183b35;
+  --color-primary: #183b35;
+  --color-primary-hover: #2a4a43;
+  --color-forest: #183b35;
+  --color-forest-deep: #2a4a43;
+  --color-sage: #6f9186;
 
-  /* legacy aliases kept for existing luxury-card, gold-button, ghost-button classes */
+  --color-accent: #a67c52;
+  --color-accent-soft: #f3ecdf;
+  --color-champagne: #a67c52;
+  --color-champagne-soft: #f6efe3;
+  --color-bronze: #8a643f;
+  --color-terracotta: #c98f65;
+
+  --color-gold: #a67c52;
+  --color-gold-soft: #f6efe3;
+  --color-teal: #2f6b70;
+  --color-info: #3e7c82;
+
+  /* status */
+  --color-success: #4c6f5b;
+  --color-warning: #c98f65;
+  --color-danger: #b14646;
+
+  /* surfaces */
+  --color-bg: #f7f5f0;
+  --color-surface: #ffffff;
+  --color-bg-alt: #efeee8;
+  --color-elevated: #ffffff;
+
+  /* text */
+  --color-text: #202522;
+  --color-text-secondary: #5c6b64;
+  --color-text-muted: #72766f;
+
+  /* border */
+  --color-border: #e3e0d8;
+
+  /* semantic shadcn-style aliases */
+  --background: var(--color-bg);
+  --foreground: var(--color-text);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-text);
+  --popover: var(--color-surface);
+  --popover-foreground: var(--color-text);
+  --secondary: var(--color-bg-alt);
+  --secondary-foreground: var(--color-text);
+  --muted: var(--color-bg-alt);
+  --muted-foreground: var(--color-text-muted);
+  --accent-foreground: var(--color-text);
+  --destructive: var(--color-danger);
+  --color-primary-foreground: #f7f5f0;
+  --primary-foreground: var(--color-primary-foreground);
+
+  /* legacy aliases kept for existing luxury-card, gold-button, ghost-button, ghost classes */
   --color-primary-soft: var(--color-gold-soft);
-  --color-secondary: var(--color-navy);
-  --color-muted: var(--color-text-secondary);
+  --color-secondary: var(--color-forest);
+  --color-muted: #72766f;
 
   /* spacing scale (8px system) */
   --space-1: 8px;
@@ -47,9 +87,9 @@
   --radius-dialog: 20px;
 
   /* shadow scale */
-  --shadow-sm: 0 1px 2px rgba(0, 56, 68, 0.06);
-  --shadow-md: 0 8px 24px rgba(0, 56, 68, 0.08);
-  --shadow-lg: 0 20px 50px rgba(0, 56, 68, 0.12);
+  --shadow-sm: 0 1px 2px rgba(24, 59, 53, 0.06);
+  --shadow-md: 0 8px 24px rgba(24, 59, 53, 0.08);
+  --shadow-lg: 0 20px 50px rgba(24, 59, 53, 0.12);
 }
 
 * {
@@ -111,7 +151,7 @@ body {
   height: 20rem;
   left: -8rem;
   top: 6rem;
-  background: rgba(80, 119, 179, 0.07);
+  background: rgba(24, 59, 53, 0.06);
 }
 
 .luxury-shell::after {
@@ -119,7 +159,7 @@ body {
   height: 18rem;
   right: -6rem;
   bottom: 6rem;
-  background: rgba(185, 180, 206, 0.18);
+  background: rgba(166, 124, 82, 0.14);
 }
 
 .luxury-section {
@@ -199,7 +239,7 @@ body {
 .luxury-input:focus,
 .luxury-select:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(80, 119, 179, 0.15);
+  box-shadow: 0 0 0 3px rgba(24, 59, 53, 0.15);
   background: var(--color-surface);
 }
 
@@ -210,7 +250,7 @@ body {
 
 .luxury-input.has-error:focus,
 .luxury-select.has-error:focus {
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+  box-shadow: 0 0 0 3px rgba(177, 70, 70, 0.15);
 }
 
 .luxury-input[type='date']::-webkit-calendar-picker-indicator {
@@ -251,7 +291,7 @@ body {
   background: #fff;
 }
 
-/* Primary button — solid steel blue (#5077b3), per design-system spec */
+/* Primary button — solid deep forest, per design-system spec */
 .gold-button {
   display: inline-flex;
   align-items: center;
@@ -260,11 +300,11 @@ body {
   border: 0;
   border-radius: var(--radius-control);
   background: var(--color-primary);
-  color: #ffffff;
+  color: var(--color-primary-foreground);
   font-family: 'Inter', sans-serif;
   font-weight: 600;
   letter-spacing: 0.01em;
-  box-shadow: 0 1px 2px rgba(0, 56, 68, 0.05);
+  box-shadow: 0 1px 2px rgba(24, 59, 53, 0.05);
   transition: background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
@@ -317,14 +357,14 @@ body {
   outline-offset: 2px;
 }
 
-/* Premium accent — gold reserved for ratings, selected states, luxury highlights only */
+/* Premium accent — champagne reserved for ratings, selected states, luxury highlights only */
 .gold-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   background: var(--color-gold-soft);
-  color: #92660f;
-  border: 1px solid rgba(212, 168, 83, 0.35);
+  color: var(--color-bronze);
+  border: 1px solid rgba(166, 124, 82, 0.35);
   border-radius: 999px;
   padding: 0.2rem 0.65rem;
   font-size: 0.7rem;
@@ -333,9 +373,9 @@ body {
 
 .mesh-glow {
   background:
-    radial-gradient(circle at top left, rgba(80, 119, 179, 0.07), transparent 30%),
-    radial-gradient(circle at top right, rgba(185, 180, 206, 0.22), transparent 32%),
-    radial-gradient(circle at bottom center, rgba(0, 56, 68, 0.03), transparent 28%);
+    radial-gradient(circle at top left, rgba(24, 59, 53, 0.05), transparent 30%),
+    radial-gradient(circle at top right, rgba(166, 124, 82, 0.18), transparent 32%),
+    radial-gradient(circle at bottom center, rgba(32, 37, 34, 0.02), transparent 28%);
 }
 
 .slow-zoom {
@@ -353,7 +393,7 @@ body {
 
 .luxury-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 56, 68, 0.12), transparent);
+  background: linear-gradient(90deg, transparent, rgba(24, 59, 53, 0.12), transparent);
 }
 
 .nav-link {
@@ -408,24 +448,64 @@ body {
 }
 
 /* ============================================================
-   Dark mode — huemint palette variant (deep teal + steel blue)
+   Dark mode — 2026 luxury hotel cinematic palette
+   (deep charcoal-green, sage, champagne, terracotta)
    ============================================================ */
 .dark {
   color-scheme: dark;
 
-  /* ink & surfaces */
-  --color-bg: #0b1d24;
-  --color-surface: #122a32;
-  --color-bg-alt: #16303a;
-  --color-border: #1d3842;
-  --color-text: #e9f1f2;
-  --color-text-secondary: #9fb2b8;
-  --color-text-muted: #6b828a;
+  /* brand */
+  --color-navy: #222823;
+  --color-primary: #8fb8a8;
+  --color-primary-hover: #a2c6b4;
+  --color-forest: #8fb8a8;
+  --color-forest-deep: #6f9186;
+  --color-sage: #8fb8a8;
 
-  /* brand accents — keep the steel blue as-is so white text on primary
-     CTAs keeps ~4.4:1 contrast; brighten only foreground accents below */
-  --color-primary: #5077b3;
-  --color-primary-hover: #4168a0;
+  --color-accent: #c5a47e;
+  --color-accent-soft: #2b2f2b;
+  --color-champagne: #c5a47e;
+  --color-champagne-soft: #33302a;
+  --color-bronze: #a67c52;
+  --color-terracotta: #d29a72;
+
+  --color-gold: #c5a47e;
+  --color-gold-soft: #33302a;
+  --color-teal: #6f9186;
+  --color-info: #7ea88b;
+
+  /* status */
+  --color-success: #7ea88b;
+  --color-warning: #d29a72;
+  --color-danger: #dd7070;
+
+  /* ink & surfaces */
+  --color-bg: #111412;
+  --color-surface: #1a1e1b;
+  --color-bg-alt: #222823;
+  --color-elevated: #222823;
+  --color-border: #303631;
+  --color-text: #f2efe8;
+  --color-text-secondary: #b8beb6;
+  --color-text-muted: #a9aea7;
+
+  /* semantic aliases */
+  --background: var(--color-bg);
+  --foreground: var(--color-text);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-text);
+  --popover: var(--color-elevated);
+  --popover-foreground: var(--color-text);
+  --secondary: var(--color-bg-alt);
+  --secondary-foreground: var(--color-text);
+  --muted: var(--color-bg-alt);
+  --muted-foreground: var(--color-text-muted);
+  --accent-foreground: var(--color-text);
+  --destructive: var(--color-danger);
+  --color-primary-foreground: #111412;
+  --primary-foreground: var(--color-primary-foreground);
+
+  --color-muted: #a9aea7;
 
   /* shadows go deeper in the dark */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -435,45 +515,45 @@ body {
 
 .dark .mesh-glow {
   background:
-    radial-gradient(circle at top left, rgba(110, 147, 201, 0.12), transparent 30%),
-    radial-gradient(circle at top right, rgba(185, 180, 206, 0.1), transparent 32%),
-    radial-gradient(circle at bottom center, rgba(233, 241, 242, 0.03), transparent 28%);
+    radial-gradient(circle at top left, rgba(143, 184, 168, 0.12), transparent 30%),
+    radial-gradient(circle at top right, rgba(197, 164, 126, 0.1), transparent 32%),
+    radial-gradient(circle at bottom center, rgba(242, 239, 232, 0.03), transparent 28%);
 }
 
 .dark .luxury-shell::before {
-  background: rgba(110, 147, 201, 0.12);
+  background: rgba(143, 184, 168, 0.12);
 }
 
 .dark .luxury-shell::after {
-  background: rgba(185, 180, 206, 0.08);
+  background: rgba(197, 164, 126, 0.08);
 }
 
 .dark .luxury-divider {
-  background: linear-gradient(90deg, transparent, rgba(233, 241, 242, 0.12), transparent);
+  background: linear-gradient(90deg, transparent, rgba(242, 239, 232, 0.12), transparent);
 }
 
 .dark .luxury-input:focus,
 .dark .luxury-select:focus {
-  box-shadow: 0 0 0 3px rgba(110, 147, 201, 0.22);
+  box-shadow: 0 0 0 3px rgba(143, 184, 168, 0.22);
 }
 
-/* Small-caps kickers get a brighter blue on dark ink for readability */
+/* Small-caps kickers get a brighter sage on dark ink for readability */
 .dark .luxury-kicker {
-  color: #93b3e0;
+  color: #8fb8a8;
 }
 
 .dark .gold-badge {
-  background: rgba(212, 168, 83, 0.12);
-  color: #e6c075;
-  border-color: rgba(212, 168, 83, 0.35);
+  background: rgba(197, 164, 126, 0.12);
+  color: #d9bc96;
+  border-color: rgba(197, 164, 126, 0.35);
 }
 
 /* Native date/select controls must flip text to light in dark mode */
 .dark .booking-date-input,
 .dark .booking-select {
-  color: #fff !important;
-  -webkit-text-fill-color: #fff !important;
-  caret-color: #fff;
+  color: #f2efe8 !important;
+  -webkit-text-fill-color: #f2efe8 !important;
+  caret-color: #f2efe8;
 }
 
 .dark .booking-date-input::-webkit-datetime-edit,
@@ -482,27 +562,27 @@ body {
 .dark .booking-date-input::-webkit-datetime-edit-month-field,
 .dark .booking-date-input::-webkit-datetime-edit-day-field,
 .dark .booking-date-input::-webkit-datetime-edit-year-field {
-  color: #fff !important;
+  color: #f2efe8 !important;
 }
 
 .dark .booking-select option {
-  color: #fff;
-  background: #122a32;
+  color: #f2efe8;
+  background: #1a1e1b;
 }
 
 /* Recharts surfaces render in the dark theme (axis ticks only — chart
    label colors set per-series are left alone) */
 .dark .recharts-default-tooltip {
-  background-color: #122a32 !important;
-  border-color: #1d3842 !important;
+  background-color: #1a1e1b !important;
+  border-color: #303631 !important;
 }
 
 .dark .recharts-cartesian-grid line {
-  stroke: #1d3842 !important;
+  stroke: #303631 !important;
 }
 
 .dark .recharts-cartesian-axis-tick text {
-  fill: #9fb2b8 !important;
+  fill: #a9aea7 !important;
 }
 
 /* Clerk auth components — adapt surfaces to the dark theme (sign-in/sign-up
@@ -511,8 +591,8 @@ body {
 .dark .cl-modalCard,
 .dark .cl-userButtonPopoverCard,
 .dark .cl-popoverCard {
-  background-color: #122a32 !important;
-  color: #e9f1f2 !important;
+  background-color: #1a1e1b !important;
+  color: #f2efe8 !important;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45) !important;
 }
 
@@ -526,26 +606,26 @@ body {
 .dark .cl-footerActionLink,
 .dark .cl-dividerText,
 .dark .cl-alternativeMethodsBlockButtonText {
-  color: #e9f1f2 !important;
+  color: #f2efe8 !important;
 }
 
 .dark .cl-formFieldInput,
 .dark .cl-phoneInputBox,
 .dark .cl-searchBox {
-  background-color: #0b1d24 !important;
-  border-color: #1d3842 !important;
-  color: #e9f1f2 !important;
+  background-color: #111412 !important;
+  border-color: #303631 !important;
+  color: #f2efe8 !important;
 }
 
 .dark .cl-formFieldInput::placeholder,
 .dark .cl-phoneInputBox::placeholder {
-  color: #6b828a !important;
+  color: #a9aea7 !important;
 }
 
 .dark .cl-socialButtonsBlockButton,
 .dark .cl-alternativeMethodsBlockButton {
-  background-color: #16303a !important;
-  border-color: #1d3842 !important;
+  background-color: #222823 !important;
+  border-color: #303631 !important;
 }
 
 .dark .cl-footer,
@@ -554,33 +634,33 @@ body {
 }
 
 .dark .cl-otpInput {
-  background-color: #0b1d24 !important;
-  border-color: #1d3842 !important;
-  color: #e9f1f2 !important;
+  background-color: #111412 !important;
+  border-color: #303631 !important;
+  color: #f2efe8 !important;
 }
 
 /* ---------------------------------------------------------------------------
-   Owner dashboard shell — dark ink background with gold accents.
+   Owner dashboard shell — dark charcoal background with champagne accents.
    Scoped to .owner-shell (added on the owner layout root) so the public site
    and the admin console keep their own palettes.
 --------------------------------------------------------------------------- */
 .owner-shell .gold-button {
-  background: linear-gradient(135deg, #e6c075 0%, #d4a853 55%, #c79a3e 100%);
-  color: #2a230f;
+  background: linear-gradient(135deg, #c5a47e 0%, #d9bc96 55%, #a67c52 100%);
+  color: #222823;
 }
 
 .owner-shell .gold-button:hover {
-  background: linear-gradient(135deg, #f0cf8f 0%, #e0b45f 55%, #d4a853 100%);
-  box-shadow: 0 8px 20px rgba(212, 168, 83, 0.35);
+  background: linear-gradient(135deg, #d9bc96 0%, #c5a47e 55%, #b08a5f 100%);
+  box-shadow: 0 8px 20px rgba(197, 164, 126, 0.35);
 }
 
 .owner-shell .gold-button:focus-visible {
-  outline-color: #d4a853;
+  outline-color: #c5a47e;
 }
 
 .owner-shell .luxury-input:focus,
 .owner-shell .luxury-select:focus {
-  border-color: #d4a853;
-  box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.22);
+  border-color: #c5a47e;
+  box-shadow: 0 0 0 3px rgba(197, 164, 126, 0.22);
 }
 

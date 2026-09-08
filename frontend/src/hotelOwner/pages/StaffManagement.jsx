@@ -13,10 +13,10 @@ const ASSIGNABLE_ROLES = [
 ];
 
 const ROLE_BADGE = {
-  hotel_manager: "border-[#D4A853]/40 bg-[#D4A853]/10 text-[#B58A2E] dark:text-[#E6C075]",
+  hotel_manager: "border-[#A67C52]/40 bg-[#A67C52]/10 text-[#8A643F] dark:text-[#C5A47E]",
   super_admin: "border-red-200 dark:border-red-500/25 bg-red-50 text-red-600 dark:text-red-300",
   receptionist: "border-indigo-200 bg-indigo-50 text-indigo-600",
-  none: "border-slate-200 dark:border-[#232737] bg-slate-100 dark:bg-[#10131D] text-slate-500 dark:text-[#8299A0]",
+  none: "border-slate-200 dark:border-[#303631] bg-slate-100 dark:bg-[#111412] text-slate-500 dark:text-[#A9AEA7]",
 };
 
 // Show the user's current role even when it isn't assignable (staff/admin),
@@ -40,14 +40,14 @@ const timeAgo = (dateStr) => {
   return `${days}d ago`;
 };
 
-const StatCard = ({ icon: Icon, label, value, tone = "bg-[#D4A853]/10 text-[#B58A2E] dark:text-[#E6C075]" }) => (
-  <div className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] p-5 flex items-center gap-4">
+const StatCard = ({ icon: Icon, label, value, tone = "bg-[#A67C52]/10 text-[#8A643F] dark:text-[#C5A47E]" }) => (
+  <div className="rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] p-5 flex items-center gap-4">
     <div className={`h-11 w-11 shrink-0 rounded-xl flex items-center justify-center ${tone}`}>
       <Icon className="w-5 h-5" />
     </div>
     <div className="min-w-0">
-      <p className="text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-wide">{label}</p>
-      <p className="text-xl font-semibold text-slate-900 dark:text-[#E9F1F2]">{value}</p>
+      <p className="text-xs font-medium text-slate-500 dark:text-[#A9AEA7] uppercase tracking-wide">{label}</p>
+      <p className="text-xl font-semibold text-slate-900 dark:text-[#F2EFE8]">{value}</p>
     </div>
   </div>
 );
@@ -141,37 +141,37 @@ const StaffManagement = () => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pb-10">
       {/* Page header */}
       <div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Staff Management</h1>
-        <p className="text-sm text-slate-500 dark:text-[#8299A0] mt-1">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-[#F2EFE8] tracking-tight">Staff Management</h1>
+        <p className="text-sm text-slate-500 dark:text-[#A9AEA7] mt-1">
           Manage your hotel team — employee list, roles, and recent activity.
         </p>
       </div>
 
       {/* Summary stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard icon={Users} label="Team members" value={total} tone="bg-[#D4A853]/10 text-[#B58A2E] dark:text-[#E6C075]" />
-        <StatCard icon={ShieldCheck} label="Owners" value={counts.owners} tone="bg-[#F3ECDE] dark:bg-[#10131D] text-[#B58A2E] dark:text-[#E6C075]" />
-        <StatCard icon={UserCog} label="Front desk" value={counts.receptionists} tone="bg-indigo-50 text-indigo-600 dark:bg-[#1B2436] dark:text-indigo-300" />
+        <StatCard icon={Users} label="Team members" value={total} tone="bg-[#A67C52]/10 text-[#8A643F] dark:text-[#C5A47E]" />
+        <StatCard icon={ShieldCheck} label="Owners" value={counts.owners} tone="bg-[#EFEEE8] dark:bg-[#111412] text-[#8A643F] dark:text-[#C5A47E]" />
+        <StatCard icon={UserCog} label="Front desk" value={counts.receptionists} tone="bg-indigo-50 text-indigo-600 dark:bg-[#222823] dark:text-indigo-300" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Employee list */}
-        <div className="lg:col-span-2 rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-black/[0.06] dark:border-[#232737]">
+        <div className="lg:col-span-2 rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-black/[0.06] dark:border-[#303631]">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7]" />
               <input
                 type="text"
                 placeholder="Search by name or email..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-64 pl-9 pr-3 py-2 text-xs rounded-lg border border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#10131D] text-slate-700 dark:text-[#E9F1F2] placeholder:text-slate-400 dark:placeholder:text-[#6B828A] outline-none focus:border-[#D4A853]/60 transition-colors"
+                className="w-64 pl-9 pr-3 py-2 text-xs rounded-lg border border-black/[0.08] dark:border-[#303631] bg-white dark:text-[#A9AEA7] text-slate-700 dark:text-[#F2EFE8] placeholder:text-slate-400 dark:placeholder:text-[#A9AEA7] outline-none focus:border-[#A67C52]/60 transition-colors"
               />
             </div>
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="h-9 px-3 text-xs rounded-lg border border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#10131D] text-slate-600 dark:text-[#9FB2B8] outline-none focus:border-[#D4A853]/60 cursor-pointer"
+              className="h-9 px-3 text-xs rounded-lg border border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#111412] text-slate-600 dark:text-[#A9AEA7] outline-none focus:border-[#A67C52]/60 cursor-pointer"
             >
               <option value="">All roles</option>
               <option value="hotel_manager">Hotel Manager</option>
@@ -195,7 +195,7 @@ const StaffManagement = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-black/[0.06] dark:border-[#232737] bg-[#f4f2ef] dark:bg-[#10131D] text-slate-500 dark:text-[#8299A0] text-xs uppercase tracking-[0.15em]">
+                  <tr className="border-b border-black/[0.06] dark:border-[#303631] bg-[#EFEEE8] dark:bg-[#111412] text-slate-500 dark:text-[#A9AEA7] text-xs uppercase tracking-[0.15em]">
                     <th className="py-3 px-4 text-left font-medium">Employee</th>
                     <th className="py-3 px-4 text-left font-medium">Role</th>
                     <th className="py-3 px-4 text-left font-medium hidden md:table-cell">Status</th>
@@ -207,19 +207,19 @@ const StaffManagement = () => {
                     const options = roleOptionsFor(u.role);
                     const locked = options.some((o) => o.locked);
                     return (
-                      <tr key={u._id} className="border-b border-black/[0.06] dark:border-[#232737] last:border-b-0 hover:bg-black/[0.02] dark:hover:bg-white/5 transition-colors">
+                      <tr key={u._id} className="border-b border-black/[0.06] dark:border-[#303631] last:border-b-0 hover:bg-black/[0.02] dark:hover:bg-white/5 transition-colors">
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-3">
                             {u.image ? (
                               <img src={u.image} alt={u.name} className="w-8 h-8 rounded-full object-cover" />
                             ) : (
-                              <div className="w-8 h-8 rounded-full bg-[#D4A853]/10 text-[#B58A2E] dark:text-[#E6C075] flex items-center justify-center text-xs font-semibold">
+                              <div className="w-8 h-8 rounded-full bg-[#A67C52]/10 text-[#8A643F] dark:text-[#C5A47E] flex items-center justify-center text-xs font-semibold">
                                 {u.name?.charAt(0)?.toUpperCase() || "?"}
                               </div>
                             )}
                             <div className="min-w-0">
-                              <p className="font-medium text-slate-900 dark:text-[#E9F1F2] truncate">{u.name || "—"}</p>
-                              <p className="text-xs text-slate-500 dark:text-[#8299A0] truncate">{u.email}</p>
+                              <p className="font-medium text-slate-900 dark:text-[#F2EFE8] truncate">{u.name || "—"}</p>
+                              <p className="text-xs text-slate-500 dark:text-[#A9AEA7] truncate">{u.email}</p>
                             </div>
                           </div>
                         </td>
@@ -233,7 +233,7 @@ const StaffManagement = () => {
                               value={u.role}
                               disabled={assigningId === u._id}
                               onChange={(e) => handleAssignRole(u._id, e.target.value)}
-                              className="h-8 rounded-lg border border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#10131D] px-2 text-xs text-slate-700 dark:text-[#E9F1F2] outline-none focus:border-[#D4A853]/60 disabled:opacity-50 cursor-pointer"
+                              className="h-8 rounded-lg border border-black/[0.08] dark:border-[#303631] bg-white dark:text-[#A9AEA7] px-2 text-xs text-slate-700 dark:text-[#F2EFE8] outline-none focus:border-[#A67C52]/60 disabled:opacity-50 cursor-pointer"
                             >
                               {options.map((o) => (
                                 <option key={o.value} value={o.value} disabled={o.locked}>{o.label}</option>
@@ -250,7 +250,7 @@ const StaffManagement = () => {
                             {u.status || "active"}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-xs text-slate-500 dark:text-[#8299A0] hidden sm:table-cell">
+                        <td className="py-3 px-4 text-xs text-slate-500 dark:text-[#A9AEA7] hidden sm:table-cell">
                           {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "—"}
                         </td>
                       </tr>
@@ -263,10 +263,10 @@ const StaffManagement = () => {
         </div>
 
         {/* Activity feed */}
-        <div className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] overflow-hidden">
-          <div className="p-5 border-b border-black/[0.06] dark:border-[#232737] flex items-center gap-2">
-            <Activity className="w-4 h-4 text-[#B58A2E] dark:text-[#E6C075]" />
-            <h3 className="font-semibold text-slate-900 dark:text-[#E9F1F2]">Recent activity</h3>
+        <div className="rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] overflow-hidden">
+          <div className="p-5 border-b border-black/[0.06] dark:border-[#303631] flex items-center gap-2">
+            <Activity className="w-4 h-4 text-[#8A643F] dark:text-[#C5A47E]" />
+            <h3 className="font-semibold text-slate-900 dark:text-[#F2EFE8]">Recent activity</h3>
           </div>
           <div className="max-h-[560px] overflow-y-auto">
             {activityLoading ? (
@@ -277,28 +277,28 @@ const StaffManagement = () => {
               </div>
             ) : activity.length === 0 ? (
               <div className="p-8 text-center">
-                <CalendarCheck className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-[#4E646B]" />
-                <p className="text-sm text-slate-400 dark:text-[#6B828A]">No staff activity yet.</p>
+                <CalendarCheck className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-[#A9AEA7]" />
+                <p className="text-sm text-slate-400 dark:text-[#A9AEA7]">No staff activity yet.</p>
               </div>
             ) : (
-              <ul className="divide-y divide-black/[0.06] dark:divide-[#232737]">
+              <ul className="divide-y divide-black/[0.06] dark:divide-[#303631]">
                 {activity.map((a, i) => (
                   <li key={a.id || i} className="flex items-start gap-3 px-5 py-3">
                     {a.actorImage ? (
                       <img src={a.actorImage} alt={a.actorName} className="w-7 h-7 rounded-full object-cover shrink-0" />
                     ) : (
-                      <div className="w-7 h-7 rounded-full bg-[#D4A853]/10 text-[#B58A2E] dark:text-[#E6C075] flex items-center justify-center text-[10px] font-semibold shrink-0">
+                      <div className="w-7 h-7 rounded-full bg-[#A67C52]/10 text-[#8A643F] dark:text-[#C5A47E] flex items-center justify-center text-[10px] font-semibold shrink-0">
                         {a.actorName?.charAt(0)?.toUpperCase() || "?"}
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm text-slate-800 dark:text-[#D3DFE2]">
+                      <p className="text-sm text-slate-800 dark:text-[#E8EDE6]">
                         <span className="font-medium">{a.actorName}</span>{" "}
-                        <span className="text-slate-500 dark:text-[#8299A0]">{a.action}</span>
+                        <span className="text-slate-500 dark:text-[#A9AEA7]">{a.action}</span>
                       </p>
-                      <p className="text-xs text-slate-400 dark:text-[#6B828A] truncate">{a.detail}</p>
+                      <p className="text-xs text-slate-400 dark:text-[#A9AEA7] truncate">{a.detail}</p>
                     </div>
-                    <span className="text-[10px] text-slate-400 dark:text-[#6B828A] shrink-0 mt-0.5">{timeAgo(a.at)}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-[#A9AEA7] shrink-0 mt-0.5">{timeAgo(a.at)}</span>
                   </li>
                 ))}
               </ul>

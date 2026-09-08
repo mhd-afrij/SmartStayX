@@ -52,7 +52,7 @@ const NewsLetter = () => {
         className="mx-auto max-w-5xl luxury-card relative overflow-hidden px-6 py-16 md:py-20"
       >
         {/* Gold + white radial glows */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(80, 119, 179,0.08),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(0,56,68,0.03),transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(24,59,53,0.08),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(24,59,53,0.03),transparent_28%)]" />
 
         <div className="relative">
           <Title
@@ -79,7 +79,7 @@ const NewsLetter = () => {
             </button>
           </div>
 
-          <p className="text-slate-400 dark:text-[#6B828A] mt-6 text-xs text-center">
+          <p className="text-slate-400 dark:text-[#A9AEA7] mt-6 text-xs text-center">
             By subscribing, you agree to our Privacy Policy and consent to
             receive updates.
           </p>

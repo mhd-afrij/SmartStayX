@@ -2,11 +2,11 @@ import { forwardRef } from 'react';
 import { Loader2 } from 'lucide-react';
 
 const VARIANTS = {
-  primary: 'bg-[#D4A853] dark:bg-[#E6C075] text-[#2A230F] hover:bg-[#E0B45F] shadow-sm',
-  secondary: 'bg-[#F3ECDE] dark:bg-[#10131D] text-[#003844] dark:text-[#E9F1F2] hover:bg-[#E8E0D1]',
-  outline: 'bg-white dark:bg-[#161925] text-[#003844] dark:text-[#E9F1F2] border border-[#E8E0D1] dark:border-[#232737] hover:border-[#D4A853]',
-  ghost: 'bg-transparent text-[#003844] dark:text-[#E9F1F2] hover:bg-[#F3ECDE] dark:hover:bg-[#16303A]',
-  danger: 'bg-[#DC2626] text-white hover:bg-[#B91C1C] shadow-sm',
+  primary: 'bg-[#A67C52] dark:bg-[#C5A47E] text-[#1A1E1B] hover:bg-[#2A4A43] hover:text-white shadow-sm',
+  secondary: 'bg-[#EFEEE8] dark:bg-[#111412] text-[#183B35] dark:text-[#F2EFE8] hover:bg-[#E3E0D8]',
+  outline: 'bg-white dark:bg-[#1A1E1B] text-[#183B35] dark:text-[#F2EFE8] border border-[#E3E0D8] dark:border-[#303631] hover:border-[#A67C52]',
+  ghost: 'bg-transparent text-[#183B35] dark:text-[#F2EFE8] hover:bg-[#EFEEE8] dark:hover:bg-[#222823]',
+  danger: 'bg-[#B14646] text-white hover:bg-[#DD7070] shadow-sm',
 };
 
 const SIZES = {
@@ -23,7 +23,7 @@ const Button = forwardRef(function Button(
     <button
       ref={ref}
       disabled={disabled || loading}
-      className={`inline-flex items-center justify-center rounded-[10px] font-semibold transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4A853] disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
+      className={`inline-flex items-center justify-center rounded-[10px] font-semibold transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#A67C52] disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
       {...props}
     >
       {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : Icon ? <Icon className="h-4 w-4" /> : null}
@@ -42,7 +42,7 @@ export const IconButton = forwardRef(function IconButton(
       ref={ref}
       aria-label={label}
       title={label}
-      className={`inline-flex items-center justify-center rounded-[10px] transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4A853] disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.96] ${VARIANTS[variant]} ${sizePx[size]} ${className}`}
+      className={`inline-flex items-center justify-center rounded-[10px] transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#A67C52] disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.96] ${VARIANTS[variant]} ${sizePx[size]} ${className}`}
       {...props}
     >
       {Icon && <Icon className="h-4 w-4" />}

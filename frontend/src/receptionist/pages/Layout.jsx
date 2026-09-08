@@ -17,10 +17,10 @@ const Layout = () => {
 
   if (!userLoaded || !roleResolved) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fffaf4] dark:bg-[#0B1D24]">
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F5F0] dark:bg-[#111412]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 rounded-full border-2 border-[#5077B3]/30 border-t-[#5077B3] animate-spin" />
-          <span className="text-sm text-slate-400 dark:text-[#6B828A] font-space">Loading dashboard...</span>
+          <div className="w-8 h-8 rounded-full border-2 border-[#2A4A43]/30 border-t-[#183B35] animate-spin" />
+          <span className="text-sm text-slate-400 dark:text-[#A9AEA7] font-space">Loading dashboard...</span>
         </div>
       </div>
     );
@@ -29,7 +29,7 @@ const Layout = () => {
   if (!user || !canAccess) return null;
 
   return (
-    <div className="min-h-screen bg-[#fffaf4] dark:bg-[#0B1D24]">
+    <div className="min-h-screen bg-[#F7F5F0] dark:bg-[#111412]">
       <div className="flex flex-col">
         <ReceptionistNavbar />
         <main className="flex-1 overflow-y-auto scrollbar-hide">

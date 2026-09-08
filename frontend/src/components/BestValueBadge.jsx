@@ -21,7 +21,7 @@ const BestValueBadge = ({ score, savingsPercent, size = 'sm' }) => {
       className={`inline-flex items-center gap-1 font-semibold uppercase tracking-wider rounded-full ${
         savingsPercent >= 15
           ? 'bg-green-50 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-500/25'
-          : 'bg-[#5077B3]/10 text-[#5077B3] dark:text-[#93B3E0] border border-[#5077B3]/25'
+          : 'bg-[#183B35]/10 text-[#183B35] dark:text-[#8FB8A8] border border-[#183B35]/25'
       } ${sizeClasses}`}
     >
       <Zap className="w-3 h-3" />

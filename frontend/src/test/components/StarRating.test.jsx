@@ -12,18 +12,18 @@ describe('StarRating', () => {
   it('renders correct number of filled stars for rating 3', () => {
     const { container } = render(<StarRating rating={3} />);
     const stars = container.querySelectorAll('svg');
-    expect(stars[0].classList.contains('fill-[#5077B3]')).toBe(true);
-    expect(stars[1].classList.contains('fill-[#5077B3]')).toBe(true);
-    expect(stars[2].classList.contains('fill-[#5077B3]')).toBe(true);
-    expect(stars[3].classList.contains('fill-[#5077B3]')).toBe(false);
-    expect(stars[4].classList.contains('fill-[#5077B3]')).toBe(false);
+    expect(stars[0].classList.contains('fill-[#183B35]')).toBe(true);
+    expect(stars[1].classList.contains('fill-[#183B35]')).toBe(true);
+    expect(stars[2].classList.contains('fill-[#183B35]')).toBe(true);
+    expect(stars[3].classList.contains('fill-[#183B35]')).toBe(false);
+    expect(stars[4].classList.contains('fill-[#183B35]')).toBe(false);
   });
 
   it('renders all empty for rating 0', () => {
     const { container } = render(<StarRating rating={0} />);
     const stars = container.querySelectorAll('svg');
     stars.forEach((star) => {
-      expect(star.classList.contains('fill-[#5077B3]')).toBe(false);
+      expect(star.classList.contains('fill-[#183B35]')).toBe(false);
     });
   });
 
@@ -31,14 +31,14 @@ describe('StarRating', () => {
     const { container } = render(<StarRating rating={5} />);
     const stars = container.querySelectorAll('svg');
     stars.forEach((star) => {
-      expect(star.classList.contains('fill-[#5077B3]')).toBe(true);
+      expect(star.classList.contains('fill-[#183B35]')).toBe(true);
     });
   });
 
   it('defaults to rating 4', () => {
     const { container } = render(<StarRating />);
     const stars = container.querySelectorAll('svg');
-    expect(stars[3].classList.contains('fill-[#5077B3]')).toBe(true);
-    expect(stars[4].classList.contains('fill-[#5077B3]')).toBe(false);
+    expect(stars[3].classList.contains('fill-[#183B35]')).toBe(true);
+    expect(stars[4].classList.contains('fill-[#183B35]')).toBe(false);
   });
 });

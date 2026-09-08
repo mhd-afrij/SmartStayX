@@ -10,7 +10,7 @@ import { Card, StatCard } from '../../components/ui/Card';
 import { Select } from '../../components/ui/Field';
 import { SkeletonCard, ErrorState, EmptyState } from '../../components/ui/States';
 
-const COLORS = ['#D4A853', '#4D6166', '#7C9885', '#E08D79', '#8B93A8', '#C79A5B', '#6B8F71', '#A8735A', '#7B8AAE', '#B5926A'];
+const COLORS = ['#183B35', '#6F9186', '#C5A47E', '#D29A72', '#A67C52', '#8A643F', '#7EA88B', '#5C6B64', '#C98F65', '#2A4A43'];
 
 const RANGES = [
   { value: '7d', label: 'Last 7 days' },
@@ -63,21 +63,21 @@ const Analytics = () => {
   }, [range, granularity]);
 
   const dark = theme === 'dark';
-  const gridColor = dark ? '#1D3842' : '#E8E0D1';
-  const axisColor = dark ? '#9FB2B8' : '#4D6166';
+  const gridColor = dark ? '#303631' : '#E3E0D8';
+  const axisColor = dark ? '#A9AEA7' : '#5C6B64';
   const tooltipStyle = {
-    backgroundColor: dark ? '#122A32' : '#ffffff',
-    border: `1px solid ${dark ? '#1D3842' : 'rgba(0,56,68,0.09)'}`,
+    backgroundColor: dark ? '#1A1E1B' : '#ffffff',
+    border: `1px solid ${dark ? '#303631' : 'rgba(24,59,53,0.09)'}`,
     borderRadius: '8px',
-    color: dark ? '#E9F1F2' : '#14181f',
+    color: dark ? '#F2EFE8' : '#202522',
     fontSize: '12px',
   };
 
   const chartCard = (title, Icon, children, actions) => (
     <Card className="p-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <h3 className="text-[#003844] dark:text-[#E9F1F2] font-semibold flex items-center gap-2">
-          <Icon className="w-4 h-4 text-[#B58A2E] dark:text-[#E6C075]" /> {title}
+        <h3 className="text-[#183B35] dark:text-[#F2EFE8] font-semibold flex items-center gap-2">
+          <Icon className="w-4 h-4 text-[#8A643F] dark:text-[#C5A47E]" /> {title}
         </h3>
         {actions}
       </div>
@@ -109,8 +109,8 @@ const Analytics = () => {
             {Array.from({ length: 4 }, (_, i) => <SkeletonCard key={i} />)}
           </div>
           <Card className="p-5 space-y-3">
-            <div className="h-4 w-40 rounded bg-[#E8E0D1] dark:bg-[#1D3842] animate-pulse" />
-            <div className="h-64 rounded-xl bg-[#E8E0D1] dark:bg-[#1D3842] animate-pulse" />
+            <div className="h-4 w-40 rounded bg-[#E3E0D8] dark:bg-[#303631] animate-pulse" />
+            <div className="h-64 rounded-xl bg-[#E3E0D8] dark:bg-[#303631] animate-pulse" />
           </Card>
         </div>
       ) : error ? (
@@ -133,21 +133,21 @@ const Analytics = () => {
                     <XAxis dataKey="period" stroke={axisColor} fontSize={12} tickMargin={8} />
                     <YAxis stroke={axisColor} fontSize={12} />
                     <Tooltip contentStyle={tooltipStyle} formatter={(value, name) => (name === 'revenue' ? formatPrice(value) : value)} />
-                    <Line type="monotone" dataKey="bookings" stroke="#D4A853" strokeWidth={2} dot={{ fill: '#D4A853', r: 3 }} />
-                    <Line type="monotone" dataKey="revenue" stroke="#4D6166" strokeWidth={2} dot={{ fill: '#4D6166', r: 3 }} />
+                    <Line type="monotone" dataKey="bookings" stroke="#A67C52" strokeWidth={2} dot={{ fill: '#A67C52', r: 3 }} />
+                    <Line type="monotone" dataKey="revenue" stroke="#183B35" strokeWidth={2} dot={{ fill: '#183B35', r: 3 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             ), (
-              <div className="flex items-center gap-1 p-1 rounded-lg border border-[#E8E0D1] dark:border-[#232737] bg-[#FFFAF4] dark:bg-[#10131D]">
+              <div className="flex items-center gap-1 p-1 rounded-lg border border-[#E3E0D8] dark:border-[#303631] bg-[#F7F5F0] dark:bg-[#111412]">
                 {GRANULARITIES.map((g) => (
                   <button
                     key={g.value}
                     onClick={() => setGranularity(g.value)}
                     className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
                       granularity === g.value
-                        ? 'bg-[#D4A853] dark:bg-[#E6C075] text-[#2A230F] shadow-sm'
-                        : 'text-[#879497] dark:text-[#6B828A] hover:text-[#003844] dark:hover:text-[#E9F1F2]'
+                        ? 'bg-[#183B35] dark:bg-[#C5A47E] text-[#F7F5F0] dark:text-[#111412] shadow-sm'
+                        : 'text-[#72766F] dark:text-[#A9AEA7] hover:text-[#183B35] dark:hover:text-[#F2EFE8]'
                     }`}
                   >
                     {g.label}
@@ -166,7 +166,7 @@ const Analytics = () => {
                     <XAxis dataKey="city" stroke={axisColor} fontSize={12} tickMargin={8} />
                     <YAxis stroke={axisColor} fontSize={12} />
                     <Tooltip contentStyle={tooltipStyle} formatter={(value, name) => (name === 'revenue' ? formatPrice(value) : value)} />
-                    <Bar dataKey="bookings" fill="#D4A853" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="bookings" fill="#A67C52" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -206,7 +206,7 @@ const Analytics = () => {
                       <XAxis dataKey="name" stroke={axisColor} fontSize={12} tickMargin={8} />
                       <YAxis stroke={axisColor} fontSize={12} />
                       <Tooltip contentStyle={tooltipStyle} />
-                      <Bar dataKey="value" fill="#4D6166" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="value" fill="#183B35" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -219,18 +219,18 @@ const Analytics = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-[#4D6166] dark:text-[#9FB2B8] uppercase text-xs border-b border-[#E8E0D1] dark:border-[#232737]">
+                    <tr className="text-[#5C6B64] dark:text-[#A9AEA7] uppercase text-xs border-b border-[#E3E0D8] dark:border-[#303631]">
                       <th className="pb-3 font-medium text-left">Hotel</th>
                       <th className="pb-3 font-medium text-left">Bookings</th>
                       <th className="pb-3 font-medium text-left">Revenue</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#E8E0D1] dark:divide-[#1D3842]">
+                  <tbody className="divide-y divide-[#E3E0D8] dark:divide-[#303631]">
                     {revenue.topHotels.map((h) => (
-                      <tr key={h.name} className="hover:bg-[#F3ECDE] dark:hover:bg-[#16303A] transition-colors">
-                        <td className="py-3 text-[#003844] dark:text-[#E9F1F2]">{h.name}</td>
-                        <td className="py-3 text-[#4D6166] dark:text-[#9FB2B8]">{h.bookings}</td>
-                        <td className="py-3 text-[#B58A2E] dark:text-[#E6C075] font-medium">{formatPrice(h.revenue)}</td>
+                      <tr key={h.name} className="hover:bg-[#EFEEE8] dark:hover:bg-[#222823] transition-colors">
+                        <td className="py-3 text-[#183B35] dark:text-[#F2EFE8]">{h.name}</td>
+                        <td className="py-3 text-[#5C6B64] dark:text-[#A9AEA7]">{h.bookings}</td>
+                        <td className="py-3 text-[#8A643F] dark:text-[#C5A47E] font-medium">{formatPrice(h.revenue)}</td>
                       </tr>
                     ))}
                   </tbody>

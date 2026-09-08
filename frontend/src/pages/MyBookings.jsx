@@ -26,7 +26,7 @@ const StarInput = ({ value, onChange }) => (
         onClick={() => onChange(star)}
         className="p-0.5 transition-transform hover:scale-110"
       >
-        <Star className={`w-6 h-6 ${star <= value ? "text-[#5077B3] dark:text-[#93B3E0]" : "text-slate-300 dark:text-[#4E646B]"}`} fill="currentColor" />
+        <Star className={`w-6 h-6 ${star <= value ? "text-[#183B35] dark:text-[#8FB8A8]" : "text-slate-300 dark:text-[#A9AEA7]"}`} fill="currentColor" />
       </button>
     ))}
   </div>
@@ -179,13 +179,13 @@ const MyBookings = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#F3ECDE] dark:bg-[#122A32]">
+            <div className="min-h-screen bg-[#EFEEE8] dark:bg-[#111412]">
                 <div className="mx-auto max-w-6xl px-4 md:px-8 lg:px-10 pt-32 pb-16">
                     <div className="animate-pulse space-y-6">
-                        <div className="h-6 w-48 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
-                        <div className="h-4 w-64 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
+                        <div className="h-6 w-48 rounded bg-[#EFEEE8] dark:bg-[#222823]" />
+                        <div className="h-4 w-64 rounded bg-[#EFEEE8] dark:bg-[#222823]" />
                         {[1, 2, 3].map((i) => (
-                            <div key={i} className="h-32 rounded-2xl bg-[#f4f2ef] dark:bg-[#16303A]" />
+                            <div key={i} className="h-32 rounded-2xl bg-[#EFEEE8] dark:bg-[#222823]" />
                         ))}
                     </div>
                 </div>
@@ -194,7 +194,7 @@ const MyBookings = () => {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-[#F3ECDE] dark:bg-[#122A32] pt-24 pb-16">
+        <div className="relative min-h-screen overflow-hidden bg-[#EFEEE8] dark:bg-[#111412] pt-24 pb-16">
             <div className="absolute inset-0 mesh-glow opacity-40" />
 
             <div className="relative mx-auto max-w-6xl px-4 md:px-8 lg:px-10">
@@ -202,7 +202,7 @@ const MyBookings = () => {
                     <Title title={translate('myBookings')} subtitle={translate('myBookingsSubtitle')} />
                 </div>
 
-                <div className="mt-6 flex flex-wrap gap-2 border-b border-black/[0.06] dark:border-[#1D3842] pb-3">
+                <div className="mt-6 flex flex-wrap gap-2 border-b border-black/[0.06] dark:border-[#303631] pb-3">
                     {TABS.map((tab) => {
                         const count = bookings.filter((b) => getTab(b) === tab.key).length;
                         const active = activeTab === tab.key;
@@ -213,8 +213,8 @@ const MyBookings = () => {
                                 onClick={() => setActiveTab(tab.key)}
                                 className={`px-4 py-2 text-sm rounded-full transition-colors ${
                                     active
-                                        ? "bg-[#5077B3] text-white"
-                                        : "bg-[#F3ECDE] dark:bg-[#16303A] text-slate-600 dark:text-[#9FB2B8] hover:bg-black/[0.06] dark:hover:bg-white/5"
+                                        ? "bg-[#183B35] text-white"
+                                        : "bg-[#EFEEE8] dark:bg-[#222823] text-slate-600 dark:text-[#A9AEA7] hover:bg-black/[0.06] dark:hover:bg-white/5"
                                 }`}
                             >
                                 {tab.label} {count > 0 && <span className="opacity-70">({count})</span>}
@@ -224,7 +224,7 @@ const MyBookings = () => {
                 </div>
 
                 {visibleBookings.length === 0 && !loading && (
-                    <p className="text-center text-slate-400 dark:text-[#6B828A] py-16">{translate('noBookings')}</p>
+                    <p className="text-center text-slate-400 dark:text-[#A9AEA7] py-16">{translate('noBookings')}</p>
                 )}
 
                 <div className="mt-6 space-y-4">
@@ -238,47 +238,47 @@ const MyBookings = () => {
                                         <img
                                             src={booking.room?.images?.[0] || placeholderImage}
                                             alt="hotel-img"
-                                            className="h-32 w-44 rounded-2xl object-cover border border-black/[0.06] dark:border-[#1D3842]"
+                                            className="h-32 w-44 rounded-2xl object-cover border border-black/[0.06] dark:border-[#303631]"
                                         />
                                     </div>
 
                                     {/* Hotel details */}
                                     <div className="flex-1 min-w-0 space-y-2">
-                                        <p className="font-playfair text-xl text-slate-900 dark:text-[#E9F1F2]">
+                                        <p className="font-playfair text-xl text-slate-900 dark:text-[#F2EFE8]">
                                             {booking.hotel?.name || 'Hotel'}
-                                            <span className="font-inter text-sm text-slate-500 dark:text-[#8299A0] ml-2">
+                                            <span className="font-inter text-sm text-slate-500 dark:text-[#A9AEA7] ml-2">
                                                 ({booking.roomNumber || booking.room?.roomNumber ? `Room ${booking.roomNumber || booking.room?.roomNumber}` : ''}{booking.room?.roomType ? `${booking.roomNumber || booking.room?.roomNumber ? ' — ' : ''}${booking.room.roomType}` : 'Room'})
                                             </span>
                                         </p>
-                                        <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-[#8299A0]">
+                                        <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-[#A9AEA7]">
                                             <MapPin className="w-4 h-4 opacity-60" />
                                             <span>{booking.hotel?.address || 'Address unavailable'}</span>
                                         </div>
-                                        <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-[#8299A0]">
+                                        <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-[#A9AEA7]">
                                             <Users className="w-4 h-4 opacity-60" />
                                             <span>{translate('guests')}: {booking.guests}</span>
                                         </div>
-                                        <p className="text-sm text-slate-900 dark:text-[#E9F1F2] mt-1">
-                                            {translate('total')}: <span className="text-[#5077B3] dark:text-[#93B3E0] font-medium">{formatPrice(booking.totalPrice)}</span>
+                                        <p className="text-sm text-slate-900 dark:text-[#F2EFE8] mt-1">
+                                            {translate('total')}: <span className="text-[#183B35] dark:text-[#8FB8A8] font-medium">{formatPrice(booking.totalPrice)}</span>
                                         </p>
                                     </div>
 
                                     {/* Dates */}
                                     <div className="flex md:flex-col gap-4 md:gap-2 shrink-0">
                                         <div>
-                                            <p className="text-xs text-slate-400 dark:text-[#6B828A] uppercase tracking-wider">{translate('checkIn')}</p>
-                                            <p className="text-sm text-slate-900 dark:text-[#E9F1F2] mt-0.5">{new Date(booking.checkInDate).toDateString()}</p>
+                                            <p className="text-xs text-slate-400 dark:text-[#A9AEA7] uppercase tracking-wider">{translate('checkIn')}</p>
+                                            <p className="text-sm text-slate-900 dark:text-[#F2EFE8] mt-0.5">{new Date(booking.checkInDate).toDateString()}</p>
                                         </div>
                                         <div>
-                                            <p className="text-xs text-slate-400 dark:text-[#6B828A] uppercase tracking-wider">{translate('checkOut')}</p>
-                                            <p className="text-sm text-slate-900 dark:text-[#E9F1F2] mt-0.5">{new Date(booking.checkOutDate).toDateString()}</p>
+                                            <p className="text-xs text-slate-400 dark:text-[#A9AEA7] uppercase tracking-wider">{translate('checkOut')}</p>
+                                            <p className="text-sm text-slate-900 dark:text-[#F2EFE8] mt-0.5">{new Date(booking.checkOutDate).toDateString()}</p>
                                         </div>
                                     </div>
 
                                     {/* Actions */}
                                     <div className="flex flex-col items-start gap-2 shrink-0">
                                         {booking.status === BOOKING_STATUS.RESERVATION && (
-                                            <span className="text-[10px] text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full border border-[#B9B4CE]/45 dark:border-[#3D4660]/45 bg-[#F4F2F9] dark:bg-[#1B2436] font-medium">
+                                            <span className="text-[10px] text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full border border-[#A67C52]/45 dark:border-[#303631]/45 bg-[#EFEEE8] dark:bg-[#222823] font-medium">
                                                 Reservation
                                             </span>
                                         )}
@@ -291,7 +291,7 @@ const MyBookings = () => {
                                                 {booking.isPaid ? translate('paid') : translate('unpaid')}
                                             </p>
                                         </div>
-                                        <p className="text-xs text-slate-400 dark:text-[#6B828A]">{translate('method')}: {booking.paymentMethod || "Pay At Hotel"}</p>
+                                        <p className="text-xs text-slate-400 dark:text-[#A9AEA7]">{translate('method')}: {booking.paymentMethod || "Pay At Hotel"}</p>
 
                                         <div className="flex flex-col gap-1.5 mt-2">
                                             {booking.status === BOOKING_STATUS.RESERVATION && (
@@ -323,7 +323,7 @@ const MyBookings = () => {
                                             {booking.status === BOOKING_STATUS.CONFIRMED && (
                                                 <button
                                                     onClick={() => setServiceModal({ open: true, roomId: booking.room?._id, hotelId: booking.hotel?._id })}
-                                                    className="text-xs px-4 py-2 rounded-full border border-[#5077B3]/30 text-[#5077B3] dark:text-[#93B3E0] hover:bg-[#5077B3]/10 transition"
+                                                    className="text-xs px-4 py-2 rounded-full border border-[#183B35]/30 text-[#183B35] dark:text-[#8FB8A8] hover:bg-[#183B35]/10 transition"
                                                 >
                                                     {translate('requestService')}
                                                 </button>
@@ -334,7 +334,7 @@ const MyBookings = () => {
                                                         setReviewForm({ rating: 0, satisfaction: "", comment: "" })
                                                         setReviewModal({ open: true, booking })
                                                     }}
-                                                    className="text-xs px-4 py-2 rounded-full border border-[#5077B3]/30 text-[#5077B3] dark:text-[#93B3E0] hover:bg-[#5077B3]/10 transition"
+                                                    className="text-xs px-4 py-2 rounded-full border border-[#183B35]/30 text-[#183B35] dark:text-[#8FB8A8] hover:bg-[#183B35]/10 transition"
                                                 >
                                                     Write a Review
                                                 </button>
@@ -342,7 +342,7 @@ const MyBookings = () => {
                                             {booking.isPaid && (
                                                 <button
                                                     onClick={() => navigate(`/invoice/${booking._id}`)}
-                                                    className="text-xs px-4 py-2 rounded-full border border-black/[0.1] dark:border-[#1D3842] text-slate-600 dark:text-[#9FB2B8] hover:text-slate-900 dark:hover:text-[#E9F1F2] hover:border-black/20 transition"
+                                                    className="text-xs px-4 py-2 rounded-full border border-black/[0.1] dark:border-[#303631] text-slate-600 dark:text-[#A9AEA7] hover:text-slate-900 dark:hover:text-[#F2EFE8] hover:border-black/20 transition"
                                                 >
                                                     View Invoice
                                                 </button>
@@ -367,7 +367,7 @@ const MyBookings = () => {
             {reviewModal.open && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setReviewModal({ open: false, booking: null })}>
                     <div className="luxury-card w-full max-w-lg p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
-                        <h3 className="text-lg font-playfair text-slate-900 dark:text-[#E9F1F2]">Write a Review</h3>
+                        <h3 className="text-lg font-playfair text-slate-900 dark:text-[#F2EFE8]">Write a Review</h3>
                         <form onSubmit={async (e) => {
                             e.preventDefault()
                             if (reviewForm.rating < 1) { toast.error("Please select a rating"); return }
@@ -397,25 +397,25 @@ const MyBookings = () => {
                             }
                         }} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-[#C1D2D6] mb-2">Rating</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-[#A9AEA7] mb-2">Rating</label>
                                 <StarInput value={reviewForm.rating} onChange={(val) => setReviewForm((p) => ({ ...p, rating: val }))} />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-[#C1D2D6] mb-2">Satisfaction</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-[#A9AEA7] mb-2">Satisfaction</label>
                                 <select
                                     value={reviewForm.satisfaction}
                                     onChange={(e) => setReviewForm((p) => ({ ...p, satisfaction: e.target.value }))}
                                     className="luxury-select text-sm w-full"
                                 >
-                                    <option value="" className="bg-white dark:bg-[#122A32]">Select satisfaction level</option>
+                                    <option value="" className="bg-white dark:bg-[#111412]">Select satisfaction level</option>
                                     {SATISFACTION_OPTIONS.map((opt) => (
-                                        <option key={opt.value} value={opt.value} className="bg-white dark:bg-[#122A32]">{opt.label}</option>
+                                        <option key={opt.value} value={opt.value} className="bg-white dark:bg-[#111412]">{opt.label}</option>
                                     ))}
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-[#C1D2D6] mb-2">
-                                    Comment <span className="text-slate-400 dark:text-[#6B828A] font-normal">({500 - reviewForm.comment.length} characters left)</span>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-[#A9AEA7] mb-2">
+                                    Comment <span className="text-slate-400 dark:text-[#A9AEA7] font-normal">({500 - reviewForm.comment.length} characters left)</span>
                                 </label>
                                 <textarea
                                     value={reviewForm.comment}
@@ -430,7 +430,7 @@ const MyBookings = () => {
                                 <button type="submit" disabled={reviewSubmitting} className="gold-button px-8 py-2.5 text-sm uppercase tracking-[0.18em] disabled:opacity-70">
                                     {reviewSubmitting ? "Submitting..." : "Submit Review"}
                                 </button>
-                                <button type="button" onClick={() => setReviewModal({ open: false, booking: null })} className="text-sm text-slate-500 dark:text-[#8299A0] hover:text-slate-900 dark:hover:text-[#E9F1F2] transition">
+                                <button type="button" onClick={() => setReviewModal({ open: false, booking: null })} className="text-sm text-slate-500 dark:text-[#A9AEA7] hover:text-slate-900 dark:hover:text-[#F2EFE8] transition">
                                     Cancel
                                 </button>
                             </div>

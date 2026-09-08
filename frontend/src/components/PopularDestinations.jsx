@@ -48,7 +48,7 @@ const PopularDestinations = () => {
                     `/blog?destination=${encodeURIComponent(destination.name)}`
                   )
                 }
-                className={`group relative overflow-hidden rounded-[24px] border border-black/[0.06] dark:border-[#1D3842] ${GRID_SPANS[index]}`}
+                className={`group relative overflow-hidden rounded-[24px] border border-black/[0.06] dark:border-[#303631] ${GRID_SPANS[index]}`}
               >
                 <img
                   src={destination.image}
@@ -58,7 +58,7 @@ const PopularDestinations = () => {
                 />
 
                 {/* Dark gradient overlay for text legibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#07111f]/95 via-[#07111f]/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#111412]/95 via-[#111412]/40 to-transparent" />
 
                 {/* Hotels count + temperature badge */}
                 <span className="absolute left-4 top-4 rounded-full border border-white/10 bg-white/10 dark:bg-white/5 px-3 py-1 text-[0.65rem] uppercase tracking-[0.2em] text-white/80 backdrop-blur-xl">

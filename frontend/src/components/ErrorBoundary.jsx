@@ -18,13 +18,13 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex min-h-screen items-center justify-center bg-[#fffaf4] dark:bg-[#0B1D24] px-6">
+        <div className="flex min-h-screen items-center justify-center bg-[#F7F5F0] dark:bg-[#111412] px-6">
           <div className="max-w-md text-center luxury-card p-10">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-black/[0.06] dark:border-[#1D3842] bg-[#fbf2e1] dark:bg-[#2E2A1F]">
-              <AlertTriangle className="h-8 w-8 text-[#5077b3] dark:text-[#93B3E0]" />
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-black/[0.06] dark:border-[#303631] bg-[#F6EFE3] dark:bg-[#33302A]">
+              <AlertTriangle className="h-8 w-8 text-[#183B35] dark:text-[#8FB8A8]" />
             </div>
-            <h1 className="font-playfair text-3xl text-slate-900 dark:text-[#E9F1F2] mb-2">Something went wrong</h1>
-            <p className="text-sm text-slate-500 dark:text-[#8299A0] mb-8">An unexpected error occurred. Please try refreshing the page.</p>
+            <h1 className="font-playfair text-3xl text-slate-900 dark:text-[#F2EFE8] mb-2">Something went wrong</h1>
+            <p className="text-sm text-slate-500 dark:text-[#A9AEA7] mb-8">An unexpected error occurred. Please try refreshing the page.</p>
             <button
               onClick={() => window.location.reload()}
               className="gold-button px-8 py-3 text-sm uppercase tracking-[0.18em]"

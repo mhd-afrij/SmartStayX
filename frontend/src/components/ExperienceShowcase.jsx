@@ -55,7 +55,7 @@ const ExperienceShowcase = () => {
             <TiltCard
               key={experience.title}
               maxTilt={5}
-              className={`relative min-w-[18rem] flex-1 overflow-hidden rounded-[28px] border border-black/[0.06] dark:border-[#1D3842] shadow-[0_20px_60px_rgba(0,56,68,0.08)] ${
+              className={`relative min-w-[18rem] flex-1 overflow-hidden rounded-[28px] border border-black/[0.06] dark:border-[#303631] shadow-[0_20px_60px_rgba(24,59,53,0.08)] ${
                 index === 0 ? 'h-[26rem]' : 'h-[22rem]'
               }`}
             >

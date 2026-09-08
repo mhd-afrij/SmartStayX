@@ -55,29 +55,29 @@ const Invoice = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F3ECDE] dark:bg-[#122A32] pt-32 flex items-start justify-center">
-        <Loader2 className="w-6 h-6 text-[#5077B3] dark:text-[#93B3E0] animate-spin mt-20" />
+      <div className="min-h-screen bg-[#EFEEE8] dark:bg-[#111412] pt-32 flex items-start justify-center">
+        <Loader2 className="w-6 h-6 text-[#183B35] dark:text-[#8FB8A8] animate-spin mt-20" />
       </div>
     );
   }
 
   if (!invoice) {
     return (
-      <div className="min-h-screen bg-[#F3ECDE] dark:bg-[#122A32] pt-32 flex flex-col items-center gap-4 px-4">
-        <FileText className="w-12 h-12 text-slate-300 dark:text-[#4E646B]" />
-        <p className="text-slate-500 dark:text-[#8299A0] text-sm">Invoice not found</p>
+      <div className="min-h-screen bg-[#EFEEE8] dark:bg-[#111412] pt-32 flex flex-col items-center gap-4 px-4">
+        <FileText className="w-12 h-12 text-slate-300 dark:text-[#A9AEA7]" />
+        <p className="text-slate-500 dark:text-[#A9AEA7] text-sm">Invoice not found</p>
         <button onClick={() => navigate("/my-bookings")} className="gold-button px-6 py-2.5 text-sm">Back to Bookings</button>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#F3ECDE] dark:bg-[#122A32] pt-24 pb-16">
+    <div className="relative min-h-screen overflow-hidden bg-[#EFEEE8] dark:bg-[#111412] pt-24 pb-16">
       <div className="absolute inset-0 mesh-glow opacity-60" />
       <div className="relative mx-auto max-w-2xl px-4 md:px-8">
         <button
           onClick={() => navigate("/my-bookings")}
-          className="flex items-center gap-2 text-xs text-slate-400 dark:text-[#6B828A] hover:text-slate-600 dark:hover:text-[#9FB2B8] transition-colors mb-6"
+          className="flex items-center gap-2 text-xs text-slate-400 dark:text-[#A9AEA7] hover:text-slate-600 dark:hover:text-[#A9AEA7] transition-colors mb-6"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to Bookings
@@ -87,77 +87,77 @@ const Invoice = () => {
           <div className="p-6 md:p-8 space-y-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#5077B3]/10 border border-[#5077B3]/20 flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-[#5077B3] dark:text-[#93B3E0]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#183B35]/10 border border-[#183B35]/20 flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-[#183B35] dark:text-[#8FB8A8]" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-playfair text-slate-900 dark:text-[#E9F1F2]">Invoice</h1>
-                  <p className="text-xs text-slate-400 dark:text-[#6B828A]">{invoice.invoiceNumber || `#${bookingId?.slice(-8)}`}</p>
+                  <h1 className="text-xl font-playfair text-slate-900 dark:text-[#F2EFE8]">Invoice</h1>
+                  <p className="text-xs text-slate-400 dark:text-[#A9AEA7]">{invoice.invoiceNumber || `#${bookingId?.slice(-8)}`}</p>
                 </div>
               </div>
               <div className="text-right">
                 <span className={`inline-block px-3 py-1 text-[10px] font-medium rounded-full border ${
                   invoice.status === "paid"
                     ? "border-green-200 dark:border-green-500/25 bg-green-50 text-green-700 dark:text-green-300"
-                    : "border-[#B9B4CE]/45 dark:border-[#3D4660]/45 bg-[#F4F2F9] dark:bg-[#1B2436] text-amber-700 dark:text-amber-300"
+                    : "border-[#A67C52]/45 dark:border-[#303631]/45 bg-[#EFEEE8] dark:bg-[#222823] text-amber-700 dark:text-amber-300"
                 }`}>
                   {(invoice.status || "pending").toUpperCase()}
                 </span>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 p-4 rounded-xl border border-black/[0.06] dark:border-[#1D3842] bg-[#f4f2ef] dark:bg-[#16303A]">
+            <div className="grid grid-cols-2 gap-4 p-4 rounded-xl border border-black/[0.06] dark:border-[#303631] bg-[#EFEEE8] dark:bg-[#222823]">
               <div>
-                <p className="text-[10px] text-slate-400 dark:text-[#6B828A] uppercase tracking-[0.12em] mb-1">Hotel</p>
-                <p className="text-sm text-slate-900 dark:text-[#E9F1F2] flex items-center gap-1.5">
-                  <Building2 className="w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A]" />
+                <p className="text-[10px] text-slate-400 dark:text-[#A9AEA7] uppercase tracking-[0.12em] mb-1">Hotel</p>
+                <p className="text-sm text-slate-900 dark:text-[#F2EFE8] flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7]" />
                   {invoice.hotel?.name || invoice.hotelName || "Hotel"}
                 </p>
               </div>
               <div>
-                <p className="text-[10px] text-slate-400 dark:text-[#6B828A] uppercase tracking-[0.12em] mb-1">Room</p>
-                <p className="text-sm text-slate-900 dark:text-[#E9F1F2]">{invoice.room?.roomType || invoice.roomType || "Room"}</p>
+                <p className="text-[10px] text-slate-400 dark:text-[#A9AEA7] uppercase tracking-[0.12em] mb-1">Room</p>
+                <p className="text-sm text-slate-900 dark:text-[#F2EFE8]">{invoice.room?.roomType || invoice.roomType || "Room"}</p>
               </div>
               <div>
-                <p className="text-[10px] text-slate-400 dark:text-[#6B828A] uppercase tracking-[0.12em] mb-1">Check-in</p>
-                <p className="text-sm text-slate-900 dark:text-[#E9F1F2] flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A]" />
+                <p className="text-[10px] text-slate-400 dark:text-[#A9AEA7] uppercase tracking-[0.12em] mb-1">Check-in</p>
+                <p className="text-sm text-slate-900 dark:text-[#F2EFE8] flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7]" />
                   {invoice.checkInDate ? new Date(invoice.checkInDate).toDateString() : "—"}
                 </p>
               </div>
               <div>
-                <p className="text-[10px] text-slate-400 dark:text-[#6B828A] uppercase tracking-[0.12em] mb-1">Check-out</p>
-                <p className="text-sm text-slate-900 dark:text-[#E9F1F2] flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A]" />
+                <p className="text-[10px] text-slate-400 dark:text-[#A9AEA7] uppercase tracking-[0.12em] mb-1">Check-out</p>
+                <p className="text-sm text-slate-900 dark:text-[#F2EFE8] flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7]" />
                   {invoice.checkOutDate ? new Date(invoice.checkOutDate).toDateString() : "—"}
                 </p>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl border border-black/[0.06] dark:border-[#1D3842] bg-[#f4f2ef] dark:bg-[#16303A] space-y-2">
+            <div className="p-4 rounded-xl border border-black/[0.06] dark:border-[#303631] bg-[#EFEEE8] dark:bg-[#222823] space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-slate-500 dark:text-[#8299A0]">Room Charges</span>
-                <span className="text-slate-900 dark:text-[#E9F1F2]">{formatPrice(invoice.roomCharges || invoice.totalPrice || 0)}</span>
+                <span className="text-slate-500 dark:text-[#A9AEA7]">Room Charges</span>
+                <span className="text-slate-900 dark:text-[#F2EFE8]">{formatPrice(invoice.roomCharges || invoice.totalPrice || 0)}</span>
               </div>
               {invoice.taxes > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-500 dark:text-[#8299A0]">Taxes & Fees</span>
-                  <span className="text-slate-900 dark:text-[#E9F1F2]">{formatPrice(invoice.taxes || 0)}</span>
+                  <span className="text-slate-500 dark:text-[#A9AEA7]">Taxes & Fees</span>
+                  <span className="text-slate-900 dark:text-[#F2EFE8]">{formatPrice(invoice.taxes || 0)}</span>
                 </div>
               )}
               {invoice.discount > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-500 dark:text-[#8299A0]">Discount</span>
+                  <span className="text-slate-500 dark:text-[#A9AEA7]">Discount</span>
                   <span className="text-green-600 dark:text-green-300">-{formatPrice(invoice.discount || 0)}</span>
                 </div>
               )}
-              <div className="flex justify-between text-lg font-semibold pt-3 border-t border-black/[0.06] dark:border-[#1D3842]">
-                <span className="text-slate-900 dark:text-[#E9F1F2]">Total</span>
-                <span className="text-[#5077B3] dark:text-[#93B3E0]">{formatPrice(invoice.total || invoice.totalPrice || 0)}</span>
+              <div className="flex justify-between text-lg font-semibold pt-3 border-t border-black/[0.06] dark:border-[#303631]">
+                <span className="text-slate-900 dark:text-[#F2EFE8]">Total</span>
+                <span className="text-[#183B35] dark:text-[#8FB8A8]">{formatPrice(invoice.total || invoice.totalPrice || 0)}</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-[#6B828A] p-3 rounded-xl bg-[#f4f2ef] dark:bg-[#16303A]">
+            <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-[#A9AEA7] p-3 rounded-xl bg-[#EFEEE8] dark:bg-[#222823]">
               <CreditCard className="w-3.5 h-3.5" />
               {invoice.paymentMethod ? `Paid via ${invoice.paymentMethod}` : invoice.status === "paid" ? "Paid" : "Payment pending"}
             </div>

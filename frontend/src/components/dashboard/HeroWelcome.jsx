@@ -10,11 +10,11 @@ const HeroWelcome = ({ hotel, user }) => {
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="relative overflow-hidden rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)]"
+      className="relative overflow-hidden rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-[0_20px_60px_rgba(24,59,53,0.06)]"
     >
       {/* Decorative glow accents */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4A853]/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-slate-400 dark:bg-[#33474E]/8 rounded-full blur-3xl" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-[#A67C52]/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-48 h-48 bg-slate-400 dark:bg-[#303631]/8 rounded-full blur-3xl" />
 
       {/* Greeting and quick actions */}
       <div className="relative z-10 p-6 lg:p-8">
@@ -22,8 +22,8 @@ const HeroWelcome = ({ hotel, user }) => {
           {/* Welcome text */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#B58A2E] dark:text-[#E6C075]" />
-              <span className="text-xs font-medium text-[#B58A2E] dark:text-[#E6C075]/90 uppercase tracking-wider">
+              <Sparkles className="w-5 h-5 text-[#8A643F] dark:text-[#C5A47E]" />
+              <span className="text-xs font-medium text-[#8A643F] dark:text-[#C5A47E]/90 uppercase tracking-wider">
                 {new Date().getHours() < 12
                   ? "Good Morning"
                   : new Date().getHours() < 18
@@ -31,13 +31,13 @@ const HeroWelcome = ({ hotel, user }) => {
                   : "Good Evening"}
               </span>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-[#F2EFE8] tracking-tight">
               Welcome back,{" "}
-              <span className="text-[#B58A2E] dark:text-[#E6C075]">
+              <span className="text-[#8A643F] dark:text-[#C5A47E]">
                 {user?.username || user?.fullName || "Admin"}
               </span>
             </h1>
-            <p className="text-sm text-slate-500 dark:text-[#8299A0] max-w-lg">
+            <p className="text-sm text-slate-500 dark:text-[#A9AEA7] max-w-lg">
               {hotel
                 ? `${hotel.name} is performing well today. Here's your overview.`
                 : "Here's what's happening with your properties today."}
@@ -48,7 +48,7 @@ const HeroWelcome = ({ hotel, user }) => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/manager/hotel-management")}
-              className="group flex items-center gap-2 px-4 py-2.5 text-xs font-medium rounded-xl border border-black/[0.08] dark:border-[#232737] text-slate-600 dark:text-[#9FB2B8] hover:text-slate-900 dark:hover:text-[#E9F1F2] hover:bg-[#f4f2ef] dark:hover:bg-[#232737] transition-all"
+              className="group flex items-center gap-2 px-4 py-2.5 text-xs font-medium rounded-xl border border-black/[0.08] dark:border-[#303631] text-slate-600 dark:text-[#A9AEA7] hover:text-slate-900 dark:hover:text-[#F2EFE8] hover:bg-[#efeee8] dark:hover:bg-[#303631] transition-all"
             >
               <FileText className="w-4 h-4" />
               View Report
@@ -56,7 +56,7 @@ const HeroWelcome = ({ hotel, user }) => {
             </button>
             <button
               onClick={() => navigate("/manager/hotel-management")}
-              className="group flex items-center gap-2 px-4 py-2.5 text-xs font-medium rounded-xl bg-[#D4A853] dark:bg-[#E6C075] text-[#2A230F] hover:shadow-lg hover:shadow-[#D4A853]/30 transition-all"
+              className="group flex items-center gap-2 px-4 py-2.5 text-xs font-medium rounded-xl bg-[#A67C52] dark:bg-[#C5A47E] text-[#1A1E1B] hover:shadow-lg hover:shadow-[#A67C52]/30 transition-all"
             >
               <PlusCircle className="w-4 h-4" />
               New Booking
