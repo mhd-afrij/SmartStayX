@@ -3,7 +3,7 @@ import { forwardRef, useId } from 'react';
 const FieldShell = ({ label, htmlFor, required, error, helper, children }) => (
   <div className="space-y-1.5">
     {label && (
-      <label htmlFor={htmlFor} className="block text-sm font-medium text-[#003844] dark:text-[#E9F1F2]">
+      <label htmlFor={htmlFor} className="block text-sm font-medium text-[#183B35] dark:text-[#F2EFE8]">
         {label}
         {required && <span className="text-[#DC2626] ml-0.5">*</span>}
       </label>
@@ -12,18 +12,18 @@ const FieldShell = ({ label, htmlFor, required, error, helper, children }) => (
     {error ? (
       <p className="text-xs text-[#DC2626]">{error}</p>
     ) : helper ? (
-      <p className="text-xs text-[#879497] dark:text-[#6B828A]">{helper}</p>
+      <p className="text-xs text-[#72766F] dark:text-[#A9AEA7]">{helper}</p>
     ) : null}
   </div>
 );
 
 const baseInputClasses =
-  'w-full h-11 rounded-[10px] border bg-white dark:bg-[#161925] px-3.5 text-sm text-[#003844] dark:text-[#E9F1F2] placeholder:text-[#879497] dark:placeholder:text-[#6B828A] outline-none transition-colors disabled:bg-[#F3ECDE] dark:disabled:bg-[#10131D] disabled:text-[#879497] dark:disabled:text-[#6B828A] disabled:cursor-not-allowed';
+  'w-full h-11 rounded-[10px] border bg-white dark:bg-[#1A1E1B] px-3.5 text-sm text-[#183B35] dark:text-[#F2EFE8] placeholder:text-[#72766F] dark:placeholder:text-[#A9AEA7] outline-none transition-colors disabled:bg-[#EFEEE8] dark:disabled:bg-[#111412] disabled:text-[#72766F] dark:disabled:text-[#A9AEA7] disabled:cursor-not-allowed';
 
 const borderClasses = (error) =>
   error
     ? 'border-[#DC2626] focus:border-[#DC2626] focus:ring-3 focus:ring-[#DC2626]/15'
-    : 'border-[#E8E0D1] dark:border-[#232737] focus:border-[#D4A853] focus:ring-3 focus:ring-[#D4A853]/20';
+    : 'border-[#E3E0D8] dark:border-[#303631] focus:border-[#A67C52] focus:ring-3 focus:ring-[#A67C52]/20';
 
 export const Input = forwardRef(function Input(
   { label, error, helper, required, id, className = '', ...props },
@@ -92,12 +92,12 @@ export const Checkbox = forwardRef(function Checkbox({ label, id, className = ''
   const autoId = useId();
   const inputId = id || autoId;
   return (
-    <label htmlFor={inputId} className={`flex items-center gap-2.5 text-sm text-[#003844] dark:text-[#E9F1F2] cursor-pointer ${className}`}>
+    <label htmlFor={inputId} className={`flex items-center gap-2.5 text-sm text-[#183B35] dark:text-[#F2EFE8] cursor-pointer ${className}`}>
       <input
         ref={ref}
         id={inputId}
         type="checkbox"
-        className="h-4 w-4 rounded border-[#E8E0D1] dark:border-[#232737] text-[#B58A2E] dark:text-[#E6C075] focus:ring-2 focus:ring-[#D4A853]/25"
+        className="h-4 w-4 rounded border-[#E3E0D8] dark:border-[#303631] text-[#8A643F] dark:text-[#C5A47E] focus:ring-2 focus:ring-[#A67C52]/25"
         {...props}
       />
       {label}
@@ -117,13 +117,13 @@ export const Toggle = ({ checked, onChange, label, id, disabled }) => {
         aria-checked={checked}
         disabled={disabled}
         onClick={() => onChange?.(!checked)}
-        className={`relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:cursor-not-allowed ${checked ? 'bg-[#D4A853] dark:bg-[#E6C075]' : 'bg-[#E8E0D1] dark:bg-[#232737]'}`}
+        className={`relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:cursor-not-allowed ${checked ? 'bg-[#A67C52] dark:bg-[#C5A47E]' : 'bg-[#E3E0D8] dark:bg-[#303631]'}`}
       >
         <span
-          className={`absolute top-0.5 h-5 w-5 rounded-full bg-white dark:bg-[#161925] shadow transition-transform ${checked ? 'translate-x-[22px]' : 'translate-x-0.5'}`}
+          className={`absolute top-0.5 h-5 w-5 rounded-full bg-white dark:bg-[#1A1E1B] shadow transition-transform ${checked ? 'translate-x-[22px]' : 'translate-x-0.5'}`}
         />
       </button>
-      {label && <span className="text-sm text-[#003844] dark:text-[#E9F1F2]">{label}</span>}
+      {label && <span className="text-sm text-[#183B35] dark:text-[#F2EFE8]">{label}</span>}
     </label>
   );
 };

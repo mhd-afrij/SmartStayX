@@ -13,7 +13,7 @@ const columnHelper = createColumnHelper();
 // METHOD_BADGE — Style map for payment method badges
 const METHOD_BADGE = {
   Stripe: "border-indigo-200 bg-indigo-50 text-indigo-600",
-  Cash: "border-[#D4A853]/40 bg-[#D4A853]/10 text-[#B58A2E] dark:text-[#E6C075]",
+  Cash: "border-[#A67C52]/40 bg-[#A67C52]/10 text-[#8A643F] dark:text-[#C5A47E]",
 };
 
 const PaymentManagement = () => {
@@ -132,10 +132,10 @@ const PaymentManagement = () => {
           const name = info.getValue();
           return (
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#D4A853]/25 to-[#D4A853]/10 border border-black/[0.06] dark:border-[#232737] flex items-center justify-center">
-                <span className="text-[10px] font-medium text-slate-600 dark:text-[#9FB2B8]">{name.charAt(0).toUpperCase()}</span>
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#A67C52]/25 to-[#A67C52]/10 border border-black/[0.06] dark:border-[#303631] flex items-center justify-center">
+                <span className="text-[10px] font-medium text-slate-600 dark:text-[#A9AEA7]">{name.charAt(0).toUpperCase()}</span>
               </div>
-              <span className="text-slate-900 dark:text-[#E9F1F2]">{name}</span>
+              <span className="text-slate-900 dark:text-[#F2EFE8]">{name}</span>
             </div>
           );
         },
@@ -144,18 +144,18 @@ const PaymentManagement = () => {
     columnHelper.accessor((row) => row.hotel?.name || "Hotel", {
       id: "hotel",
       header: "Hotel",
-      cell: (info) => <span className="text-slate-600 dark:text-[#9FB2B8]">{info.getValue()}</span>,
+      cell: (info) => <span className="text-slate-600 dark:text-[#A9AEA7]">{info.getValue()}</span>,
     }),
     columnHelper.accessor(
       (row) => {
         const num = row.roomNumber || row.room?.roomNumber;
         return `${num ? `Room ${num}` : ""}${row.room?.roomType ? (num ? ` — ${row.room.roomType}` : row.room.roomType) : "Room"}`;
       },
-      { id: "room", header: "Room", cell: (info) => <span className="text-slate-600 dark:text-[#9FB2B8]">{info.getValue()}</span> }
+      { id: "room", header: "Room", cell: (info) => <span className="text-slate-600 dark:text-[#A9AEA7]">{info.getValue()}</span> }
     ),
     columnHelper.accessor("totalPrice", {
       header: "Total",
-      cell: (info) => <span className="text-slate-900 dark:text-[#E9F1F2] font-space">{formatPrice(info.getValue())}</span>,
+      cell: (info) => <span className="text-slate-900 dark:text-[#F2EFE8] font-space">{formatPrice(info.getValue())}</span>,
     }),
     columnHelper.accessor((row) => row.paymentMethod || "N/A", {
       id: "method",
@@ -163,7 +163,7 @@ const PaymentManagement = () => {
       cell: (info) => {
         const value = info.getValue();
         return (
-          <span className={`inline-block px-2 py-0.5 text-[10px] font-medium rounded-full border ${METHOD_BADGE[value] || "border-black/[0.08] dark:border-[#232737] bg-[#f4f2ef] dark:bg-[#10131D] text-slate-600 dark:text-[#9FB2B8]"}`}>
+          <span className={`inline-block px-2 py-0.5 text-[10px] font-medium rounded-full border ${METHOD_BADGE[value] || "border-black/[0.08] dark:border-[#303631] bg-[#EFEEE8] dark:bg-[#111412] text-slate-600 dark:text-[#A9AEA7]"}`}>
             {value}
           </span>
         );
@@ -177,7 +177,7 @@ const PaymentManagement = () => {
         return (
           <span
             className={`inline-block px-2 py-0.5 text-[10px] font-medium rounded-full border ${
-              isPaid ? "border-green-200 dark:border-green-500/25 bg-green-50 text-green-700 dark:text-green-300" : "border-[#B9B4CE]/45 dark:border-[#3D4660]/45 bg-[#F4F2F9] dark:bg-[#1B2436] text-amber-700 dark:text-amber-300"
+              isPaid ? "border-green-200 dark:border-green-500/25 bg-green-50 text-green-700 dark:text-green-300" : "border-[#A67C52]/45 dark:border-[#303631]/45 bg-[#EFEEE8] dark:bg-[#222823] text-amber-700 dark:text-amber-300"
             }`}
           >
             {isPaid ? "Paid" : "Unpaid"}
@@ -196,7 +196,7 @@ const PaymentManagement = () => {
             <button
               onClick={() => updatePayment(item._id, true)}
               disabled={updatingId === item._id || deletingId === item._id || item.status === "cancelled"}
-              className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#232737] text-green-500 dark:text-green-300/70 hover:text-green-600 dark:hover:text-green-300 hover:border-green-200 dark:hover:border-green-500/25 hover:bg-green-50 transition-all disabled:opacity-40"
+              className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#303631] text-green-500 dark:text-green-300/70 hover:text-green-600 dark:hover:text-green-300 hover:border-green-200 dark:hover:border-green-500/25 hover:bg-green-50 transition-all disabled:opacity-40"
               title="Mark Paid"
             >
               <CheckCircle className="w-3.5 h-3.5" />
@@ -204,7 +204,7 @@ const PaymentManagement = () => {
             <button
               onClick={() => updatePayment(item._id, false)}
               disabled={updatingId === item._id || deletingId === item._id || item.status === "cancelled"}
-              className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#232737] text-amber-500 dark:text-amber-300/70 hover:text-amber-600 dark:hover:text-amber-300 hover:border-[#B9B4CE]/45 dark:hover:border-[#3D4660]/45 hover:bg-[#F4F2F9] dark:hover:bg-[#1B2436] transition-all disabled:opacity-40"
+              className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#303631] text-amber-500 dark:text-amber-300/70 hover:text-amber-600 dark:hover:text-amber-300 hover:border-[#A67C52]/45 dark:hover:border-[#303631]/45 hover:bg-[#EFEEE8] dark:hover:bg-[#222823] transition-all disabled:opacity-40"
               title="Mark Unpaid"
             >
               <XCircle className="w-3.5 h-3.5" />
@@ -212,7 +212,7 @@ const PaymentManagement = () => {
             <button
               onClick={() => requestConfirm(item._id, "Delete Booking", "Delete this booking record? This action cannot be undone.")}
               disabled={updatingId === item._id || deletingId === item._id}
-              className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#232737] text-slate-400 dark:text-[#6B828A] hover:text-red-600 dark:hover:text-red-300 hover:border-red-200 dark:hover:border-red-500/25 hover:bg-red-50 transition-all disabled:opacity-40"
+              className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#303631] text-slate-400 dark:text-[#A9AEA7] hover:text-red-600 dark:hover:text-red-300 hover:border-red-200 dark:hover:border-red-500/25 hover:bg-red-50 transition-all disabled:opacity-40"
               title="Delete"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -231,8 +231,8 @@ const PaymentManagement = () => {
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Payment Management</h1>
-          <p className="text-sm text-slate-400 dark:text-[#6B828A] mt-1">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-[#F2EFE8] tracking-tight">Payment Management</h1>
+          <p className="text-sm text-slate-400 dark:text-[#A9AEA7] mt-1">
             Manage booking payment status and methods for your properties.
           </p>
         </div>
@@ -241,15 +241,15 @@ const PaymentManagement = () => {
             <select
               value={selectedHotelId}
               onChange={handleHotelFilterChange}
-              className="appearance-none pl-9 pr-8 py-2 text-sm rounded-xl border border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#161925] text-slate-600 dark:text-[#9FB2B8] outline-none focus:border-[#D4A853]/60 transition-colors cursor-pointer"
+              className="appearance-none pl-9 pr-8 py-2 text-sm rounded-xl border border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-slate-600 dark:text-[#A9AEA7] outline-none focus:border-[#A67C52]/60 transition-colors cursor-pointer"
             >
               <option value="all">All Properties</option>
               {hotels.map((hotel) => (
                 <option key={hotel._id} value={hotel._id}>{hotel.name}</option>
               ))}
             </select>
-            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
+            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#A9AEA7] pointer-events-none" />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7] pointer-events-none" />
           </div>
         )}
       </div>
@@ -269,7 +269,7 @@ const PaymentManagement = () => {
             <select
               value={methodFilter}
               onChange={(e) => setMethodFilter(e.target.value)}
-              className="px-2 py-2 text-xs rounded-lg border border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#161925] text-slate-600 dark:text-[#9FB2B8] outline-none focus:border-[#D4A853]/60 transition-colors"
+              className="px-2 py-2 text-xs rounded-lg border border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-slate-600 dark:text-[#A9AEA7] outline-none focus:border-[#A67C52]/60 transition-colors"
             >
               <option value="all">All Methods</option>
               <option value="Stripe">Stripe</option>
@@ -278,7 +278,7 @@ const PaymentManagement = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-2 py-2 text-xs rounded-lg border border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#161925] text-slate-600 dark:text-[#9FB2B8] outline-none focus:border-[#D4A853]/60 transition-colors"
+              className="px-2 py-2 text-xs rounded-lg border border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-slate-600 dark:text-[#A9AEA7] outline-none focus:border-[#A67C52]/60 transition-colors"
             >
               <option value="all">All Status</option>
               <option value="paid">Paid</option>

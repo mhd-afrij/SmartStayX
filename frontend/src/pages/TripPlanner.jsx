@@ -158,7 +158,7 @@ const TripPlanner = () => {
   const handlePrint = () => window.print()
 
   return (
-    <div className="min-h-screen bg-[#FFFAF4] dark:bg-[#0B1D24] pt-24 pb-16 px-4 md:px-8 lg:px-10">
+    <div className="min-h-screen bg-[#F7F5F0] dark:bg-[#111412] pt-24 pb-16 px-4 md:px-8 lg:px-10">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <p className="luxury-kicker mb-2">AI Trip Planner</p>
@@ -237,7 +237,7 @@ const TripPlanner = () => {
           </div>
 
           <div>
-            <p className="block text-sm font-medium text-[#003844] dark:text-[#E9F1F2] mb-2">Interests</p>
+            <p className="block text-sm font-medium text-[#202522] dark:text-[#F2EFE8] mb-2">Interests</p>
             <div className="flex flex-wrap gap-2">
               {INTERESTS.map((interest) => (
                 <button
@@ -246,8 +246,8 @@ const TripPlanner = () => {
                   onClick={() => toggleInterest(interest)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                     form.interests.includes(interest)
-                      ? 'bg-[#5077B3] text-white border-[#5077B3]'
-                      : 'bg-white dark:bg-[#122A32] text-[#4D6166] dark:text-[#9FB2B8] border-[#E8E0D1] dark:border-[#1D3842] hover:border-[#5077B3]/40'
+                      ? 'bg-[#183B35] text-white border-[#183B35]'
+                      : 'bg-white dark:bg-[#111412] text-[#5C6B64] dark:text-[#A9AEA7] border-[#E3E0D8] dark:border-[#303631] hover:border-[#183B35]/40'
                   }`}
                 >
                   {interest}
@@ -272,7 +272,7 @@ const TripPlanner = () => {
           </div>
 
           <div>
-            <p className="block text-sm font-medium text-[#003844] dark:text-[#E9F1F2] mb-2">Or pick a popular destination</p>
+            <p className="block text-sm font-medium text-[#202522] dark:text-[#F2EFE8] mb-2">Or pick a popular destination</p>
             <DestinationsGrid selected={form.destination} onSelect={(name) => updateField('destination', name)} />
           </div>
 
@@ -305,8 +305,8 @@ const TripPlanner = () => {
             <div>
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <div>
-                  <h2 className="text-xl font-playfair font-bold text-[#003844] dark:text-[#E9F1F2]">{itinerary.title}</h2>
-                  <p className="text-sm text-[#4D6166] dark:text-[#9FB2B8]">{itinerary.destination}</p>
+                  <h2 className="text-xl font-playfair font-bold text-[#202522] dark:text-[#F2EFE8]">{itinerary.title}</h2>
+                  <p className="text-sm text-[#5C6B64] dark:text-[#A9AEA7]">{itinerary.destination}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <Button variant="outline" size="sm" icon={Save} onClick={handleSave}>Save</Button>
@@ -322,14 +322,14 @@ const TripPlanner = () => {
                 <button
                   type="button"
                   onClick={() => setMobileTab('itinerary')}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-[10px] text-sm font-medium ${mobileTab === 'itinerary' ? 'bg-[#5077B3] text-white' : 'bg-white dark:bg-[#122A32] border border-[#E8E0D1] dark:border-[#1D3842] text-[#4D6166] dark:text-[#9FB2B8]'}`}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-[10px] text-sm font-medium ${mobileTab === 'itinerary' ? 'bg-[#183B35] text-white' : 'bg-white dark:bg-[#111412] border border-[#E3E0D8] dark:border-[#303631] text-[#5C6B64] dark:text-[#A9AEA7]'}`}
                 >
                   <List className="h-4 w-4" /> Itinerary
                 </button>
                 <button
                   type="button"
                   onClick={() => setMobileTab('map')}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-[10px] text-sm font-medium ${mobileTab === 'map' ? 'bg-[#5077B3] text-white' : 'bg-white dark:bg-[#122A32] border border-[#E8E0D1] dark:border-[#1D3842] text-[#4D6166] dark:text-[#9FB2B8]'}`}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-[10px] text-sm font-medium ${mobileTab === 'map' ? 'bg-[#183B35] text-white' : 'bg-white dark:bg-[#111412] border border-[#E3E0D8] dark:border-[#303631] text-[#5C6B64] dark:text-[#A9AEA7]'}`}
                 >
                   <MapIcon className="h-4 w-4" /> Map
                 </button>

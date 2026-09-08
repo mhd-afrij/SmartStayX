@@ -44,6 +44,6 @@ describe('ErrorBoundary', () => {
 
     const svg = document.querySelector('svg');
     expect(svg).toBeInTheDocument();
-    expect(svg).toHaveClass('text-[#5077b3]');
+    expect(svg).toHaveClass('text-[#183B35]');
   });
 });

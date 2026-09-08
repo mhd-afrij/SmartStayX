@@ -63,20 +63,20 @@ const SupportTickets = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F3ECDE] dark:bg-[#122A32] pt-32 flex items-start justify-center">
-        <Loader2 className="w-6 h-6 text-[#5077B3] dark:text-[#93B3E0] animate-spin mt-20" />
+      <div className="min-h-screen bg-[#EFEEE8] dark:bg-[#111412] pt-32 flex items-start justify-center">
+        <Loader2 className="w-6 h-6 text-[#183B35] dark:text-[#8FB8A8] animate-spin mt-20" />
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#F3ECDE] dark:bg-[#122A32] pt-24 pb-16">
+    <div className="relative min-h-screen overflow-hidden bg-[#EFEEE8] dark:bg-[#111412] pt-24 pb-16">
       <div className="absolute inset-0 mesh-glow opacity-60" />
       <div className="relative mx-auto max-w-2xl px-4 md:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-playfair text-slate-900 dark:text-[#E9F1F2]">Support Tickets</h1>
-            <p className="text-sm text-slate-400 dark:text-[#6B828A] mt-1">Get help with your bookings and account</p>
+            <h1 className="text-2xl font-playfair text-slate-900 dark:text-[#F2EFE8]">Support Tickets</h1>
+            <p className="text-sm text-slate-400 dark:text-[#A9AEA7] mt-1">Get help with your bookings and account</p>
           </div>
           <button
             onClick={() => setShowNew(!showNew)}
@@ -91,7 +91,7 @@ const SupportTickets = () => {
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="luxury-card p-6 mb-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-[0.12em] mb-1.5">Subject</label>
+                <label className="block text-xs font-medium text-slate-500 dark:text-[#A9AEA7] uppercase tracking-[0.12em] mb-1.5">Subject</label>
                 <input
                   type="text"
                   value={subject}
@@ -101,7 +101,7 @@ const SupportTickets = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-[0.12em] mb-1.5">Message</label>
+                <label className="block text-xs font-medium text-slate-500 dark:text-[#A9AEA7] uppercase tracking-[0.12em] mb-1.5">Message</label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -125,9 +125,9 @@ const SupportTickets = () => {
 
         {tickets.length === 0 ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="luxury-card p-12 text-center">
-            <LifeBuoy className="w-12 h-12 mx-auto mb-3 text-slate-300 dark:text-[#4E646B]" />
-            <p className="text-slate-500 dark:text-[#8299A0] text-sm">No support tickets yet</p>
-            <p className="text-slate-400 dark:text-[#6B828A] text-xs mt-1">Create a ticket and we'll get back to you</p>
+            <LifeBuoy className="w-12 h-12 mx-auto mb-3 text-slate-300 dark:text-[#A9AEA7]" />
+            <p className="text-slate-500 dark:text-[#A9AEA7] text-sm">No support tickets yet</p>
+            <p className="text-slate-400 dark:text-[#A9AEA7] text-xs mt-1">Create a ticket and we'll get back to you</p>
           </motion.div>
         ) : (
           <div className="space-y-2">
@@ -139,28 +139,28 @@ const SupportTickets = () => {
                 transition={{ delay: i * 0.03 }}
                 className="luxury-card p-4 flex items-start gap-4"
               >
-                <div className="w-9 h-9 rounded-xl bg-[#f4f2ef] dark:bg-[#16303A] flex items-center justify-center shrink-0">
-                  <MessageSquare className="w-4 h-4 text-slate-400 dark:text-[#6B828A]" />
+                <div className="w-9 h-9 rounded-xl bg-[#EFEEE8] dark:bg-[#222823] flex items-center justify-center shrink-0">
+                  <MessageSquare className="w-4 h-4 text-slate-400 dark:text-[#A9AEA7]" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm text-slate-900 dark:text-[#E9F1F2] font-medium">{ticket.subject}</p>
+                    <p className="text-sm text-slate-900 dark:text-[#F2EFE8] font-medium">{ticket.subject}</p>
                     <span
                       className={`text-[10px] px-2 py-0.5 rounded-full border ${
                         ticket.status === "open"
                           ? "border-green-200 dark:border-green-500/25 bg-green-50 text-green-700 dark:text-green-300"
                           : ticket.status === "resolved"
-                          ? "border-[#5077B3]/20 bg-[#5077B3]/10 text-[#5077B3] dark:text-[#93B3E0]"
+                          ? "border-[#183B35]/20 bg-[#183B35]/10 text-[#183B35] dark:text-[#8FB8A8]"
                           : ticket.status === "closed"
-                          ? "border-black/[0.06] dark:border-[#1D3842] bg-[#f4f2ef] dark:bg-[#16303A] text-slate-500 dark:text-[#8299A0]"
-                          : "border-[#B9B4CE]/45 dark:border-[#3D4660]/45 bg-[#F4F2F9] dark:bg-[#1B2436] text-amber-700 dark:text-amber-300"
+                          ? "border-black/[0.06] dark:border-[#303631] bg-[#EFEEE8] dark:bg-[#222823] text-slate-500 dark:text-[#A9AEA7]"
+                          : "border-[#A67C52]/45 dark:border-[#303631]/45 bg-[#EFEEE8] dark:bg-[#222823] text-amber-700 dark:text-amber-300"
                       }`}
                     >
                       {ticket.status || "open"}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-[#8299A0] mt-1 line-clamp-2">{ticket.message}</p>
-                  <p className="text-[10px] text-slate-400 dark:text-[#6B828A] mt-1.5">
+                  <p className="text-xs text-slate-500 dark:text-[#A9AEA7] mt-1 line-clamp-2">{ticket.message}</p>
+                  <p className="text-[10px] text-slate-400 dark:text-[#A9AEA7] mt-1.5">
                     {ticket.createdAt ? new Date(ticket.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : ""}
                   </p>
                 </div>

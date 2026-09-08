@@ -87,11 +87,11 @@ const RoomStatusBoard = () => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pb-10">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Room Status Board</h1>
-          <p className="text-sm text-slate-500 dark:text-[#8299A0] mt-1">Live overview of every room, with fast status updates</p>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-[#F2EFE8] tracking-tight">Room Status Board</h1>
+          <p className="text-sm text-slate-500 dark:text-[#A9AEA7] mt-1">Live overview of every room, with fast status updates</p>
         </div>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7]" />
           <input type="text" placeholder="Search rooms..." value={search} onChange={(e) => setSearch(e.target.value)}
             className="luxury-input w-48 h-auto py-2 pl-9 pr-3 text-xs" />
         </div>
@@ -109,48 +109,48 @@ const RoomStatusBoard = () => {
               <option key={hotel._id} value={hotel._id}>{hotel.name}</option>
             ))}
           </select>
-          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
+          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#A9AEA7] pointer-events-none" />
         </div>
 
-        <div className="flex items-center gap-1.5 bg-[#f4f2ef] dark:bg-[#16303A] rounded-xl p-1 border border-black/[0.06] dark:border-[#1D3842] flex-wrap">
+        <div className="flex items-center gap-1.5 bg-[#EFEEE8] dark:bg-[#222823] rounded-xl p-1 border border-black/[0.06] dark:border-[#303631] flex-wrap">
           <button onClick={() => setStatusFilter("all")}
-            className={`px-3 py-1.5 text-xs rounded-lg transition-all ${statusFilter === "all" ? "bg-[#EFEDF7] dark:bg-[#1B2436] text-[#5077B3] dark:text-[#93B3E0] border border-[#B9B4CE]/45 dark:border-[#3D4660]/45" : "text-slate-500 dark:text-[#8299A0] hover:text-slate-800 dark:hover:text-[#D3DFE2]"}`}>
+            className={`px-3 py-1.5 text-xs rounded-lg transition-all ${statusFilter === "all" ? "bg-[#EFEAE1] dark:bg-[#222823] text-[#183B35] dark:text-[#8FB8A8] border border-[#A67C52]/45 dark:border-[#303631]/45" : "text-slate-500 dark:text-[#A9AEA7] hover:text-slate-800 dark:hover:text-[#F2EFE8]"}`}>
             All
           </button>
           {STATUS_OPTIONS.map((s) => (
             <button key={s} onClick={() => setStatusFilter(s)}
-              className={`px-3 py-1.5 text-xs rounded-lg transition-all ${statusFilter === s ? "bg-[#EFEDF7] dark:bg-[#1B2436] text-[#5077B3] dark:text-[#93B3E0] border border-[#B9B4CE]/45 dark:border-[#3D4660]/45" : "text-slate-500 dark:text-[#8299A0] hover:text-slate-800 dark:hover:text-[#D3DFE2]"}`}>
+              className={`px-3 py-1.5 text-xs rounded-lg transition-all ${statusFilter === s ? "bg-[#EFEAE1] dark:bg-[#222823] text-[#183B35] dark:text-[#8FB8A8] border border-[#A67C52]/45 dark:border-[#303631]/45" : "text-slate-500 dark:text-[#A9AEA7] hover:text-slate-800 dark:hover:text-[#F2EFE8]"}`}>
               {STATUS_CONFIG[s].label}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-black/[0.06] dark:border-[#1D3842] bg-white dark:bg-[#122A32] shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-black/[0.06] dark:border-[#1D3842]">
+      <div className="rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-sm overflow-hidden">
+        <div className="p-5 border-b border-black/[0.06] dark:border-[#303631]">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#EFEDF7] dark:bg-[#1B2436] border border-[#B9B4CE]/45 dark:border-[#3D4660]/45 flex items-center justify-center">
-              <LayoutGrid className="w-4 h-4 text-[#5077B3] dark:text-[#93B3E0]" />
+            <div className="w-8 h-8 rounded-lg bg-[#EFEAE1] dark:bg-[#222823] border border-[#A67C52]/45 dark:border-[#303631]/45 flex items-center justify-center">
+              <LayoutGrid className="w-4 h-4 text-[#183B35] dark:text-[#8FB8A8]" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">Rooms</h3>
-              <p className="text-xs text-slate-500 dark:text-[#8299A0]">{filtered.length} room{filtered.length !== 1 ? "s" : ""} found</p>
+              <h3 className="text-sm font-medium text-slate-900 dark:text-[#F2EFE8]">Rooms</h3>
+              <p className="text-xs text-slate-500 dark:text-[#A9AEA7]">{filtered.length} room{filtered.length !== 1 ? "s" : ""} found</p>
             </div>
           </div>
         </div>
 
         {loading ? (
           <div className="p-8 flex items-center gap-3">
-            <div className="w-5 h-5 rounded-full border-2 border-[#5077B3]/25 border-t-[#5077B3] animate-spin" />
-            <span className="text-sm text-slate-500 dark:text-[#8299A0]">Loading rooms...</span>
+            <div className="w-5 h-5 rounded-full border-2 border-[#2A4A43]/30 border-t-[#183B35] animate-spin" />
+            <span className="text-sm text-slate-500 dark:text-[#A9AEA7]">Loading rooms...</span>
           </div>
         ) : error ? (
           <div className="p-8 text-center">
-            <p className="text-sm text-slate-500 dark:text-[#8299A0] mb-3">Could not load rooms.</p>
+            <p className="text-sm text-slate-500 dark:text-[#A9AEA7] mb-3">Could not load rooms.</p>
             <button onClick={() => loadRooms()} className="ghost-button px-4 py-1.5 text-xs">Try again</button>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 dark:text-[#6B828A] text-sm">No rooms found.</div>
+          <div className="p-8 text-center text-slate-400 dark:text-[#A9AEA7] text-sm">No rooms found.</div>
         ) : (
           <div className="grid gap-4 p-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {filtered.map((room) => {
@@ -161,19 +161,19 @@ const RoomStatusBoard = () => {
                   <button
                     onClick={() => setOpenPopoverId(openPopoverId === room._id ? null : room._id)}
                     disabled={updatingId === room._id}
-                    className="w-full text-left rounded-2xl border border-black/[0.06] dark:border-[#1D3842] bg-white dark:bg-[#122A32] p-4 space-y-2 hover:border-black/[0.14] dark:hover:border-[#1D3842] shadow-sm transition-all disabled:opacity-60"
+                    className="w-full text-left rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] p-4 space-y-2 hover:border-black/[0.14] dark:hover:border-[#303631] shadow-sm transition-all disabled:opacity-60"
                   >
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-lg font-bold text-slate-900 dark:text-[#E9F1F2] font-space">Room {room.roomNumber}</p>
-                        <p className="text-xs text-slate-500 dark:text-[#8299A0]">{room.roomType || "—"}</p>
+                        <p className="text-lg font-bold text-slate-900 dark:text-[#F2EFE8] font-space">Room {room.roomNumber}</p>
+                        <p className="text-xs text-slate-500 dark:text-[#A9AEA7]">{room.roomType || "—"}</p>
                       </div>
                       {updatingId === room._id && (
-                        <div className="w-4 h-4 rounded-full border-2 border-[#5077B3]/25 border-t-[#5077B3] animate-spin" />
+                        <div className="w-4 h-4 rounded-full border-2 border-[#2A4A43]/30 border-t-[#183B35] animate-spin" />
                       )}
                     </div>
                     {(room.hotelName || room.hotel?.name) && (
-                      <p className="text-[11px] text-slate-400 dark:text-[#6B828A] truncate">{room.hotelName || room.hotel?.name}</p>
+                      <p className="text-[11px] text-slate-400 dark:text-[#A9AEA7] truncate">{room.hotelName || room.hotel?.name}</p>
                     )}
                     <Badge tone={cfg.tone}>{cfg.label}</Badge>
                   </button>
@@ -184,14 +184,14 @@ const RoomStatusBoard = () => {
                         initial={{ opacity: 0, y: 6, scale: 0.97 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 6, scale: 0.97 }}
-                        className="absolute z-20 top-full mt-2 left-0 w-52 rounded-xl border border-black/[0.06] dark:border-[#1D3842] bg-white dark:bg-[#122A32] shadow-2xl p-1.5"
+                        className="absolute z-20 top-full mt-2 left-0 w-52 rounded-xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-2xl p-1.5"
                       >
                         {STATUS_OPTIONS.map((s) => (
                           <button
                             key={s}
                             onClick={() => handleStatusChange(room._id, s)}
                             className={`flex items-center justify-between w-full px-3 py-2 text-xs rounded-lg transition-colors ${
-                              s === roomStatus ? "bg-[#f4f2ef] dark:bg-[#16303A] text-slate-900 dark:text-[#E9F1F2]" : "text-slate-600 dark:text-[#9FB2B8] hover:bg-[#f4f2ef] dark:hover:bg-[#16303A]"
+                              s === roomStatus ? "bg-[#EFEEE8] dark:bg-[#222823] text-slate-900 dark:text-[#F2EFE8]" : "text-slate-600 dark:text-[#A9AEA7] hover:bg-[#EFEEE8] dark:hover:bg-[#222823]"
                             }`}
                           >
                             {STATUS_CONFIG[s].label}

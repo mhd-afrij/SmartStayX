@@ -117,15 +117,15 @@ const UserManagement = () => {
       <PageHeader title="User Management" description="View, filter, and manage every account on SmartStayX." />
 
       <Card padded={false} className="overflow-hidden">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-[#E8E0D1] dark:border-[#232737]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-[#E3E0D8] dark:border-[#303631]">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#879497] dark:text-[#6B828A]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#72766F] dark:text-[#A9AEA7]" />
             <input
               type="text"
               placeholder="Search by name or email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-64 pl-9 pr-3 py-2 text-xs rounded-lg border border-[#E8E0D1] dark:border-[#232737] bg-white dark:bg-[#161925] text-[#003844] dark:text-[#E9F1F2] placeholder:text-[#879497] dark:placeholder:text-[#6B828A] outline-none focus:border-[#D4A853]/60 transition-colors"
+              className="w-64 pl-9 pr-3 py-2 text-xs rounded-lg border border-[#E3E0D8] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-[#183B35] dark:text-[#F2EFE8] placeholder:text-[#72766F] dark:placeholder:text-[#A9AEA7] outline-none focus:border-[#A67C52]/60 transition-colors"
             />
           </div>
           <Select
@@ -158,31 +158,31 @@ const UserManagement = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#E8E0D1] dark:border-[#232737] bg-[#FFFAF4] dark:bg-[#10131D]">
-                    <th className="py-3 px-4 text-left text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">User</th>
-                    <th className="py-3 px-4 text-left text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">Role</th>
-                    <th className="py-3 px-4 text-left text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">Status</th>
-                    <th className="py-3 px-4 text-left text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">Joined</th>
-                    <th className="py-3 px-4 text-right text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">Actions</th>
+                  <tr className="border-b border-[#E3E0D8] dark:border-[#303631] bg-[#F7F5F0] dark:bg-[#111412]">
+                    <th className="py-3 px-4 text-left text-xs font-medium text-[#5C6B64] dark:text-[#A9AEA7] uppercase tracking-wider">User</th>
+                    <th className="py-3 px-4 text-left text-xs font-medium text-[#5C6B64] dark:text-[#A9AEA7] uppercase tracking-wider">Role</th>
+                    <th className="py-3 px-4 text-left text-xs font-medium text-[#5C6B64] dark:text-[#A9AEA7] uppercase tracking-wider">Status</th>
+                    <th className="py-3 px-4 text-left text-xs font-medium text-[#5C6B64] dark:text-[#A9AEA7] uppercase tracking-wider">Joined</th>
+                    <th className="py-3 px-4 text-right text-xs font-medium text-[#5C6B64] dark:text-[#A9AEA7] uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {users.map((u) => {
                     const self = isSelf(u);
                     return (
-                      <tr key={u._id} className="border-b border-[#E8E0D1] dark:border-[#232737] last:border-b-0 hover:bg-[#F3ECDE] dark:hover:bg-[#232737] transition-colors">
+                      <tr key={u._id} className="border-b border-[#E3E0D8] dark:border-[#303631] last:border-b-0 hover:bg-[#EFEEE8] dark:hover:bg-[#303631] transition-colors">
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-3">
                             {u.image ? (
                               <img src={u.image} alt={u.name} className="w-8 h-8 rounded-full object-cover" />
                             ) : (
-                              <div className="w-8 h-8 rounded-full bg-[#D4A853]/10 text-[#B58A2E] dark:text-[#E6C075] flex items-center justify-center text-xs font-semibold">
+                              <div className="w-8 h-8 rounded-full bg-[#A67C52]/10 text-[#8A643F] dark:text-[#C5A47E] flex items-center justify-center text-xs font-semibold">
                                 {u.name?.charAt(0)?.toUpperCase() || '?'}
                               </div>
                             )}
                             <div className="min-w-0">
-                              <p className="font-medium text-[#003844] dark:text-[#E9F1F2] truncate">{u.name}{self && <span className="ml-1.5 text-[10px] text-[#879497] dark:text-[#6B828A] font-normal">(you)</span>}</p>
-                              <p className="text-xs text-[#4D6166] dark:text-[#9FB2B8] truncate">{u.email}</p>
+                              <p className="font-medium text-[#183B35] dark:text-[#F2EFE8] truncate">{u.name}{self && <span className="ml-1.5 text-[10px] text-[#72766F] dark:text-[#A9AEA7] font-normal">(you)</span>}</p>
+                              <p className="text-xs text-[#5C6B64] dark:text-[#A9AEA7] truncate">{u.email}</p>
                             </div>
                           </div>
                         </td>
@@ -191,7 +191,7 @@ const UserManagement = () => {
                             value={u.role}
                             disabled={self || busyId === u._id}
                             onChange={(e) => handleRoleChange(u, e.target.value)}
-                            className="h-8 rounded-lg border border-[#E8E0D1] dark:border-[#232737] bg-white dark:bg-[#161925] px-2 text-xs text-[#003844] dark:text-[#E9F1F2] outline-none focus:border-[#D4A853]/60 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="h-8 rounded-lg border border-[#E3E0D8] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] px-2 text-xs text-[#183B35] dark:text-[#F2EFE8] outline-none focus:border-[#A67C52]/60 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {ROLES.map((r) => (
                               <option key={r} value={r}>{r}</option>
@@ -203,14 +203,14 @@ const UserManagement = () => {
                             value={u.status || 'active'}
                             disabled={self || busyId === u._id}
                             onChange={(e) => handleStatusChange(u, e.target.value)}
-                            className="h-8 rounded-lg border border-[#E8E0D1] dark:border-[#232737] bg-white dark:bg-[#161925] px-2 text-xs text-[#003844] dark:text-[#E9F1F2] outline-none focus:border-[#D4A853]/60 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="h-8 rounded-lg border border-[#E3E0D8] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] px-2 text-xs text-[#183B35] dark:text-[#F2EFE8] outline-none focus:border-[#A67C52]/60 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {STATUSES.map((s) => (
                               <option key={s} value={s}>{s}</option>
                             ))}
                           </select>
                         </td>
-                        <td className="py-3 px-4 text-[#4D6166] dark:text-[#9FB2B8] text-xs">
+                        <td className="py-3 px-4 text-[#5C6B64] dark:text-[#A9AEA7] text-xs">
                           {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}
                         </td>
                         <td className="py-3 px-4 text-right">
@@ -232,20 +232,20 @@ const UserManagement = () => {
             </div>
 
             {pages > 1 && (
-              <div className="flex items-center justify-between px-4 py-4 border-t border-[#E8E0D1] dark:border-[#232737]">
-                <span className="text-xs text-[#879497] dark:text-[#6B828A]">Page {page} of {pages}</span>
+              <div className="flex items-center justify-between px-4 py-4 border-t border-[#E3E0D8] dark:border-[#303631]">
+                <span className="text-xs text-[#72766F] dark:text-[#A9AEA7]">Page {page} of {pages}</span>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page <= 1}
-                    className="p-1.5 rounded-lg border border-[#E8E0D1] dark:border-[#232737] text-[#879497] dark:text-[#6B828A] hover:text-[#003844] dark:hover:text-[#E9F1F2] hover:bg-[#F3ECDE] dark:hover:bg-[#232737] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="p-1.5 rounded-lg border border-[#E3E0D8] dark:border-[#303631] text-[#72766F] dark:text-[#A9AEA7] hover:text-[#183B35] dark:hover:text-[#F2EFE8] hover:bg-[#EFEEE8] dark:hover:bg-[#303631] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <ChevronLeft className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => setPage((p) => Math.min(pages, p + 1))}
                     disabled={page >= pages}
-                    className="p-1.5 rounded-lg border border-[#E8E0D1] dark:border-[#232737] text-[#879497] dark:text-[#6B828A] hover:text-[#003844] dark:hover:text-[#E9F1F2] hover:bg-[#F3ECDE] dark:hover:bg-[#232737] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="p-1.5 rounded-lg border border-[#E3E0D8] dark:border-[#303631] text-[#72766F] dark:text-[#A9AEA7] hover:text-[#183B35] dark:hover:text-[#F2EFE8] hover:bg-[#EFEEE8] dark:hover:bg-[#303631] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>

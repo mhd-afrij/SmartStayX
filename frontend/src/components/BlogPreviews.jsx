@@ -34,7 +34,7 @@ const BlogPreviews = () => {
             >
               <TiltCard
                 maxTilt={4}
-                className="overflow-hidden rounded-[24px] border border-black/[0.06] dark:border-[#1D3842] shadow-[0_20px_60px_rgba(0,56,68,0.06)]"
+                className="overflow-hidden rounded-[24px] border border-black/[0.06] dark:border-[#303631] shadow-[0_20px_60px_rgba(24,59,53,0.06)]"
               >
                 <Link
                   to={`/blog?destination=${encodeURIComponent(dest.name)}`}
@@ -47,20 +47,20 @@ const BlogPreviews = () => {
                       loading="lazy"
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#07111f]/85 via-[#07111f]/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#111412]/85 via-[#111412]/20 to-transparent" />
                     <span className="absolute bottom-4 left-4 rounded-full border border-white/20 bg-white/15 dark:bg-white/5 px-3 py-1 text-[0.65rem] uppercase tracking-[0.2em] text-white/90 backdrop-blur-xl">
                       {dest.hotels}
                     </span>
                   </div>
 
                   <div className="p-5">
-                    <p className="font-playfair text-xl text-slate-900 dark:text-[#E9F1F2] group-hover:text-[#5077B3] dark:group-hover:text-[#93B3E0] transition-colors">
+                    <p className="font-playfair text-xl text-slate-900 dark:text-[#F2EFE8] group-hover:text-[#183B35] dark:group-hover:text-[#8FB8A8] transition-colors">
                       {dest.name}
                     </p>
-                    <p className="mt-2 text-sm text-slate-500 dark:text-[#8299A0] line-clamp-2">
+                    <p className="mt-2 text-sm text-slate-500 dark:text-[#A9AEA7] line-clamp-2">
                       {dest.description}
                     </p>
-                    <div className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#5077B3] dark:text-[#93B3E0]">
+                    <div className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#183B35] dark:text-[#8FB8A8]">
                       <span>Read article</span>
                       <ArrowRight className="w-3.5" />
                     </div>

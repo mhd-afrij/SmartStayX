@@ -100,59 +100,59 @@ const AssignedTasks = () => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pb-10">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Assigned Tasks</h1>
-          <p className="text-sm text-slate-500 dark:text-[#8299A0] mt-1">Service and maintenance tasks assigned to you</p>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-[#F2EFE8] tracking-tight">Assigned Tasks</h1>
+          <p className="text-sm text-slate-500 dark:text-[#A9AEA7] mt-1">Service and maintenance tasks assigned to you</p>
         </div>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7]" />
           <input type="text" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)}
             className="luxury-input w-48 h-auto py-2 pl-9 pr-3 text-xs" />
         </div>
       </div>
 
-      <div className="flex items-center gap-2 bg-[#f4f2ef] dark:bg-[#16303A] rounded-xl p-1 border border-black/[0.06] dark:border-[#1D3842] w-fit">
+      <div className="flex items-center gap-2 bg-[#EFEEE8] dark:bg-[#222823] rounded-xl p-1 border border-black/[0.06] dark:border-[#303631] w-fit">
         <button onClick={() => setMode("mine")}
-          className={`px-4 py-1.5 text-sm rounded-lg transition-all ${mode === "mine" ? "bg-[#EFEDF7] dark:bg-[#1B2436] text-[#5077B3] dark:text-[#93B3E0] border border-[#B9B4CE]/45 dark:border-[#3D4660]/45" : "text-slate-500 dark:text-[#8299A0] hover:text-slate-800 dark:hover:text-[#D3DFE2]"}`}>
+          className={`px-4 py-1.5 text-sm rounded-lg transition-all ${mode === "mine" ? "bg-[#EFEAE1] dark:bg-[#222823] text-[#183B35] dark:text-[#8FB8A8] border border-[#A67C52]/45 dark:border-[#303631]/45" : "text-slate-500 dark:text-[#A9AEA7] hover:text-slate-800 dark:hover:text-[#F2EFE8]"}`}>
           My Tasks
         </button>
         <button onClick={() => setMode("open")}
-          className={`px-4 py-1.5 text-sm rounded-lg transition-all ${mode === "open" ? "bg-[#EFEDF7] dark:bg-[#1B2436] text-[#5077B3] dark:text-[#93B3E0] border border-[#B9B4CE]/45 dark:border-[#3D4660]/45" : "text-slate-500 dark:text-[#8299A0] hover:text-slate-800 dark:hover:text-[#D3DFE2]"}`}>
+          className={`px-4 py-1.5 text-sm rounded-lg transition-all ${mode === "open" ? "bg-[#EFEAE1] dark:bg-[#222823] text-[#183B35] dark:text-[#8FB8A8] border border-[#A67C52]/45 dark:border-[#303631]/45" : "text-slate-500 dark:text-[#A9AEA7] hover:text-slate-800 dark:hover:text-[#F2EFE8]"}`}>
           All Open Tasks
         </button>
       </div>
 
-      <div className="rounded-2xl border border-black/[0.06] dark:border-[#1D3842] bg-white dark:bg-[#122A32] shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-black/[0.06] dark:border-[#1D3842]">
+      <div className="rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-sm overflow-hidden">
+        <div className="p-5 border-b border-black/[0.06] dark:border-[#303631]">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-violet-50 border border-violet-200 flex items-center justify-center">
               <ClipboardList className="w-4 h-4 text-violet-600" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">{mode === "mine" ? "My Tasks" : "All Open Tasks"}</h3>
-              <p className="text-xs text-slate-500 dark:text-[#8299A0]">{filtered.length} task{filtered.length !== 1 ? "s" : ""}</p>
+              <h3 className="text-sm font-medium text-slate-900 dark:text-[#F2EFE8]">{mode === "mine" ? "My Tasks" : "All Open Tasks"}</h3>
+              <p className="text-xs text-slate-500 dark:text-[#A9AEA7]">{filtered.length} task{filtered.length !== 1 ? "s" : ""}</p>
             </div>
           </div>
         </div>
 
         {loading ? (
           <div className="p-8 flex items-center gap-3">
-            <div className="w-5 h-5 rounded-full border-2 border-[#5077B3]/25 border-t-[#5077B3] animate-spin" />
-            <span className="text-sm text-slate-500 dark:text-[#8299A0]">Loading...</span>
+            <div className="w-5 h-5 rounded-full border-2 border-[#2A4A43]/30 border-t-[#183B35] animate-spin" />
+            <span className="text-sm text-slate-500 dark:text-[#A9AEA7]">Loading...</span>
           </div>
         ) : error ? (
           <div className="p-8 text-center">
-            <p className="text-sm text-slate-500 dark:text-[#8299A0] mb-3">Could not load tasks.</p>
+            <p className="text-sm text-slate-500 dark:text-[#A9AEA7] mb-3">Could not load tasks.</p>
             <button onClick={() => loadTasks()} className="ghost-button px-4 py-1.5 text-xs">Try again</button>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 dark:text-[#6B828A] text-sm">No tasks found.</div>
+          <div className="p-8 text-center text-slate-400 dark:text-[#A9AEA7] text-sm">No tasks found.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#f4f2ef] dark:bg-[#16303A] border-b border-black/[0.06] dark:border-[#1D3842]">
+                <tr className="bg-[#EFEEE8] dark:bg-[#222823] border-b border-black/[0.06] dark:border-[#303631]">
                   {["Type", "Guest", "Room", "Priority", "Requested", "Status", "Assigned To", "Actions"].map((h) => (
-                    <th key={h} className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-wider">{h}</th>
+                    <th key={h} className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#A9AEA7] uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -161,16 +161,16 @@ const AssignedTasks = () => {
                   const st = STATUS_CONFIG[item.status] || STATUS_CONFIG.pending;
                   const pr = PRIORITY_CONFIG[item.priority] || PRIORITY_CONFIG.normal;
                   return (
-                    <tr key={item._id} className="border-b border-black/[0.06] dark:border-[#1D3842] hover:bg-black/[0.02] dark:hover:bg-white/5 transition-colors">
-                      <td className="py-3 px-4 text-slate-700 dark:text-[#C1D2D6]">{item.serviceType}</td>
-                      <td className="py-3 px-4 text-slate-500 dark:text-[#8299A0]">{item.guest?.name || item.guest?.username || "Guest"}</td>
-                      <td className="py-3 px-4 text-slate-500 dark:text-[#8299A0]">Room {item.roomNumber || item.room?.roomNumber || "—"}</td>
+                    <tr key={item._id} className="border-b border-black/[0.06] dark:border-[#303631] hover:bg-black/[0.02] dark:hover:bg-white/5 transition-colors">
+                      <td className="py-3 px-4 text-slate-700 dark:text-[#E8EDE6]">{item.serviceType}</td>
+                      <td className="py-3 px-4 text-slate-500 dark:text-[#A9AEA7]">{item.guest?.name || item.guest?.username || "Guest"}</td>
+                      <td className="py-3 px-4 text-slate-500 dark:text-[#A9AEA7]">Room {item.roomNumber || item.room?.roomNumber || "—"}</td>
                       <td className="py-3 px-4"><Badge tone={pr.tone}>{pr.label}</Badge></td>
-                      <td className="py-3 px-4 text-slate-400 dark:text-[#6B828A] text-xs">
+                      <td className="py-3 px-4 text-slate-400 dark:text-[#A9AEA7] text-xs">
                         {new Date(item.requestedAt || item.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                       </td>
                       <td className="py-3 px-4"><Badge tone={st.tone}>{st.label}</Badge></td>
-                      <td className="py-3 px-4 text-slate-500 dark:text-[#8299A0] text-xs">
+                      <td className="py-3 px-4 text-slate-500 dark:text-[#A9AEA7] text-xs">
                         {item.assignedTo?.name || item.assignedTo?.username || "Unassigned"}
                       </td>
                       <td className="py-3 px-4">

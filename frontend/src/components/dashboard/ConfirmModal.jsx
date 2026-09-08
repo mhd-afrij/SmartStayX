@@ -25,7 +25,7 @@ const ConfirmModal = ({
   }, [open, onCancel]);
 
   const confirmColor =
-    variant === "danger" ? "bg-[#EF4444]" : "bg-[#F59E0B]";
+    variant === "danger" ? "bg-[#B14646]" : "bg-[#C98F65]";
 
   return (
     <AnimatePresence>
@@ -49,22 +49,22 @@ const ConfirmModal = ({
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-md mx-4"
           >
-            <div className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] p-6 shadow-2xl">
+            <div className="rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] p-6 shadow-2xl">
               {title && (
                 <h3
                   id="confirm-modal-title"
-                  className="text-lg font-semibold text-slate-900 dark:text-[#E9F1F2] mb-2"
+                  className="text-lg font-semibold text-slate-900 dark:text-[#F2EFE8] mb-2"
                 >
                   {title}
                 </h3>
               )}
               {message && (
-                <p className="text-sm text-slate-500 dark:text-[#8299A0] mb-6">{message}</p>
+                <p className="text-sm text-slate-500 dark:text-[#A9AEA7] mb-6">{message}</p>
               )}
               <div className="flex items-center justify-end gap-3">
                 <button
                   onClick={onCancel}
-                  className="px-4 py-2 text-sm font-medium rounded-xl border border-black/[0.08] dark:border-[#232737] text-slate-500 dark:text-[#8299A0] hover:text-slate-900 dark:hover:text-[#E9F1F2] hover:bg-[#f4f2ef] dark:hover:bg-[#232737] transition-all"
+                  className="px-4 py-2 text-sm font-medium rounded-xl border border-black/[0.08] dark:border-[#303631] text-slate-500 dark:text-[#A9AEA7] hover:text-slate-900 dark:hover:text-[#F2EFE8] hover:bg-[#efeee8] dark:hover:bg-[#303631] transition-all"
                 >
                   {cancelLabel}
                 </button>

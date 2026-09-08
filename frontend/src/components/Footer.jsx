@@ -5,33 +5,33 @@ import { assets } from '../assets/assets';
 
 const Footer = () => {
   return (
-    <footer className="bg-[#EFE5D3] dark:bg-[#122A32] border-t border-black/[0.08] dark:border-[#1D3842] pt-12 pb-8 px-6 md:px-16 lg:px-24 xl:px-32">
+    <footer className="bg-[#EFEEE8] dark:bg-[#111412] border-t border-black/[0.08] dark:border-[#303631] pt-12 pb-8 px-6 md:px-16 lg:px-24 xl:px-32">
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-wrap justify-between gap-12 md:gap-6">
           <div className="max-w-[300px]">
             <img src={assets.logo} alt="logo" className="mb-4 h-8 md:h-10" />
-            <p className="text-sm text-slate-500 dark:text-[#8299A0] leading-relaxed">
+            <p className="text-sm text-slate-500 dark:text-[#A9AEA7] leading-relaxed">
               SmartStayX is your premier destination for booking luxury accommodations worldwide. Experience unparalleled comfort, exceptional service, and exclusive deals tailored to discerning travelers.
             </p>
             <div className="flex items-center gap-4 mt-6">
-              <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-black/[0.08] dark:border-[#1D3842] bg-black/[0.03] dark:bg-white/5 transition-transform hover:-translate-y-1">
-                <Camera className="w-5 h-5 text-slate-600 dark:text-[#9FB2B8]" />
+              <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-black/[0.08] dark:border-[#303631] bg-black/[0.03] dark:bg-white/5 transition-transform hover:-translate-y-1">
+                <Camera className="w-5 h-5 text-slate-600 dark:text-[#A9AEA7]" />
               </a>
-              <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-black/[0.08] dark:border-[#1D3842] bg-black/[0.03] dark:bg-white/5 transition-transform hover:-translate-y-1">
-                <MessageCircle className="w-5 h-5 text-slate-600 dark:text-[#9FB2B8]" />
+              <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-black/[0.08] dark:border-[#303631] bg-black/[0.03] dark:bg-white/5 transition-transform hover:-translate-y-1">
+                <MessageCircle className="w-5 h-5 text-slate-600 dark:text-[#A9AEA7]" />
               </a>
-              <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-black/[0.08] dark:border-[#1D3842] bg-black/[0.03] dark:bg-white/5 transition-transform hover:-translate-y-1">
-                <AtSign className="w-5 h-5 text-slate-600 dark:text-[#9FB2B8]" />
+              <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-black/[0.08] dark:border-[#303631] bg-black/[0.03] dark:bg-white/5 transition-transform hover:-translate-y-1">
+                <AtSign className="w-5 h-5 text-slate-600 dark:text-[#A9AEA7]" />
               </a>
-              <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-black/[0.08] dark:border-[#1D3842] bg-black/[0.03] dark:bg-white/5 transition-transform hover:-translate-y-1">
-                <Briefcase className="w-5 h-5 text-slate-600 dark:text-[#9FB2B8]" />
+              <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full border border-black/[0.08] dark:border-[#303631] bg-black/[0.03] dark:bg-white/5 transition-transform hover:-translate-y-1">
+                <Briefcase className="w-5 h-5 text-slate-600 dark:text-[#A9AEA7]" />
               </a>
             </div>
           </div>
 
           <div>
-            <p className="font-space text-xs uppercase tracking-[0.28em] text-slate-400 dark:text-[#6B828A] mb-4">COMPANY</p>
-            <ul className="flex flex-col gap-3 text-sm text-slate-500 dark:text-[#8299A0]">
+            <p className="font-space text-xs uppercase tracking-[0.28em] text-slate-400 dark:text-[#A9AEA7] mb-4">COMPANY</p>
+            <ul className="flex flex-col gap-3 text-sm text-slate-500 dark:text-[#A9AEA7]">
               <li><Link to="/about" className="nav-link">About</Link></li>
               <li><a href="#" className="nav-link opacity-50 cursor-not-allowed">Careers</a></li>
               <li><a href="#" className="nav-link opacity-50 cursor-not-allowed">Press</a></li>
@@ -41,8 +41,8 @@ const Footer = () => {
           </div>
 
           <div>
-            <p className="font-space text-xs uppercase tracking-[0.28em] text-slate-400 dark:text-[#6B828A] mb-4">SUPPORT</p>
-            <ul className="flex flex-col gap-3 text-sm text-slate-500 dark:text-[#8299A0]">
+            <p className="font-space text-xs uppercase tracking-[0.28em] text-slate-400 dark:text-[#A9AEA7] mb-4">SUPPORT</p>
+            <ul className="flex flex-col gap-3 text-sm text-slate-500 dark:text-[#A9AEA7]">
               <li><a href="#" className="nav-link opacity-50 cursor-not-allowed">Help Center</a></li>
               <li><a href="#" className="nav-link opacity-50 cursor-not-allowed">Safety Information</a></li>
               <li><Link to="/my-bookings" className="nav-link">Cancellation Options</Link></li>
@@ -52,8 +52,8 @@ const Footer = () => {
           </div>
 
           <div className="max-w-[300px]">
-            <p className="font-space text-xs uppercase tracking-[0.28em] text-slate-400 dark:text-[#6B828A] mb-4">STAY UPDATED</p>
-            <p className="text-sm text-slate-500 dark:text-[#8299A0] mb-4">
+            <p className="font-space text-xs uppercase tracking-[0.28em] text-slate-400 dark:text-[#A9AEA7] mb-4">STAY UPDATED</p>
+            <p className="text-sm text-slate-500 dark:text-[#A9AEA7] mb-4">
               Subscribe to our newsletter for inspiration and special offers.
             </p>
             <div className="flex items-center">
@@ -72,12 +72,12 @@ const Footer = () => {
         <div className="luxury-divider mt-12 mb-6" />
 
         <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
-          <p className="text-xs text-slate-400 dark:text-[#6B828A]">© {new Date().getFullYear()} SmartStayX. All rights reserved.</p>
-          <ul className="flex items-center gap-6 text-xs text-slate-400 dark:text-[#6B828A]">
-            <li><a href="#" className="hover:text-slate-500 dark:hover:text-[#8299A0] transition-colors">Privacy</a></li>
-            <li><a href="#" className="hover:text-slate-500 dark:hover:text-[#8299A0] transition-colors">Terms</a></li>
-            <li><a href="#" className="hover:text-slate-500 dark:hover:text-[#8299A0] transition-colors">Sitemap</a></li>
-            <li><a href="#" className="hover:text-slate-500 dark:hover:text-[#8299A0] transition-colors">Cookie Policy</a></li>
+          <p className="text-xs text-slate-400 dark:text-[#A9AEA7]">© {new Date().getFullYear()} SmartStayX. All rights reserved.</p>
+          <ul className="flex items-center gap-6 text-xs text-slate-400 dark:text-[#A9AEA7]">
+            <li><a href="#" className="hover:text-slate-500 dark:hover:text-[#A9AEA7] transition-colors">Privacy</a></li>
+            <li><a href="#" className="hover:text-slate-500 dark:hover:text-[#A9AEA7] transition-colors">Terms</a></li>
+            <li><a href="#" className="hover:text-slate-500 dark:hover:text-[#A9AEA7] transition-colors">Sitemap</a></li>
+            <li><a href="#" className="hover:text-slate-500 dark:hover:text-[#A9AEA7] transition-colors">Cookie Policy</a></li>
           </ul>
         </div>
       </div>

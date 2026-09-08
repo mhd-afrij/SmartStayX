@@ -14,7 +14,7 @@ import { Skeleton, EmptyState, ErrorState } from './States';
 const SortIcon = ({ sorted }) => {
   if (sorted === 'asc') return <ChevronUp className="h-3.5 w-3.5" />;
   if (sorted === 'desc') return <ChevronDown className="h-3.5 w-3.5" />;
-  return <ChevronsUpDown className="h-3.5 w-3.5 text-[#879497] dark:text-[#6B828A]" />;
+  return <ChevronsUpDown className="h-3.5 w-3.5 text-[#72766F] dark:text-[#A9AEA7]" />;
 };
 
 // DataTable — Generic TanStack-Table-powered table with sorting, search, pagination, and loading/empty/error states
@@ -55,7 +55,7 @@ const DataTable = ({
             if (el) el.indeterminate = table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected();
           }}
           onChange={table.getToggleAllPageRowsSelectedHandler()}
-          className="h-4 w-4 rounded border-[#E8E0D1] dark:border-[#232737] text-[#B58A2E] dark:text-[#E6C075] focus:ring-[#D4A853]"
+          className="h-4 w-4 rounded border-[#E3E0D8] dark:border-[#303631] text-[#8A643F] dark:text-[#C5A47E] focus:ring-[#A67C52]"
         />
       ),
       cell: ({ row }) => (
@@ -64,7 +64,7 @@ const DataTable = ({
           checked={row.getIsSelected()}
           disabled={!row.getCanSelect()}
           onChange={row.getToggleSelectedHandler()}
-          className="h-4 w-4 rounded border-[#E8E0D1] dark:border-[#232737] text-[#B58A2E] dark:text-[#E6C075] focus:ring-[#D4A853]"
+          className="h-4 w-4 rounded border-[#E3E0D8] dark:border-[#303631] text-[#8A643F] dark:text-[#C5A47E] focus:ring-[#A67C52]"
         />
       ),
       enableSorting: false,
@@ -95,18 +95,18 @@ const DataTable = ({
   return (
     <Card padded={false} className="overflow-hidden">
       {(title || searchable || headerActions) && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-[#E8E0D1] dark:border-[#232737]">
-          {title && <h3 className="text-sm font-semibold text-[#003844] dark:text-[#E9F1F2]">{title}</h3>}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-[#E3E0D8] dark:border-[#303631]">
+          {title && <h3 className="text-sm font-semibold text-[#183B35] dark:text-[#F2EFE8]">{title}</h3>}
           <div className="flex items-center gap-2">
             {searchable && (
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#879497] dark:text-[#6B828A]" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#72766F] dark:text-[#A9AEA7]" />
                 <input
                   type="text"
                   placeholder={searchPlaceholder}
                   value={globalFilter}
                   onChange={(e) => setGlobalFilter(e.target.value)}
-                  className="w-48 sm:w-56 pl-9 pr-3 py-2 text-xs rounded-lg border border-[#E8E0D1] dark:border-[#232737] bg-white dark:bg-[#161925] text-[#003844] dark:text-[#E9F1F2] placeholder:text-[#879497] dark:placeholder:text-[#6B828A] outline-none focus:border-[#D4A853]/60 transition-colors"
+                  className="w-48 sm:w-56 pl-9 pr-3 py-2 text-xs rounded-lg border border-[#E3E0D8] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-[#183B35] dark:text-[#F2EFE8] placeholder:text-[#72766F] dark:placeholder:text-[#A9AEA7] outline-none focus:border-[#A67C52]/60 transition-colors"
                 />
               </div>
             )}
@@ -131,12 +131,12 @@ const DataTable = ({
             <table className="w-full text-sm">
               <thead>
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id} className="border-b border-[#E8E0D1] dark:border-[#232737] bg-[#FFFAF4] dark:bg-[#10131D]">
+                  <tr key={headerGroup.id} className="border-b border-[#E3E0D8] dark:border-[#303631] bg-[#F7F5F0] dark:bg-[#111412]">
                     {headerGroup.headers.map((header) => (
                       <th
                         key={header.id}
-                        className={`py-3 px-4 text-left text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider ${
-                          header.column.getCanSort() ? 'cursor-pointer select-none hover:text-[#003844] dark:hover:text-[#E9F1F2]' : ''
+                        className={`py-3 px-4 text-left text-xs font-medium text-[#5C6B64] dark:text-[#A9AEA7] uppercase tracking-wider ${
+                          header.column.getCanSort() ? 'cursor-pointer select-none hover:text-[#183B35] dark:hover:text-[#F2EFE8]' : ''
                         }`}
                         onClick={header.column.getToggleSortingHandler()}
                       >
@@ -155,10 +155,10 @@ const DataTable = ({
                 {rows.map((row) => (
                   <tr
                     key={row.id}
-                    className="border-b border-[#E8E0D1] dark:border-[#232737] last:border-b-0 hover:bg-[#F3ECDE] dark:hover:bg-[#232737] transition-colors"
-                  >
+className="border-b border-[#E3E0D8] dark:border-[#303631] last:border-b-0 hover:bg-[#EFEEE8] dark:hover:bg-[#303631] transition-colors"
+                    >
                     {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="py-3 px-4 text-[#003844] dark:text-[#E9F1F2]">
+                      <td key={cell.id} className="py-3 px-4 text-[#183B35] dark:text-[#F2EFE8]">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
@@ -169,15 +169,15 @@ const DataTable = ({
           </div>
 
           {pageCount > 1 && (
-            <div className="flex items-center justify-between px-4 py-4 border-t border-[#E8E0D1] dark:border-[#232737]">
-              <span className="text-xs text-[#879497] dark:text-[#6B828A]">
+            <div className="flex items-center justify-between px-4 py-4 border-t border-[#E3E0D8] dark:border-[#303631]">
+              <span className="text-xs text-[#72766F] dark:text-[#A9AEA7]">
                 Page {pageIndex + 1} of {pageCount}
               </span>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
-                  className="p-1.5 rounded-lg border border-[#E8E0D1] dark:border-[#232737] text-[#879497] dark:text-[#6B828A] hover:text-[#003844] dark:hover:text-[#E9F1F2] hover:bg-[#F3ECDE] dark:hover:bg-[#232737] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded-lg border border-[#E3E0D8] dark:border-[#303631] text-[#72766F] dark:text-[#A9AEA7] hover:text-[#183B35] dark:hover:text-[#F2EFE8] hover:bg-[#EFEEE8] dark:hover:bg-[#303631] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                 </button>
@@ -187,8 +187,8 @@ const DataTable = ({
                     onClick={() => table.setPageIndex(i)}
                     className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${
                       i === pageIndex
-                        ? 'bg-[#D4A853]/10 text-[#B58A2E] dark:text-[#E6C075] border border-[#D4A853]/40'
-                        : 'text-[#879497] dark:text-[#6B828A] hover:text-[#003844] dark:hover:text-[#E9F1F2] hover:bg-[#F3ECDE] dark:hover:bg-[#232737] border border-transparent'
+                        ? 'bg-[#A67C52]/10 text-[#8A643F] dark:text-[#C5A47E] border border-[#A67C52]/40'
+                        : 'text-[#72766F] dark:text-[#A9AEA7] hover:text-[#183B35] dark:hover:text-[#F2EFE8] hover:bg-[#EFEEE8] dark:hover:bg-[#303631] border border-transparent'
                     }`}
                   >
                     {i + 1}
@@ -197,7 +197,7 @@ const DataTable = ({
                 <button
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
-                  className="p-1.5 rounded-lg border border-[#E8E0D1] dark:border-[#232737] text-[#879497] dark:text-[#6B828A] hover:text-[#003844] dark:hover:text-[#E9F1F2] hover:bg-[#F3ECDE] dark:hover:bg-[#232737] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded-lg border border-[#E3E0D8] dark:border-[#303631] text-[#72766F] dark:text-[#A9AEA7] hover:text-[#183B35] dark:hover:text-[#F2EFE8] hover:bg-[#EFEEE8] dark:hover:bg-[#303631] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>

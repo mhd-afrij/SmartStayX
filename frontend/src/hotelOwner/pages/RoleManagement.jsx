@@ -7,7 +7,7 @@ import { ShieldCheck, Search, UserCog, Plus, Trash2, X, Link2 } from "lucide-rea
 import ConfirmModal from "../../components/dashboard/ConfirmModal";
 
 const ROLE_OPTIONS = [
-  { value: "hotel_manager", label: "Hotel Manager", color: "border-[#D4A853]/40 bg-[#D4A853]/10 text-[#B58A2E] dark:text-[#E6C075]" },
+  { value: "hotel_manager", label: "Hotel Manager", color: "border-[#A67C52]/40 bg-[#A67C52]/10 text-[#8A643F] dark:text-[#C5A47E]" },
   { value: "receptionist", label: "Receptionist", color: "border-indigo-200 bg-indigo-50 text-indigo-600" },
   { value: "none", label: "No Access", color: "border-red-200 dark:border-red-500/25 bg-red-50 text-red-600 dark:text-red-300" },
 ];
@@ -118,8 +118,8 @@ const RoleManagement = () => {
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Role Management</h1>
-          <p className="text-sm text-slate-400 dark:text-[#6B828A] mt-1">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-[#F2EFE8] tracking-tight">Role Management</h1>
+          <p className="text-sm text-slate-400 dark:text-[#A9AEA7] mt-1">
             Search users and assign Owner or Receptionist roles. New users sign up via Clerk, then manage their role here.
           </p>
         </div>
@@ -134,7 +134,7 @@ const RoleManagement = () => {
 
       <div className="flex gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#6B828A]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#A9AEA7]" />
           <input
             type="text"
             placeholder="Search by name or email..."
@@ -156,8 +156,8 @@ const RoleManagement = () => {
       <div className="luxury-card overflow-hidden">
         {users.length === 0 ? (
           <div className="p-12 text-center">
-            <ShieldCheck className="w-12 h-12 mx-auto mb-3 text-slate-300 dark:text-[#4E646B]" />
-            <p className="text-slate-500 dark:text-[#8299A0] text-sm">
+            <ShieldCheck className="w-12 h-12 mx-auto mb-3 text-slate-300 dark:text-[#A9AEA7]" />
+            <p className="text-slate-500 dark:text-[#A9AEA7] text-sm">
               {searching ? "Searching..." : "Search for a user or create a new one."}
             </p>
           </div>
@@ -165,27 +165,27 @@ const RoleManagement = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-black/[0.06] dark:border-[#232737] bg-[#f4f2ef] dark:bg-[#10131D]">
-                  <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-wider">User</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-wider">Email</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-wider">Role</th>
-                  <th className="py-3 px-4 text-right text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-wider">Actions</th>
+                <tr className="border-b border-black/[0.06] dark:border-[#303631] bg-[#EFEEE8] dark:bg-[#111412]">
+                  <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#A9AEA7] uppercase tracking-wider">User</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#A9AEA7] uppercase tracking-wider">Email</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#A9AEA7] uppercase tracking-wider">Role</th>
+                  <th className="py-3 px-4 text-right text-xs font-medium text-slate-500 dark:text-[#A9AEA7] uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((user) => {
                   const currentRole = ROLE_OPTIONS.find((r) => r.value === user.role) || ROLE_OPTIONS[3];
                   return (
-                    <tr key={user._id} className="border-b border-black/[0.06] dark:border-[#232737] hover:bg-black/[0.02] dark:hover:bg-white/5 transition-colors">
+                    <tr key={user._id} className="border-b border-black/[0.06] dark:border-[#303631] hover:bg-black/[0.02] dark:hover:bg-white/5 transition-colors">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#D4A853]/25 to-[#D4A853]/10 border border-black/[0.06] dark:border-[#232737] flex items-center justify-center">
-                            <UserCog className="w-4 h-4 text-[#B58A2E] dark:text-[#E6C075]/70" />
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#A67C52]/25 to-[#A67C52]/10 border border-black/[0.06] dark:border-[#303631] flex items-center justify-center">
+                            <UserCog className="w-4 h-4 text-[#8A643F] dark:text-[#C5A47E]/70" />
                           </div>
-                          <span className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">{user.name || user.username || "User"}</span>
+                          <span className="text-sm font-medium text-slate-900 dark:text-[#F2EFE8]">{user.name || user.username || "User"}</span>
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-slate-600 dark:text-[#9FB2B8]">{user.email || "—"}</td>
+                      <td className="py-3 px-4 text-slate-600 dark:text-[#A9AEA7]">{user.email || "—"}</td>
                       <td className="py-3 px-4">
                         <span className={`inline-block px-2 py-0.5 text-[10px] font-medium rounded-full border ${currentRole.color}`}>
                           {currentRole.label}
@@ -197,7 +197,7 @@ const RoleManagement = () => {
                             value={user.role}
                             onChange={(e) => handleAssignRole(user._id, e.target.value)}
                             disabled={assigningId === user._id}
-                            className="appearance-none pl-2.5 pr-6 py-1.5 text-xs rounded-lg border border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#161925] text-slate-600 dark:text-[#9FB2B8] outline-none focus:border-[#D4A853]/60 transition-colors cursor-pointer disabled:opacity-40"
+                            className="appearance-none pl-2.5 pr-6 py-1.5 text-xs rounded-lg border border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-slate-600 dark:text-[#A9AEA7] outline-none focus:border-[#A67C52]/60 transition-colors cursor-pointer disabled:opacity-40"
                           >
                             {ROLE_OPTIONS.map((opt) => (
                               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -206,7 +206,7 @@ const RoleManagement = () => {
                           <button
                             onClick={() => setConfirmDelete({ open: true, id: user._id })}
                             disabled={deletingId === user._id}
-                            className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#232737] text-slate-400 dark:text-[#6B828A] hover:text-red-600 dark:hover:text-red-300 hover:border-red-200 dark:hover:border-red-500/25 hover:bg-red-50 transition-all disabled:opacity-40"
+                            className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#303631] text-slate-400 dark:text-[#A9AEA7] hover:text-red-600 dark:hover:text-red-300 hover:border-red-200 dark:hover:border-red-500/25 hover:bg-red-50 transition-all disabled:opacity-40"
                             title="Delete user"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -229,22 +229,22 @@ const RoleManagement = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-md rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] p-6 space-y-5 shadow-2xl"
+            className="w-full max-w-md rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] p-6 space-y-5 shadow-2xl"
           >
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-[#E9F1F2]">Invite User</h3>
-                <p className="text-sm text-slate-400 dark:text-[#6B828A]">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F2EFE8]">Invite User</h3>
+                <p className="text-sm text-slate-400 dark:text-[#A9AEA7]">
                   Add a user via Clerk sign-up or share an invite link.
                 </p>
               </div>
               <button type="button" onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/5 transition-colors">
-                <X className="w-4 h-4 text-slate-400 dark:text-[#6B828A]" />
+                <X className="w-4 h-4 text-slate-400 dark:text-[#A9AEA7]" />
               </button>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-500 dark:text-[#8299A0] mb-1.5 block">Email address</label>
+              <label className="text-sm font-medium text-slate-500 dark:text-[#A9AEA7] mb-1.5 block">Email address</label>
               <input
                 type="email"
                 required
@@ -276,7 +276,7 @@ const RoleManagement = () => {
               </button>
             </div>
 
-            <p className="text-xs text-slate-400 dark:text-[#6B828A] text-center">
+            <p className="text-xs text-slate-400 dark:text-[#A9AEA7] text-center">
               After sign-up, search for the user below to assign their role.
             </p>
           </motion.div>

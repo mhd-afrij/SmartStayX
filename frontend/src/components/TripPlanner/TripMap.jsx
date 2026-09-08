@@ -43,7 +43,7 @@ const TripMap = ({ destination, items = [] }) => {
   const pins = items.filter((item) => Number.isFinite(item.lat) && Number.isFinite(item.lng))
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-[#E8E0D1] dark:border-[#1D3842] h-[300px] md:h-full md:min-h-[400px]">
+    <div className="rounded-2xl overflow-hidden border border-[#E3E0D8] dark:border-[#303631] h-[300px] md:h-full md:min-h-[400px]">
       <MapContainer
         center={coords || defaultCenter}
         zoom={coords ? 12 : defaultZoom}
@@ -64,7 +64,7 @@ const TripMap = ({ destination, items = [] }) => {
           <Marker key={item._id || item.title} position={[item.lat, item.lng]}>
             <Popup>
               <span className="text-sm font-medium">{item.title}</span>
-              {item.day && <div className="text-xs text-slate-500 dark:text-[#8299A0]">Day {item.day}</div>}
+              {item.day && <div className="text-xs text-slate-500 dark:text-[#A9AEA7]">Day {item.day}</div>}
             </Popup>
           </Marker>
         ))}

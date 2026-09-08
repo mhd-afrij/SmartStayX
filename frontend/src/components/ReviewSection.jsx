@@ -29,7 +29,7 @@ const StarInput = ({ value, onChange }) => (
         className="p-0.5 transition-transform hover:scale-110"
       >
         <Star
-          className={`w-6 h-6 ${star <= value ? "text-[#5077b3] dark:text-[#93B3E0] fill-[#5077b3]" : "text-slate-300 dark:text-[#4E646B]"}`}
+          className={`w-6 h-6 ${star <= value ? "text-[#183B35] dark:text-[#8FB8A8] fill-[#183B35]" : "text-slate-300 dark:text-[#A9AEA7]"}`}
         />
       </button>
     ))}
@@ -113,9 +113,9 @@ export default function ReviewSection({ roomId }) {
   return (
     <section className="space-y-6">
       <div className="flex items-center gap-3">
-        <h2 className="text-2xl md:text-3xl font-playfair text-slate-900 dark:text-[#E9F1F2]">Reviews</h2>
+        <h2 className="text-2xl md:text-3xl font-playfair text-slate-900 dark:text-[#F2EFE8]">Reviews</h2>
         {!loading && totalReviews > 0 && (
-          <span className="text-sm text-slate-500 dark:text-[#8299A0]">({totalReviews})</span>
+          <span className="text-sm text-slate-500 dark:text-[#A9AEA7]">({totalReviews})</span>
         )}
       </div>
 
@@ -136,18 +136,18 @@ export default function ReviewSection({ roomId }) {
         </div>
       ) : !reviews || reviews.length === 0 ? (
         <div className="luxury-card p-8 text-center">
-          <p className="text-slate-500 dark:text-[#8299A0]">No reviews yet. Be the first to share your experience!</p>
+          <p className="text-slate-500 dark:text-[#A9AEA7]">No reviews yet. Be the first to share your experience!</p>
         </div>
       ) : (
         <div className="space-y-4">
           {satisfactionBreakdown && totalReviews > 0 && (
             <div className="luxury-card-soft p-4 flex flex-wrap gap-4 text-xs">
-              <span className="text-slate-600 dark:text-[#9FB2B8]">
-                Average: <span className="text-[#5077b3] dark:text-[#93B3E0] font-semibold">{averageRating.toFixed(1)}</span> / 5
+              <span className="text-slate-600 dark:text-[#A9AEA7]">
+                Average: <span className="text-[#183B35] dark:text-[#8FB8A8] font-semibold">{averageRating.toFixed(1)}</span> / 5
               </span>
               {SATISFACTION_OPTIONS.map((opt) => (
-                <span key={opt.value} className="text-slate-400 dark:text-[#6B828A]">
-                  {opt.label}: <span className="text-slate-600 dark:text-[#9FB2B8]">{satisfactionBreakdown[opt.value] || 0}</span>
+                <span key={opt.value} className="text-slate-400 dark:text-[#A9AEA7]">
+                  {opt.label}: <span className="text-slate-600 dark:text-[#A9AEA7]">{satisfactionBreakdown[opt.value] || 0}</span>
                 </span>
               ))}
             </div>
@@ -159,31 +159,31 @@ export default function ReviewSection({ roomId }) {
                   <img
                     src={review.user?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.guestName)}&background=fbf2e1&color=b8862f&size=40`}
                     alt={review.guestName}
-                    className="h-10 w-10 rounded-full object-cover border border-black/[0.06] dark:border-[#1D3842]"
+                    className="h-10 w-10 rounded-full object-cover border border-black/[0.06] dark:border-[#303631]"
                     onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(review.guestName)}&background=fbf2e1&color=b8862f&size=40`; }}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">{review.guestName}</span>
-                      <span className="text-[10px] text-slate-400 dark:text-[#6B828A]">{formatDate(review.createdAt)}</span>
+                      <span className="text-sm font-medium text-slate-900 dark:text-[#F2EFE8]">{review.guestName}</span>
+                      <span className="text-[10px] text-slate-400 dark:text-[#A9AEA7]">{formatDate(review.createdAt)}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex items-center gap-0.5">
                         {[1, 2, 3, 4, 5].map((s) => (
                           <Star
                             key={s}
-                            className={`w-3 h-3 ${s <= review.rating ? "text-[#5077b3] dark:text-[#93B3E0] fill-[#5077b3]" : "text-slate-300 dark:text-[#4E646B]"}`}
+                            className={`w-3 h-3 ${s <= review.rating ? "text-[#183B35] dark:text-[#8FB8A8] fill-[#183B35]" : "text-slate-300 dark:text-[#A9AEA7]"}`}
                           />
                         ))}
                       </div>
                       {review.satisfaction && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full border ${SATISFACTION_STYLES[review.satisfaction] || "bg-black/[0.03] dark:bg-white/5 text-slate-500 dark:text-[#8299A0]"}`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full border ${SATISFACTION_STYLES[review.satisfaction] || "bg-black/[0.03] dark:bg-white/5 text-slate-500 dark:text-[#A9AEA7]"}`}>
                           {SATISFACTION_OPTIONS.find((o) => o.value === review.satisfaction)?.label || review.satisfaction}
                         </span>
                       )}
                     </div>
                     {review.comment && (
-                      <p className="text-sm text-slate-600 dark:text-[#9FB2B8] mt-2 leading-relaxed">{review.comment}</p>
+                      <p className="text-sm text-slate-600 dark:text-[#A9AEA7] mt-2 leading-relaxed">{review.comment}</p>
                     )}
                   </div>
                 </div>
@@ -195,28 +195,28 @@ export default function ReviewSection({ roomId }) {
 
       {user && (
         <div className="luxury-card p-6">
-          <h3 className="text-lg font-playfair text-slate-900 dark:text-[#E9F1F2] mb-4">Write a Review</h3>
+          <h3 className="text-lg font-playfair text-slate-900 dark:text-[#F2EFE8] mb-4">Write a Review</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-2">Rating</label>
+              <label className="block text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-2">Rating</label>
               <StarInput value={form.rating} onChange={(val) => setForm((p) => ({ ...p, rating: val }))} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-2">Satisfaction</label>
+              <label className="block text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-2">Satisfaction</label>
               <select
                 value={form.satisfaction}
                 onChange={(e) => setForm((p) => ({ ...p, satisfaction: e.target.value }))}
                 className="luxury-select text-sm w-full"
               >
-                <option value="" className="bg-white dark:bg-[#122A32]">Select satisfaction level</option>
+                <option value="" className="bg-white dark:bg-[#1A1E1B]">Select satisfaction level</option>
                 {SATISFACTION_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value} className="bg-white dark:bg-[#122A32]">{opt.label}</option>
+                  <option key={opt.value} value={opt.value} className="bg-white dark:bg-[#1A1E1B]">{opt.label}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-2">
-                Comment <span className="text-slate-400 dark:text-[#6B828A] font-normal">({500 - form.comment.length} characters left)</span>
+              <label className="block text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-2">
+                Comment <span className="text-slate-400 dark:text-[#A9AEA7] font-normal">({500 - form.comment.length} characters left)</span>
               </label>
               <textarea
                 value={form.comment}

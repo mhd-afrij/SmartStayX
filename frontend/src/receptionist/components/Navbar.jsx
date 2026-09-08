@@ -36,12 +36,12 @@ const Navbar = () => {
     <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="sticky top-0 z-50 bg-white/90 dark:bg-[#0E242C]/90 backdrop-blur-xl border-b border-black/[0.06] dark:border-[#1D3842] shadow-[0_4px_30px_rgba(0,56,68,0.06)]"
+      className="sticky top-0 z-50 bg-white/90 dark:bg-[#111412]/90 backdrop-blur-xl border-b border-black/[0.06] dark:border-[#303631] shadow-[0_4px_30px_rgba(24,59,53,0.06)]"
     >
       <div className="flex items-center justify-between px-6 py-3 gap-4">
         <div className="flex items-center gap-2 shrink-0">
-          <CalendarDays className="w-4 h-4 text-slate-400 dark:text-[#6B828A]" />
-          <span className="text-sm text-slate-500 dark:text-[#8299A0] font-space hidden md:block">
+          <CalendarDays className="w-4 h-4 text-slate-400 dark:text-[#A9AEA7]" />
+          <span className="text-sm text-slate-500 dark:text-[#A9AEA7] font-space hidden md:block">
             {new Date().toLocaleDateString("en-US", {
               weekday: "short", month: "short", day: "numeric", year: "numeric",
             })}
@@ -57,8 +57,8 @@ const Navbar = () => {
               className={({ isActive }) =>
                 `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
                   isActive
-                    ? "bg-[#EFEDF7] dark:bg-[#1B2436] text-[#5077B3] dark:text-[#93B3E0] border border-[#B9B4CE]/45 dark:border-[#3D4660]/45"
-                    : "text-slate-500 dark:text-[#8299A0] hover:text-slate-800 dark:hover:text-[#D3DFE2] hover:bg-[#f4f2ef] dark:hover:bg-[#16303A] border border-transparent"
+                    ? "bg-[#EFEAE1] dark:bg-[#222823] text-[#183B35] dark:text-[#8FB8A8] border border-[#A67C52]/45 dark:border-[#303631]/45"
+                    : "text-slate-500 dark:text-[#A9AEA7] hover:text-slate-800 dark:hover:text-[#F2EFE8] hover:bg-[#EFEEE8] dark:hover:bg-[#222823] border border-transparent"
                 }`
               }
             >
@@ -73,12 +73,12 @@ const Navbar = () => {
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setShowProfile(!showProfile)}
-              className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg border border-black/[0.08] dark:border-[#1D3842] bg-white dark:bg-[#122A32] hover:bg-[#f4f2ef] dark:hover:bg-[#16303A] transition-colors"
+              className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg border border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] hover:bg-[#EFEEE8] dark:hover:bg-[#222823] transition-colors"
             >
-              <div className="w-6 h-6 rounded-full bg-[#5077B3] flex items-center justify-center">
+              <div className="w-6 h-6 rounded-full bg-[#183B35] flex items-center justify-center">
                 <User className="w-3.5 h-3.5 text-white" />
               </div>
-              <span className="text-sm text-slate-600 dark:text-[#9FB2B8] hidden sm:block">
+              <span className="text-sm text-slate-600 dark:text-[#A9AEA7] hidden sm:block">
                 {user?.username || user?.fullName || "Receptionist"}
               </span>
             </button>
@@ -88,24 +88,24 @@ const Navbar = () => {
                 initial={{ opacity: 0, y: 8, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                className="absolute right-0 top-12 w-48 rounded-xl border border-black/[0.06] dark:border-[#1D3842] bg-white dark:bg-[#122A32] shadow-2xl overflow-hidden"
+                className="absolute right-0 top-12 w-48 rounded-xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-2xl overflow-hidden"
               >
-                <div className="p-3 border-b border-black/[0.06] dark:border-[#1D3842]">
-                  <p className="text-sm text-slate-800 dark:text-[#D3DFE2]">{user?.username || "Receptionist"}</p>
-                  <p className="text-xs text-slate-400 dark:text-[#6B828A]">{user?.primaryEmailAddress?.emailAddress || ""}</p>
+                <div className="p-3 border-b border-black/[0.06] dark:border-[#303631]">
+                  <p className="text-sm text-slate-800 dark:text-[#E8EDE6]">{user?.username || "Receptionist"}</p>
+                  <p className="text-xs text-slate-400 dark:text-[#A9AEA7]">{user?.primaryEmailAddress?.emailAddress || ""}</p>
                 </div>
                 <div className="p-1">
-                  <button className="flex items-center gap-2 w-full px-3 py-2 text-sm text-slate-600 dark:text-[#9FB2B8] hover:text-slate-900 dark:hover:text-[#E9F1F2] hover:bg-[#f4f2ef] dark:hover:bg-[#16303A] rounded-lg transition-colors">
+                  <button className="flex items-center gap-2 w-full px-3 py-2 text-sm text-slate-600 dark:text-[#A9AEA7] hover:text-slate-900 dark:hover:text-[#F2EFE8] hover:bg-[#EFEEE8] dark:hover:bg-[#222823] rounded-lg transition-colors">
                     <Settings className="w-4 h-4" />
                     Settings
                   </button>
-                  <div className="border-t border-black/[0.06] dark:border-[#1D3842] mt-1 pt-1 mb-1">
+                  <div className="border-t border-black/[0.06] dark:border-[#303631] mt-1 pt-1 mb-1">
                     <OrganizationSwitcher
                       appearance={{
                         elements: {
-                          organizationSwitcherTrigger: "w-full text-xs text-slate-600 dark:text-[#9FB2B8] hover:text-slate-900 dark:hover:text-[#E9F1F2] bg-[#f4f2ef] dark:bg-[#16303A] rounded-lg px-2 py-1.5",
-                          organizationSwitcherPopoverCard: "bg-white dark:bg-[#122A32] border border-black/10",
-                          organizationSwitcherPopoverActionButton: "text-slate-600 dark:text-[#9FB2B8] text-xs hover:text-slate-900 dark:hover:text-[#E9F1F2]",
+                          organizationSwitcherTrigger: "w-full text-xs text-slate-600 dark:text-[#A9AEA7] hover:text-slate-900 dark:hover:text-[#F2EFE8] bg-[#EFEEE8] dark:bg-[#222823] rounded-lg px-2 py-1.5",
+                          organizationSwitcherPopoverCard: "bg-white dark:bg-[#1A1E1B] border border-black/10",
+                          organizationSwitcherPopoverActionButton: "text-slate-600 dark:text-[#A9AEA7] text-xs hover:text-slate-900 dark:hover:text-[#F2EFE8]",
                         }
                       }}
                     />

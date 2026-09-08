@@ -203,23 +203,23 @@ const ManageOffers = () => {
       className="space-y-6 pb-10"
     >
       <div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Exclusive Offers</h1>
-        <p className="text-sm text-slate-400 dark:text-[#6B828A] mt-1">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-[#F2EFE8] tracking-tight">Exclusive Offers</h1>
+        <p className="text-sm text-slate-400 dark:text-[#A9AEA7] mt-1">
           Create, edit, and retire special deals. Link each offer to a specific room so guests can book directly.
         </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[2fr_3fr]">
         <form onSubmit={handleSubmit} className="luxury-card p-5 space-y-4 h-fit">
-          <div className="flex items-center gap-2 pb-2 border-b border-black/[0.06] dark:border-[#232737]">
-            <div className="w-7 h-7 rounded-lg bg-[#D4A853]/10 border border-[#D4A853]/40 flex items-center justify-center">
-              <Tag className="w-3.5 h-3.5 text-[#B58A2E] dark:text-[#E6C075]" />
+          <div className="flex items-center gap-2 pb-2 border-b border-black/[0.06] dark:border-[#303631]">
+            <div className="w-7 h-7 rounded-lg bg-[#A67C52]/10 border border-[#A67C52]/40 flex items-center justify-center">
+              <Tag className="w-3.5 h-3.5 text-[#8A643F] dark:text-[#C5A47E]" />
             </div>
-            <span className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">{editingId ? "Edit Offer" : "New Offer"}</span>
+            <span className="text-sm font-medium text-slate-900 dark:text-[#F2EFE8]">{editingId ? "Edit Offer" : "New Offer"}</span>
           </div>
 
           <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-[#8299A0] mb-1.5">Offer title</p>
+            <p className="text-sm font-medium text-slate-500 dark:text-[#A9AEA7] mb-1.5">Offer title</p>
             <input
               type="text"
               className="luxury-input text-sm"
@@ -230,7 +230,7 @@ const ManageOffers = () => {
           </div>
 
           <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-[#8299A0] mb-1.5">Description</p>
+            <p className="text-sm font-medium text-slate-500 dark:text-[#A9AEA7] mb-1.5">Description</p>
             <textarea
               className="luxury-input text-sm h-24 resize-none"
               value={form.description}
@@ -241,7 +241,7 @@ const ManageOffers = () => {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <p className="text-sm font-medium text-slate-500 dark:text-[#8299A0] mb-1.5">Discount (%)</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-[#A9AEA7] mb-1.5">Discount (%)</p>
               <input
                 type="number" min={0} max={100}
                 className="luxury-input text-sm"
@@ -250,7 +250,7 @@ const ManageOffers = () => {
               />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-500 dark:text-[#8299A0] mb-1.5">Expires</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-[#A9AEA7] mb-1.5">Expires</p>
               <input
                 type="date"
                 className="luxury-input text-sm"
@@ -261,7 +261,7 @@ const ManageOffers = () => {
           </div>
 
           <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-[#8299A0] mb-1.5">Select Hotel</p>
+            <p className="text-sm font-medium text-slate-500 dark:text-[#A9AEA7] mb-1.5">Select Hotel</p>
             <div className="relative">
               <select
                 className="luxury-select text-sm cursor-pointer"
@@ -275,12 +275,12 @@ const ManageOffers = () => {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7] pointer-events-none" />
             </div>
           </div>
 
           <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-[#8299A0] mb-1.5">Link to room</p>
+            <p className="text-sm font-medium text-slate-500 dark:text-[#A9AEA7] mb-1.5">Link to room</p>
             <div className="relative">
               <select
                 className="luxury-select text-sm cursor-pointer disabled:opacity-40"
@@ -297,7 +297,7 @@ const ManageOffers = () => {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7] pointer-events-none" />
             </div>
           </div>
 
@@ -306,14 +306,14 @@ const ManageOffers = () => {
               type="checkbox"
               checked={form.isActive}
               onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-              className="w-4 h-4 rounded border-black/[0.1] dark:border-[#232737] bg-white dark:bg-[#161925] text-[#B58A2E] dark:text-[#E6C075] focus:ring-[#D4A853]/40"
+              className="w-4 h-4 rounded border-black/[0.1] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-[#8A643F] dark:text-[#C5A47E] focus:ring-[#A67C52]/40"
             />
-            <span className="text-sm text-slate-600 dark:text-[#9FB2B8]">Active (visible to guests)</span>
+            <span className="text-sm text-slate-600 dark:text-[#A9AEA7]">Active (visible to guests)</span>
           </label>
 
           <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-[#8299A0] mb-1.5">Offer image</p>
-            <label className="border border-dashed border-black/[0.1] dark:border-[#232737] rounded-xl px-3 py-4 block text-center cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/5 transition">
+            <p className="text-sm font-medium text-slate-500 dark:text-[#A9AEA7] mb-1.5">Offer image</p>
+            <label className="border border-dashed border-black/[0.1] dark:border-[#303631] rounded-xl px-3 py-4 block text-center cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/5 transition">
               <input
                 type="file" accept="image/*" hidden
                 onChange={(e) => {
@@ -322,7 +322,7 @@ const ManageOffers = () => {
                   setPreview(file ? safeUrl(URL.createObjectURL(file)) : null);
                 }}
               />
-              <span className="text-xs text-slate-400 dark:text-[#6B828A]">Click to upload (optional)</span>
+              <span className="text-xs text-slate-400 dark:text-[#A9AEA7]">Click to upload (optional)</span>
             </label>
             {preview && safeUrl(preview) && (
               <img src={safeUrl(preview)} alt="preview" className="mt-3 rounded-xl w-full max-h-48 object-cover" />
@@ -339,7 +339,7 @@ const ManageOffers = () => {
               {saving ? "Saving..." : editingId ? "Update Offer" : "Create Offer"}
             </button>
             {editingId && (
-              <button type="button" className="text-sm text-slate-500 dark:text-[#8299A0] hover:text-slate-900 dark:hover:text-[#E9F1F2]" onClick={resetForm}>
+              <button type="button" className="text-sm text-slate-500 dark:text-[#A9AEA7] hover:text-slate-900 dark:hover:text-[#F2EFE8]" onClick={resetForm}>
                 Cancel edit
               </button>
             )}
@@ -348,21 +348,21 @@ const ManageOffers = () => {
 
         <div className="space-y-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7]" />
             <input
               type="text"
               placeholder="Search offers..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#161925] text-slate-600 dark:text-[#9FB2B8] placeholder:text-slate-400 dark:placeholder:text-[#6B828A] outline-none focus:border-[#D4A853]/60 transition-colors"
+              className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-slate-600 dark:text-[#A9AEA7] placeholder:text-slate-400 dark:placeholder:text-[#A9AEA7] outline-none focus:border-[#A67C52]/60 transition-colors"
             />
           </div>
           {sortedOffers.length === 0 && (
             <div className="luxury-card p-8 text-center">
-              <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#D4A853]/25 to-[#D4A853]/10 border border-[#D4A853]/40 flex items-center justify-center">
-                <Tag className="w-6 h-6 text-[#B58A2E] dark:text-[#E6C075]/70" />
+              <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#A67C52]/25 to-[#A67C52]/10 border border-[#A67C52]/40 flex items-center justify-center">
+                <Tag className="w-6 h-6 text-[#8A643F] dark:text-[#C5A47E]/70" />
               </div>
-              <p className="text-slate-500 dark:text-[#8299A0]">No offers yet. Add your first deal to boost bookings.</p>
+              <p className="text-slate-500 dark:text-[#A9AEA7]">No offers yet. Add your first deal to boost bookings.</p>
             </div>
           )}
 
@@ -371,28 +371,28 @@ const ManageOffers = () => {
               key={offer._id}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="luxury-card p-5 hover:border-black/[0.12] dark:hover:border-[#1D3842] transition-all"
+              className="luxury-card p-5 hover:border-black/[0.12] dark:hover:border-[#303631] transition-all"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-1.5 flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-semibold text-slate-900 dark:text-[#E9F1F2] truncate">{offer.title}</h3>
+                    <h3 className="text-base font-semibold text-slate-900 dark:text-[#F2EFE8] truncate">{offer.title}</h3>
                     <span
                       className={`shrink-0 px-2 py-0.5 text-[10px] font-medium rounded-full border ${
                         offer.isActive
                           ? "border-green-200 dark:border-green-500/25 bg-green-50 text-green-700 dark:text-green-300"
-                          : "border-[#B9B4CE]/45 dark:border-[#3D4660]/45 bg-[#F4F2F9] dark:bg-[#1B2436] text-amber-700 dark:text-amber-300"
+                          : "border-[#A67C52]/45 dark:border-[#303631]/45 bg-[#EFEEE8] dark:bg-[#222823] text-amber-700 dark:text-amber-300"
                       }`}
                     >
                       {offer.isActive ? "Active" : "Hidden"}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-600 dark:text-[#9FB2B8]">{offer.description}</p>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400 dark:text-[#6B828A]">
-                    <span className="text-[#B58A2E] dark:text-[#E6C075] font-medium font-space">{offer.discountPercent}% off</span>
+                  <p className="text-sm text-slate-600 dark:text-[#A9AEA7]">{offer.description}</p>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400 dark:text-[#A9AEA7]">
+                    <span className="text-[#8A643F] dark:text-[#C5A47E] font-medium font-space">{offer.discountPercent}% off</span>
                     <span>Expires {new Date(offer.expiryDate).toLocaleDateString()}</span>
                     <span>{offer.hotel?.name || "Hotel"} — {offer.room?.roomType || "Room"}</span>
-                    <Link className="text-[#B58A2E] dark:text-[#E6C075]/80 hover:text-[#B58A2E] dark:hover:text-[#E6C075] underline" to={`/rooms/${offer.room?._id || offer.room}`}>
+                    <Link className="text-[#8A643F] dark:text-[#C5A47E]/80 hover:text-[#8A643F] dark:hover:text-[#C5A47E] underline" to={`/rooms/${offer.room?._id || offer.room}`}>
                       View room
                     </Link>
                   </div>
@@ -402,16 +402,16 @@ const ManageOffers = () => {
                 )}
               </div>
 
-              <div className="flex items-center gap-2 mt-4 pt-3 border-t border-black/[0.06] dark:border-[#232737]">
+              <div className="flex items-center gap-2 mt-4 pt-3 border-t border-black/[0.06] dark:border-[#303631]">
                 <button
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-black/[0.08] dark:border-[#232737] text-slate-500 dark:text-[#8299A0] hover:text-[#B58A2E] dark:hover:text-[#E6C075] hover:border-[#D4A853]/40 hover:bg-[#D4A853]/10 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-black/[0.08] dark:border-[#303631] text-slate-500 dark:text-[#A9AEA7] hover:text-[#8A643F] dark:hover:text-[#C5A47E] hover:border-[#A67C52]/40 hover:bg-[#A67C52]/10 transition-all"
                   onClick={() => handleEdit(offer)}
                 >
                   <Edit3 className="w-3.5 h-3.5" />
                   Edit
                 </button>
                 <button
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-black/[0.08] dark:border-[#232737] text-slate-500 dark:text-[#8299A0] hover:text-red-600 dark:hover:text-red-300 hover:border-red-200 dark:hover:border-red-500/25 hover:bg-red-50 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-black/[0.08] dark:border-[#303631] text-slate-500 dark:text-[#A9AEA7] hover:text-red-600 dark:hover:text-red-300 hover:border-red-200 dark:hover:border-red-500/25 hover:bg-red-50 transition-all"
                   disabled={deletingId === offer._id} onClick={() => handleDelete(offer._id)}
                 >
                   <Trash2 className="w-3.5 h-3.5" />

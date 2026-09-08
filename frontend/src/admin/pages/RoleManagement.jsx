@@ -39,8 +39,8 @@ const RoleFormModal = ({ open, initial, onSave, onCancel, saving }) => {
           onClick={(e) => e.stopPropagation()}
           className="w-full max-w-md mx-4"
         >
-          <div className="rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] p-6 shadow-2xl space-y-4">
-            <h3 className="text-lg font-semibold text-[#003844] dark:text-[#E9F1F2]">{initial ? 'Edit role' : 'New role'}</h3>
+          <div className="rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] p-6 shadow-2xl space-y-4">
+            <h3 className="text-lg font-semibold text-[#183B35] dark:text-[#F2EFE8]">{initial ? 'Edit role' : 'New role'}</h3>
             <Input
               label="Role name"
               required
@@ -68,7 +68,7 @@ const RoleFormModal = ({ open, initial, onSave, onCancel, saving }) => {
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={onCancel}
-                className="px-4 py-2 text-sm font-medium rounded-xl border border-black/[0.08] dark:border-[#232737] text-slate-500 dark:text-[#8299A0] hover:text-slate-900 dark:hover:text-[#E9F1F2] hover:bg-[#f4f2ef] dark:hover:bg-[#232737] transition-all"
+                className="px-4 py-2 text-sm font-medium rounded-xl border border-black/[0.08] dark:border-[#303631] text-slate-500 dark:text-[#A9AEA7] hover:text-slate-900 dark:hover:text-[#F2EFE8] hover:bg-[#EFEEE8] dark:hover:bg-[#303631] transition-all"
               >
                 Cancel
               </button>
@@ -178,23 +178,23 @@ const RoleManagement = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#E8E0D1] dark:border-[#232737] bg-[#FFFAF4] dark:bg-[#10131D]">
-                  <th className="py-3 px-4 text-left text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">Name</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">Description</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">Dashboard access</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">Users</th>
-                  <th className="py-3 px-4 text-right text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wider">Actions</th>
+                <tr className="border-b border-[#E3E0D8] dark:border-[#303631] bg-[#F7F5F0] dark:bg-[#111412]">
+                  <th className="py-3 px-4 text-left text-xs font-medium text-[#5C6B64] dark:text-[#A9AEA7] uppercase tracking-wider">Name</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-[#5C6B64] dark:text-[#A9AEA7] uppercase tracking-wider">Description</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-[#5C6B64] dark:text-[#A9AEA7] uppercase tracking-wider">Dashboard access</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-[#5C6B64] dark:text-[#A9AEA7] uppercase tracking-wider">Users</th>
+                  <th className="py-3 px-4 text-right text-xs font-medium text-[#5C6B64] dark:text-[#A9AEA7] uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {roles.map((role) => (
-                  <tr key={role._id} className="border-b border-[#E8E0D1] dark:border-[#232737] last:border-b-0 hover:bg-[#F3ECDE] dark:hover:bg-[#232737] transition-colors">
-                    <td className="py-3 px-4 font-medium text-[#003844] dark:text-[#E9F1F2]">{role.name}</td>
-                    <td className="py-3 px-4 text-[#4D6166] dark:text-[#9FB2B8]">{role.description || '—'}</td>
+                  <tr key={role._id} className="border-b border-[#E3E0D8] dark:border-[#303631] last:border-b-0 hover:bg-[#EFEEE8] dark:hover:bg-[#303631] transition-colors">
+                    <td className="py-3 px-4 font-medium text-[#183B35] dark:text-[#F2EFE8]">{role.name}</td>
+                    <td className="py-3 px-4 text-[#5C6B64] dark:text-[#A9AEA7]">{role.description || '—'}</td>
                     <td className="py-3 px-4">
                       <Badge tone={ACCESS_TONES[role.dashboardAccess] || 'neutral'}>{role.dashboardAccess}</Badge>
                     </td>
-                    <td className="py-3 px-4 text-[#4D6166] dark:text-[#9FB2B8]">{role.userCount ?? 0}</td>
+                    <td className="py-3 px-4 text-[#5C6B64] dark:text-[#A9AEA7]">{role.userCount ?? 0}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center justify-end gap-1">
                         <IconButton icon={Pencil} variant="ghost" size="sm" label="Edit role" onClick={() => openEdit(role)} />

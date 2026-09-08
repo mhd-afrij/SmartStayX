@@ -191,8 +191,8 @@ const DestinationManagement = () => {
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Destination Management</h1>
-          <p className="text-sm text-slate-400 dark:text-[#6B828A] mt-1">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-[#F2EFE8] tracking-tight">Destination Management</h1>
+          <p className="text-sm text-slate-400 dark:text-[#A9AEA7] mt-1">
             Create and manage travel destinations featured on your platform.
           </p>
         </div>
@@ -206,26 +206,26 @@ const DestinationManagement = () => {
       </div>
 
       <div className="relative max-w-xs">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A]" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7]" />
         <input
           type="text"
           placeholder="Search destinations..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#161925] text-slate-600 dark:text-[#9FB2B8] placeholder:text-slate-400 dark:placeholder:text-[#6B828A] outline-none focus:border-[#D4A853]/60 transition-colors"
+          className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-slate-600 dark:text-[#A9AEA7] placeholder:text-slate-400 dark:placeholder:text-[#A9AEA7] outline-none focus:border-[#A67C52]/60 transition-colors"
         />
       </div>
 
       {showForm && (
         <form onSubmit={handleSubmit} className="luxury-card p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-[#E9F1F2]">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-[#F2EFE8]">
               {editingId ? "Edit Destination" : "New Destination"}
             </h3>
             <button
               type="button"
               onClick={resetForm}
-              className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#232737] text-slate-400 dark:text-[#6B828A] hover:text-slate-600 dark:hover:text-[#9FB2B8] transition-all"
+              className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#303631] text-slate-400 dark:text-[#A9AEA7] hover:text-slate-600 dark:hover:text-[#F2EFE8] transition-all"
             >
               <X className="w-4 h-4" />
             </button>
@@ -234,10 +234,10 @@ const DestinationManagement = () => {
           <div className="grid gap-4 lg:grid-cols-[1fr_2fr]">
             <div className="space-y-4">
               <div>
-                <p className="text-sm font-medium text-slate-500 dark:text-[#8299A0] mb-1.5">Destination Image</p>
+                <p className="text-sm font-medium text-slate-500 dark:text-[#A9AEA7] mb-1.5">Destination Image</p>
                 <label
                   htmlFor="dest-image"
-                  className="block border border-dashed border-black/[0.1] dark:border-[#232737] rounded-xl p-2 cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/5 transition"
+                  className="block border border-dashed border-black/[0.1] dark:border-[#303631] rounded-xl p-2 cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/5 transition"
                 >
                   <img
                     src={preview || "https://placehold.co/400x300?text=No+Image"}
@@ -258,7 +258,7 @@ const DestinationManagement = () => {
             <div className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-slate-500 dark:text-[#8299A0] mb-1.5">Destination Name</p>
+                  <p className="text-sm font-medium text-slate-500 dark:text-[#A9AEA7] mb-1.5">Destination Name</p>
                   <input
                     type="text"
                     value={form.name}
@@ -268,9 +268,9 @@ const DestinationManagement = () => {
                   />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-500 dark:text-[#8299A0] mb-1.5">Country</p>
+                  <p className="text-sm font-medium text-slate-500 dark:text-[#A9AEA7] mb-1.5">Country</p>
                   <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A]" />
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7]" />
                     <input
                       type="text"
                       value={form.country}
@@ -281,9 +281,9 @@ const DestinationManagement = () => {
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-500 dark:text-[#8299A0] mb-1.5">Hotel Count</p>
+                  <p className="text-sm font-medium text-slate-500 dark:text-[#A9AEA7] mb-1.5">Hotel Count</p>
                   <div className="relative">
-                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A]" />
+                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7]" />
                     <input
                       type="number"
                       value={form.hotelCount}
@@ -294,9 +294,9 @@ const DestinationManagement = () => {
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-500 dark:text-[#8299A0] mb-1.5">Temperature</p>
+                  <p className="text-sm font-medium text-slate-500 dark:text-[#A9AEA7] mb-1.5">Temperature</p>
                   <div className="relative">
-                    <Thermometer className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A]" />
+                    <Thermometer className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7]" />
                     <input
                       type="number"
                       value={form.temperature}
@@ -309,7 +309,7 @@ const DestinationManagement = () => {
               </div>
 
               <div>
-                <p className="text-sm font-medium text-slate-500 dark:text-[#8299A0] mb-1.5">Description</p>
+                <p className="text-sm font-medium text-slate-500 dark:text-[#A9AEA7] mb-1.5">Description</p>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
@@ -323,10 +323,10 @@ const DestinationManagement = () => {
                   type="checkbox"
                   checked={form.featured}
                   onChange={(e) => setForm((prev) => ({ ...prev, featured: e.target.checked }))}
-                  className="w-4 h-4 rounded border-black/[0.1] dark:border-[#232737] bg-white dark:bg-[#161925] text-[#B58A2E] dark:text-[#E6C075] focus:ring-[#D4A853]/40"
+                  className="w-4 h-4 rounded border-black/[0.1] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-[#8A643F] dark:text-[#C5A47E] focus:ring-[#A67C52]/40"
                 />
-                <Star className="w-3.5 h-3.5 text-[#B58A2E] dark:text-[#E6C075]" />
-                <span className="text-sm text-slate-600 dark:text-[#9FB2B8]">Featured destination</span>
+                <Star className="w-3.5 h-3.5 text-[#8A643F] dark:text-[#C5A47E]" />
+                <span className="text-sm text-slate-600 dark:text-[#A9AEA7]">Featured destination</span>
               </label>
 
               <div className="flex items-center gap-2 pt-2">
@@ -361,20 +361,20 @@ const DestinationManagement = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-black/[0.06] dark:border-[#232737] bg-[#f4f2ef] dark:bg-[#10131D]">
-                <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-[0.15em]">Image</th>
-                <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-[0.15em]">Name</th>
-                <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-[0.15em]">Country</th>
-                <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-[0.15em]">Details</th>
-                <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-[0.15em]">Featured</th>
-                <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-[0.15em]">Actions</th>
+              <tr className="border-b border-black/[0.06] dark:border-[#303631] bg-[#EFEEE8] dark:bg-[#111412]">
+                <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#A9AEA7] uppercase tracking-[0.15em]">Image</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#A9AEA7] uppercase tracking-[0.15em]">Name</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#A9AEA7] uppercase tracking-[0.15em]">Country</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#A9AEA7] uppercase tracking-[0.15em]">Details</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#A9AEA7] uppercase tracking-[0.15em]">Featured</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#A9AEA7] uppercase tracking-[0.15em]">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredDestinations.map((dest) => (
                 <tr
                   key={dest._id}
-                  className="border-t border-black/[0.06] dark:border-[#232737] hover:bg-black/[0.02] dark:hover:bg-white/5 transition-colors"
+                  className="border-t border-black/[0.06] dark:border-[#303631] hover:bg-black/[0.02] dark:hover:bg-white/5 transition-colors"
                 >
                   <td className="py-3 px-4">
                     <img
@@ -383,26 +383,26 @@ const DestinationManagement = () => {
                       className="w-16 h-10 object-cover rounded-lg"
                     />
                   </td>
-                  <td className="py-3 px-4 text-slate-900 dark:text-[#E9F1F2] font-medium">{dest.name}</td>
-                  <td className="py-3 px-4 text-slate-600 dark:text-[#9FB2B8]">{dest.country}</td>
-                  <td className="py-3 px-4 text-slate-600 dark:text-[#9FB2B8]">
+                  <td className="py-3 px-4 text-slate-900 dark:text-[#F2EFE8] font-medium">{dest.name}</td>
+                  <td className="py-3 px-4 text-slate-600 dark:text-[#A9AEA7]">{dest.country}</td>
+                  <td className="py-3 px-4 text-slate-600 dark:text-[#A9AEA7]">
                     <span className="text-xs">{dest.hotelCount}</span>
                     {dest.temperature && (
-                      <span className="text-xs ml-2 text-slate-400 dark:text-[#6B828A]">| {dest.temperature}</span>
+                      <span className="text-xs ml-2 text-slate-400 dark:text-[#A9AEA7]">| {dest.temperature}</span>
                     )}
                   </td>
                   <td className="py-3 px-4">
                     {dest.featured ? (
-                      <span className="text-[#B58A2E] dark:text-[#E6C075] text-xs">Featured</span>
+                      <span className="text-[#8A643F] dark:text-[#C5A47E] text-xs">Featured</span>
                     ) : (
-                      <span className="text-slate-400 dark:text-[#6B828A] text-xs">No</span>
+                      <span className="text-slate-400 dark:text-[#A9AEA7] text-xs">No</span>
                     )}
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => startEdit(dest)}
-                        className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#232737] text-slate-400 dark:text-[#6B828A] hover:text-[#B58A2E] dark:hover:text-[#E6C075] hover:border-[#D4A853]/40 hover:bg-[#D4A853]/10 transition-all"
+                        className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#303631] text-slate-400 dark:text-[#A9AEA7] hover:text-[#8A643F] dark:hover:text-[#8A643F] hover:border-[#A67C52]/40 hover:bg-[#A67C52]/10 transition-all"
                         title="Edit"
                       >
                         <Pencil className="w-3.5 h-3.5" />
@@ -410,7 +410,7 @@ const DestinationManagement = () => {
                       <button
                         onClick={() => handleDelete(dest._id)}
                         disabled={deletingId === dest._id}
-                        className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#232737] text-slate-400 dark:text-[#6B828A] hover:text-red-600 dark:hover:text-red-300 hover:border-red-200 dark:hover:border-red-500/25 hover:bg-red-50 transition-all disabled:opacity-40 disabled:pointer-events-none"
+                        className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#303631] text-slate-400 dark:text-[#A9AEA7] hover:text-red-600 dark:hover:text-red-300 hover:border-red-200 dark:hover:border-red-500/25 hover:bg-red-50 transition-all disabled:opacity-40 disabled:pointer-events-none"
                         title="Delete"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -425,15 +425,15 @@ const DestinationManagement = () => {
 
         {loading && (
           <div className="flex items-center justify-center p-8">
-            <div className="w-5 h-5 rounded-full border-2 border-[#D4A853]/30 border-t-[#D4A853] animate-spin" />
-            <span className="ml-3 text-sm text-slate-400 dark:text-[#6B828A]">Loading destinations...</span>
+            <div className="w-5 h-5 rounded-full border-2 border-[#A67C52]/30 border-t-[#A67C52] animate-spin" />
+            <span className="ml-3 text-sm text-slate-400 dark:text-[#A9AEA7]">Loading destinations...</span>
           </div>
         )}
 
         {!loading && filteredDestinations.length === 0 && (
           <div className="p-12 text-center">
-            <Globe className="w-12 h-12 mx-auto mb-3 text-slate-300 dark:text-[#4E646B]" />
-            <p className="text-slate-500 dark:text-[#8299A0] text-sm">No destinations yet. Create your first one!</p>
+            <Globe className="w-12 h-12 mx-auto mb-3 text-slate-300 dark:text-[#A9AEA7]" />
+            <p className="text-slate-500 dark:text-[#A9AEA7] text-sm">No destinations yet. Create your first one!</p>
           </div>
         )}
       </div>

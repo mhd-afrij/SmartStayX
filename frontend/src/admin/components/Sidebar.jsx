@@ -46,12 +46,12 @@ const Sidebar = () => {
       transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
       className="relative h-full flex-shrink-0"
     >
-      <div className="absolute inset-0 bg-[#0A1628] dark:bg-[#060E18]" />
+      <div className="absolute inset-0 bg-[#222823] dark:bg-[#222823]" />
 
       <div className="relative z-10 flex flex-col h-full py-6">
         <Link to="/super-admin" className="flex items-center gap-3 px-6 mb-8">
-          <div className="w-9 h-9 rounded-lg bg-[#D4A853] dark:bg-[#E6C075] flex items-center justify-center shadow-lg shadow-[#D4A853]/30">
-            <ShieldCheck className="w-5 h-5 text-[#2A230F]" />
+          <div className="w-9 h-9 rounded-lg bg-[#A67C52] dark:bg-[#C5A47E] flex items-center justify-center shadow-lg shadow-[#A67C52]/30">
+            <ShieldCheck className="w-5 h-5 text-[#1A1E1B]" />
           </div>
           <AnimatePresence>
             {!collapsed && (
@@ -72,17 +72,17 @@ const Sidebar = () => {
             <NavLink key={item.path} to={item.path} end={item.path === "/super-admin"} className="group relative block">
               {({ isActive }) => (                  <div
                     className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
-                      isActive ? "bg-[#D4A853]/10 border border-[#D4A853]/25 dark:bg-[#E6C075]/10 dark:border-[#E6C075]/25" : "hover:bg-white/5 dark:hover:bg-white/5 border border-transparent"
+                      isActive ? "bg-[#A67C52]/10 border border-[#A67C52]/25 dark:bg-[#C5A47E]/10 dark:border-[#C5A47E]/25" : "hover:bg-white/5 dark:hover:bg-white/5 border border-transparent"
                     }`}
                   >
                   {isActive && (
                     <motion.div
                       layoutId="super-admin-sidebar-active"
-                      className="absolute left-0 w-1 h-6 bg-[#D4A853] dark:bg-[#E6C075] rounded-full"
+                      className="absolute left-0 w-1 h-6 bg-[#A67C52] dark:bg-[#C5A47E] rounded-full"
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                   )}
-                  <item.icon className={`w-5 h-5 shrink-0 transition-colors ${isActive ? "text-[#E6C075]" : "text-white/50 group-hover:text-white/80"}`} />
+                  <item.icon className={`w-5 h-5 shrink-0 transition-colors ${isActive ? "text-[#C5A47E]" : "text-white/50 group-hover:text-white/80"}`} />
                   <AnimatePresence>
                     {!collapsed && (
                       <motion.span
@@ -103,7 +103,7 @@ const Sidebar = () => {
 
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border border-white/10 bg-[#0A1628] dark:bg-[#060E18] flex items-center justify-center hover:bg-[#0E1E38] dark:hover:bg-[#0D1624] transition-colors z-20 shadow-sm"
+          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border border-white/10 bg-[#222823] dark:bg-[#222823] flex items-center justify-center hover:bg-[#1A1E1B] dark:hover:bg-[#1A1E1B] transition-colors z-20 shadow-sm"
         >
           {collapsed ? <ChevronRight className="w-3 h-3 text-white/60" /> : <ChevronLeft className="w-3 h-3 text-white/60" />}
         </button>

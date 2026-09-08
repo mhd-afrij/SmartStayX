@@ -21,7 +21,7 @@ const BackToTop = () => {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-8 right-8 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-[#5077B3] text-white shadow-[0_12px_28px_rgba(80, 119, 179,0.3)] hover:brightness-105 transition-all"
+          className="fixed bottom-8 right-8 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-[#183B35] text-white shadow-[0_12px_28px_rgba(24, 59, 53,0.3)] hover:brightness-105 transition-all"
           aria-label="Back to top"
         >
           <ChevronUp className="h-5 w-5" />

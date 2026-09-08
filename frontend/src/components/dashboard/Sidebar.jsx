@@ -50,13 +50,13 @@ const Sidebar = () => {
       transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
       className="relative h-full flex-shrink-0"
     >
-      <div className="absolute inset-0 bg-[#f4f2ef] dark:bg-[#003844]" />
-      <div className="absolute inset-0 border-r border-black/[0.06] dark:border-[#0D4A54]" />
+      <div className="absolute inset-0 bg-[#efeee8] dark:bg-[#111412]" />
+      <div className="absolute inset-0 border-r border-black/[0.06] dark:border-[#303631]" />
 
       <div className="relative z-10 flex flex-col h-full py-6">
         <Link to="/manager" className="flex items-center gap-3 px-6 mb-8">
-          <div className="w-9 h-9 rounded-lg bg-[#D4A853] dark:bg-[#E6C075] flex items-center justify-center shadow-lg shadow-[#D4A853]/30">
-            <Hotel className="w-5 h-5 text-[#2A230F]" />
+          <div className="w-9 h-9 rounded-lg bg-[#A67C52] dark:bg-[#C5A47E] flex items-center justify-center shadow-lg shadow-[#A67C52]/30">
+            <Hotel className="w-5 h-5 text-[#1A1E1B]" />
           </div>
           <AnimatePresence>
             {!collapsed && (
@@ -64,7 +64,7 @@ const Sidebar = () => {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
-                className="font-space text-lg font-semibold text-slate-900 dark:text-[#E9F1F2] tracking-tight"
+                className="font-space text-lg font-semibold text-slate-900 dark:text-[#F2EFE8] tracking-tight"
               >
                 SmartStayX
               </motion.span>
@@ -83,25 +83,25 @@ const Sidebar = () => {
               {({ isActive }) => (                  <div
                     className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
                       isActive
-                        ? "bg-[#D4A853]/10 border border-[#D4A853]/25 dark:bg-[#E6C075]/10 dark:border-[#E6C075]/25"
+                        ? "bg-[#A67C52]/10 border border-[#A67C52]/25 dark:bg-[#C5A47E]/10 dark:border-[#C5A47E]/25"
                         : "hover:bg-black/[0.03] dark:hover:bg-white/5 border border-transparent"
                     }`}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="manager-sidebar-active"
-                        className="absolute left-0 w-1 h-6 bg-[#D4A853] dark:bg-[#E6C075] rounded-full"
+                        className="absolute left-0 w-1 h-6 bg-[#A67C52] dark:bg-[#C5A47E] rounded-full"
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       />
                     )}
-                    <item.icon className={`w-5 h-5 shrink-0 transition-colors ${isActive ? "text-[#B58A2E] dark:text-[#E6C075]" : "text-slate-500 dark:text-[#8299A0] group-hover:text-slate-700 dark:group-hover:text-[#C1D2D6]"}`} />
+                    <item.icon className={`w-5 h-5 shrink-0 transition-colors ${isActive ? "text-[#8A643F] dark:text-[#C5A47E]" : "text-slate-500 dark:text-[#A9AEA7] group-hover:text-slate-700 dark:group-hover:text-[#F2EFE8]"}`} />
                   <AnimatePresence>
                     {!collapsed && (
                       <motion.span
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -10 }}
-                        className={`text-sm font-medium transition-colors ${isActive ? "text-[#B58A2E] dark:text-[#E6C075]" : "text-slate-600 dark:text-[#9FB2B8] group-hover:text-slate-900 dark:group-hover:text-[#E9F1F2]"}`}
+                        className={`text-sm font-medium transition-colors ${isActive ? "text-[#8A643F] dark:text-[#C5A47E]" : "text-slate-600 dark:text-[#A9AEA7] group-hover:text-slate-900 dark:group-hover:text-[#F2EFE8]"}`}
                       >
                         {item.name}
                       </motion.span>
@@ -115,12 +115,12 @@ const Sidebar = () => {
 
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border border-black/[0.08] dark:border-[#0D4A54] bg-white dark:bg-[#003844] flex items-center justify-center hover:bg-[#f4f2ef] dark:hover:bg-[#0D4A54] transition-colors z-20 shadow-sm"
+          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#111412] flex items-center justify-center hover:bg-[#efeee8] dark:hover:bg-[#303631] transition-colors z-20 shadow-sm"
         >
           {collapsed ? (
-            <ChevronRight className="w-3 h-3 text-slate-500 dark:text-[#8299A0]" />
+            <ChevronRight className="w-3 h-3 text-slate-500 dark:text-[#A9AEA7]" />
           ) : (
-            <ChevronLeft className="w-3 h-3 text-slate-500 dark:text-[#8299A0]" />
+            <ChevronLeft className="w-3 h-3 text-slate-500 dark:text-[#A9AEA7]" />
           )}
         </button>
       </div>

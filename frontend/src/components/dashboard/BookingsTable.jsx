@@ -8,18 +8,18 @@ import DataTable from "../ui/DataTable";
 
 // Visual config for each booking status badge
 const statusConfig = {
-  pending: { label: "Pending", color: "bg-[#F4F2F9] dark:bg-[#1B2436] text-amber-700 dark:text-amber-300 border-[#B9B4CE]/45 dark:border-[#3D4660]/45" },
+  pending: { label: "Pending", color: "bg-[#EFEAE1] dark:bg-[#222823] text-amber-700 dark:text-amber-300 border-[#A67C52]/45 dark:border-[#303631]/45" },
   confirmed: { label: "Confirmed", color: "bg-indigo-50 text-indigo-700 border-indigo-200" },
   checked_in: { label: "Checked-in", color: "bg-green-50 text-green-700 dark:text-green-300 border-green-200 dark:border-green-500/25" },
-  checked_out: { label: "Completed", color: "bg-[#fbf2e1] dark:bg-[#2E2A1F] text-[#8a6621] border-[#D4A853]/40" },
+  checked_out: { label: "Completed", color: "bg-[#F6EFE3] dark:bg-[#1A1E1B] text-[#8A643F] border-[#A67C52]/40" },
   cancelled: { label: "Cancelled", color: "bg-red-50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-500/25" },
-  expired: { label: "Expired", color: "bg-slate-100 dark:bg-[#10131D] text-slate-500 dark:text-[#8299A0] border-slate-200 dark:border-[#232737]" },
+  expired: { label: "Expired", color: "bg-slate-100 dark:bg-[#111412] text-slate-500 dark:text-[#A9AEA7] border-slate-200 dark:border-[#303631]" },
 };
 
 // Visual config for payment status badges
 const paymentConfig = {
   paid: { label: "Paid", color: "bg-green-50 text-green-700 dark:text-green-300 border-green-200 dark:border-green-500/25" },
-  pending: { label: "Pending", color: "bg-[#F4F2F9] dark:bg-[#1B2436] text-amber-700 dark:text-amber-300 border-[#B9B4CE]/45 dark:border-[#3D4660]/45" },
+  pending: { label: "Pending", color: "bg-[#EFEAE1] dark:bg-[#222823] text-amber-700 dark:text-amber-300 border-[#A67C52]/45 dark:border-[#303631]/45" },
 };
 
 // Allowed booking status transitions for dropdown
@@ -100,10 +100,10 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency, on
           const initial = guestName.charAt(0).toUpperCase();
           return (
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-[#D4A853]/10 border border-black/[0.06] dark:border-[#232737] flex items-center justify-center">
-                <span className="text-[10px] font-medium text-[#8a6621] dark:text-[#E6C075]">{initial}</span>
+              <div className="w-7 h-7 rounded-full bg-[#A67C52]/10 border border-black/[0.06] dark:border-[#303631] flex items-center justify-center">
+                <span className="text-[10px] font-medium text-[#8A643F] dark:text-[#C5A47E]">{initial}</span>
               </div>
-              <span className="text-slate-800 dark:text-[#D3DFE2]">{guestName}</span>
+              <span className="text-slate-800 dark:text-[#F2EFE8]">{guestName}</span>
             </div>
           );
         },
@@ -111,12 +111,12 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency, on
     ),
     columnHelper.accessor(
       (row) => (row.roomNumber || row.room?.roomNumber ? `Room ${row.roomNumber || row.room?.roomNumber} — ${row.room?.roomType || ""}` : row.room?.roomType || "Room"),
-      { id: "room", header: "Room", cell: (info) => <span className="text-slate-600 dark:text-[#9FB2B8]">{info.getValue()}</span> }
+      { id: "room", header: "Room", cell: (info) => <span className="text-slate-600 dark:text-[#A9AEA7]">{info.getValue()}</span> }
     ),
     columnHelper.accessor("checkInDate", {
       header: "Check-in",
       cell: (info) => (
-        <span className="text-slate-600 dark:text-[#9FB2B8] font-space text-xs">
+        <span className="text-slate-600 dark:text-[#A9AEA7] font-space text-xs">
           {new Date(info.getValue()).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
         </span>
       ),
@@ -124,14 +124,14 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency, on
     columnHelper.accessor("checkOutDate", {
       header: "Check-out",
       cell: (info) => (
-        <span className="text-slate-600 dark:text-[#9FB2B8] font-space text-xs">
+        <span className="text-slate-600 dark:text-[#A9AEA7] font-space text-xs">
           {new Date(info.getValue()).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
         </span>
       ),
     }),
     columnHelper.accessor("totalPrice", {
       header: "Total",
-      cell: (info) => <span className="text-slate-900 dark:text-[#E9F1F2] font-space text-sm">{formatCurrency(info.getValue())}</span>,
+      cell: (info) => <span className="text-slate-900 dark:text-[#F2EFE8] font-space text-sm">{formatCurrency(info.getValue())}</span>,
     }),
     columnHelper.accessor("status", {
       header: "Status",
@@ -171,11 +171,11 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency, on
                   if (e.target.value) onStatusChange(item._id, e.target.value);
                 }}
                 disabled={updatingStatusId === item._id}
-                className="p-1 text-[10px] rounded-lg border border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#161925] text-slate-600 dark:text-[#9FB2B8] outline-none focus:border-[#D4A853]/60 transition-colors disabled:opacity-50"
+                className="p-1 text-[10px] rounded-lg border border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-slate-600 dark:text-[#A9AEA7] outline-none focus:border-[#A67C52]/60 transition-colors disabled:opacity-50"
               >
-                <option value="" className="bg-white dark:bg-[#161925]">Set status</option>
+                <option value="" className="bg-white dark:bg-[#1A1E1B]">Set status</option>
                 {ALLOWED_TRANSITIONS[item.status].map((s) => (
-                  <option key={s} value={s} className="bg-white dark:bg-[#161925]">
+                  <option key={s} value={s} className="bg-white dark:bg-[#1A1E1B]">
                     {statusConfig[s]?.label || s}
                   </option>
                 ))}
@@ -189,7 +189,7 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency, on
                 roomNumber: item.roomNumber || item.room?.roomNumber || "",
                 roomType: item.room?.roomType || "",
               })}
-              className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#232737] text-slate-400 dark:text-[#6B828A] hover:text-green-600 dark:hover:text-green-300 hover:border-green-200 dark:hover:border-green-500/25 hover:bg-green-50 transition-all"
+              className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#303631] text-slate-400 dark:text-[#A9AEA7] hover:text-green-600 dark:hover:text-green-300 hover:border-green-200 dark:hover:border-green-500/25 hover:bg-green-50 transition-all"
               title="Assign Room"
             >
               <DoorOpen className="w-3.5 h-3.5" />
@@ -197,7 +197,7 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency, on
             <button
               onClick={() => onDelete(item._id)}
               disabled={deletingId === item._id}
-              className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#232737] text-slate-400 dark:text-[#6B828A] hover:text-red-600 dark:hover:text-red-300 hover:border-red-200 dark:hover:border-red-500/25 hover:bg-red-50 transition-all disabled:opacity-50"
+              className="p-1.5 rounded-lg border border-black/[0.08] dark:border-[#303631] text-slate-400 dark:text-[#A9AEA7] hover:text-red-600 dark:hover:text-red-300 hover:border-red-200 dark:hover:border-red-500/25 hover:bg-red-50 transition-all disabled:opacity-50"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -229,46 +229,46 @@ const BookingsTable = ({ bookings = [], onDelete, deletingId, formatCurrency, on
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             onSubmit={(e) => { e.preventDefault(); handleAssignRoom(); }}
-            className="w-full max-w-md rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] p-6 space-y-5 shadow-2xl"
+            className="w-full max-w-md rounded-2xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] p-6 space-y-5 shadow-2xl"
           >
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-[#E9F1F2]">Assign Room</h3>
-                <p className="text-sm text-slate-400 dark:text-[#6B828A]">Set room number for this booking</p>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F2EFE8]">Assign Room</h3>
+                <p className="text-sm text-slate-400 dark:text-[#A9AEA7]">Set room number for this booking</p>
               </div>
               <button
                 type="button"
                 onClick={resetAssignRoom}
-                className="p-1 rounded-lg hover:bg-[#f4f2ef] dark:hover:bg-[#232737] transition-colors"
+                className="p-1 rounded-lg hover:bg-[#efeee8] dark:hover:bg-[#303631] transition-colors"
               >
-                <X className="w-4 h-4 text-slate-400 dark:text-[#6B828A]" />
+                <X className="w-4 h-4 text-slate-400 dark:text-[#A9AEA7]" />
               </button>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-[#9FB2B8] mb-1.5">Room Number</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-[#A9AEA7] mb-1.5">Room Number</p>
               <input
                 type="text"
                 placeholder="e.g. R101"
                 value={assignRoomState.roomNumber}
                 onChange={(e) => setAssignRoomState((prev) => ({ ...prev, roomNumber: e.target.value }))}
-                className="w-full px-3 py-2.5 text-sm rounded-xl border border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#161925] text-slate-600 dark:text-[#9FB2B8] placeholder:text-slate-400 dark:placeholder:text-[#6B828A] outline-none focus:border-[#D4A853]/60 transition-colors"
+                className="w-full px-3 py-2.5 text-sm rounded-xl border border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-slate-600 dark:text-[#A9AEA7] placeholder:text-slate-400 dark:placeholder:text-[#A9AEA7] outline-none focus:border-[#A67C52]/60 transition-colors"
                 autoFocus
               />
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-black/[0.06] dark:border-[#232737]">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-black/[0.06] dark:border-[#303631]">
               <button
                 type="button"
                 onClick={resetAssignRoom}
-                className="px-4 py-2 text-sm font-medium rounded-xl border border-black/[0.08] dark:border-[#232737] text-slate-500 dark:text-[#8299A0] hover:text-slate-900 dark:hover:text-[#E9F1F2] hover:bg-[#f4f2ef] dark:hover:bg-[#232737] transition-all"
+                className="px-4 py-2 text-sm font-medium rounded-xl border border-black/[0.08] dark:border-[#303631] text-slate-500 dark:text-[#A9AEA7] hover:text-slate-900 dark:hover:text-[#F2EFE8] hover:bg-[#efeee8] dark:hover:bg-[#303631] transition-all"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={assigningId === assignRoomState.bookingId}
-                className="px-4 py-2 text-sm font-medium rounded-xl bg-[#D4A853] dark:bg-[#E6C075] text-[#2A230F] hover:shadow-lg hover:shadow-[#D4A853]/30 transition-all disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium rounded-xl bg-[#A67C52] dark:bg-[#C5A47E] text-[#1A1E1B] hover:shadow-lg hover:shadow-[#A67C52]/30 transition-all disabled:opacity-50"
               >
                 {assigningId === assignRoomState.bookingId ? "Assigning..." : "Assign Room"}
               </button>

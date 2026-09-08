@@ -14,9 +14,9 @@ const Checkbox = ({ label, selected = false, onChange = () => {} }) => (
       type="checkbox"
       checked={selected}
       onChange={(e) => onChange(e.target.checked, label)}
-      className="h-4 w-4 rounded border-black/[0.1] dark:border-[#1D3842] bg-white dark:bg-[#122A32] text-[#5077B3] dark:text-[#93B3E0] focus:ring-[#5077B3]/30 focus:ring-2 accent-[#5077B3]"
+      className="h-4 w-4 rounded border-black/[0.1] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-[#183B35] dark:text-[#8FB8A8] focus:ring-[#183B35]/30 focus:ring-2 accent-[#183B35]"
     />
-    <span className={`text-sm font-medium select-none transition-colors ${selected ? 'text-slate-900 dark:text-[#E9F1F2]' : 'text-slate-500 dark:text-[#8299A0] group-hover:text-slate-700 dark:group-hover:text-[#C1D2D6]'}`}>{label}</span>
+    <span className={`text-sm font-medium select-none transition-colors ${selected ? 'text-slate-900 dark:text-[#F2EFE8]' : 'text-slate-500 dark:text-[#A9AEA7] group-hover:text-slate-700 dark:group-hover:text-[#F2EFE8]'}`}>{label}</span>
   </label>
 );
 
@@ -33,18 +33,18 @@ const formatSearchDate = (value) => {
 
 const SkeletonCard = () => (
   <div className="luxury-card overflow-hidden animate-pulse">
-    <div className="h-44 bg-[#f4f2ef] dark:bg-[#16303A]" />
+    <div className="h-44 bg-[#EFEEE8] dark:bg-[#222823]" />
     <div className="p-5 space-y-3">
-      <div className="h-5 w-3/4 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
-      <div className="h-3 w-1/2 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
-      <div className="h-3 w-2/3 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
+      <div className="h-5 w-3/4 rounded bg-[#EFEEE8] dark:bg-[#222823]" />
+      <div className="h-3 w-1/2 rounded bg-[#EFEEE8] dark:bg-[#222823]" />
+      <div className="h-3 w-2/3 rounded bg-[#EFEEE8] dark:bg-[#222823]" />
       <div className="flex gap-1.5 mt-4">
-        <div className="h-5 w-16 rounded-full bg-[#f4f2ef] dark:bg-[#16303A]" />
-        <div className="h-5 w-16 rounded-full bg-[#f4f2ef] dark:bg-[#16303A]" />
+        <div className="h-5 w-16 rounded-full bg-[#EFEEE8] dark:bg-[#222823]" />
+        <div className="h-5 w-16 rounded-full bg-[#EFEEE8] dark:bg-[#222823]" />
       </div>
-      <div className="flex items-center justify-between mt-5 pt-4 border-t border-black/[0.06] dark:border-[#1D3842]">
-        <div className="h-5 w-20 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
-        <div className="h-9 w-16 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
+      <div className="flex items-center justify-between mt-5 pt-4 border-t border-black/[0.06] dark:border-[#303631]">
+        <div className="h-5 w-20 rounded bg-[#EFEEE8] dark:bg-[#222823]" />
+        <div className="h-9 w-16 rounded bg-[#EFEEE8] dark:bg-[#222823]" />
       </div>
     </div>
   </div>
@@ -55,7 +55,7 @@ const StarRating = ({ rating }) => {
   return (
     <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((s) => (
-        <Star key={s} className={`w-3.5 h-3.5 ${s <= stars ? 'text-[#5077B3] dark:text-[#93B3E0] fill-[#5077B3]' : 'text-slate-300 dark:text-[#4E646B]'}`} />
+        <Star key={s} className={`w-3.5 h-3.5 ${s <= stars ? 'text-[#183B35] dark:text-[#8FB8A8] fill-[#183B35]' : 'text-slate-300 dark:text-[#A9AEA7]'}`} />
       ))}
     </div>
   );
@@ -201,17 +201,17 @@ const AllRooms = () => {
   const filteredCount = allFiltered.length;
 
   return (
-    <div className="pt-20 min-h-screen bg-[#F3ECDE] dark:bg-[#122A32]">
+    <div className="pt-20 min-h-screen bg-[#EFEEE8] dark:bg-[#111412]">
       <div className="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
           <div>
             <p className="luxury-kicker">Rooms</p>
-            <h1 className="text-3xl md:text-4xl font-playfair text-slate-900 dark:text-[#E9F1F2] mt-1">
+            <h1 className="text-3xl md:text-4xl font-playfair text-slate-900 dark:text-[#F2EFE8] mt-1">
               {searchDestination
                 ? `Stays in ${searchDestination}`
                 : "Find your next stay"}
             </h1>
-            <p className="text-sm text-slate-500 dark:text-[#8299A0] mt-1">
+            <p className="text-sm text-slate-500 dark:text-[#A9AEA7] mt-1">
               {pageLoading ? 'Loading rooms...' : `Showing ${Math.min(visibleCount, filteredCount)} of ${filteredCount} rooms`}
             </p>
             <AnimatePresence>
@@ -220,7 +220,7 @@ const AllRooms = () => {
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
-                  className="mt-4 flex flex-wrap gap-2 text-xs text-slate-600 dark:text-[#9FB2B8]"
+                  className="mt-4 flex flex-wrap gap-2 text-xs text-slate-600 dark:text-[#A9AEA7]"
                 >
                   {searchCheckIn && (
                     <span className="luxury-card-soft px-3 py-2">
@@ -248,9 +248,9 @@ const AllRooms = () => {
               }}
               className="luxury-select text-sm min-w-[8rem]"
             >
-              <option value="" className="bg-white dark:bg-[#122A32]">All destinations</option>
+              <option value="" className="bg-white dark:bg-[#1A1E1B]">All destinations</option>
               {cities.map((city) => (
-                <option key={city} value={city} className="bg-white dark:bg-[#122A32]">{city}</option>
+                <option key={city} value={city} className="bg-white dark:bg-[#1A1E1B]">{city}</option>
               ))}
             </select>
 
@@ -259,9 +259,9 @@ const AllRooms = () => {
               onChange={(e) => handleSortChange(e.target.value)}
               className="luxury-select text-sm min-w-[10rem]"
             >
-              <option value="" className="bg-white dark:bg-[#122A32]">Sort: Recommended</option>
+              <option value="" className="bg-white dark:bg-[#1A1E1B]">Sort: Recommended</option>
               {sortOptions.map((option) => (
-                <option key={option} value={option} className="bg-white dark:bg-[#122A32]">{option}</option>
+                <option key={option} value={option} className="bg-white dark:bg-[#1A1E1B]">{option}</option>
               ))}
             </select>
             <button onClick={clearFilters} className="ghost-button px-4 py-2.5 text-sm">Reset</button>
@@ -316,10 +316,10 @@ const AllRooms = () => {
                   <button
                     key={filter}
                     onClick={() => removeFilter(filter)}
-                    className="luxury-card-soft flex items-center gap-2 px-3 py-1.5 text-xs text-slate-600 dark:text-[#9FB2B8]"
+                    className="luxury-card-soft flex items-center gap-2 px-3 py-1.5 text-xs text-slate-600 dark:text-[#A9AEA7]"
                   >
                     {filter}
-                    <span className="text-slate-400 dark:text-[#6B828A] hover:text-slate-900 dark:hover:text-[#E9F1F2] transition-colors">✕</span>
+                    <span className="text-slate-400 dark:text-[#A9AEA7] hover:text-slate-900 dark:hover:text-[#F2EFE8] transition-colors">✕</span>
                   </button>
                 ))}
               </div>
@@ -333,8 +333,8 @@ const AllRooms = () => {
 
             {!pageLoading && filteredRooms.length === 0 && (
               <div className="luxury-card p-10 text-center">
-                <h3 className="font-playfair text-xl text-slate-900 dark:text-[#E9F1F2] mb-2">No rooms found</h3>
-                <p className="text-slate-500 dark:text-[#8299A0] mb-5">Try adjusting your filters or destination.</p>
+                <h3 className="font-playfair text-xl text-slate-900 dark:text-[#F2EFE8] mb-2">No rooms found</h3>
+                <p className="text-slate-500 dark:text-[#A9AEA7] mb-5">Try adjusting your filters or destination.</p>
                 <button onClick={clearFilters} className="gold-button px-6 py-2.5 text-sm">Clear filters</button>
               </div>
             )}
@@ -364,7 +364,7 @@ const AllRooms = () => {
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-[#6B828A] bg-[#f4f2ef] dark:bg-[#16303A]">
+                          <div className="w-full h-full flex items-center justify-center text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-[#A9AEA7] bg-[#EFEEE8] dark:bg-[#222823]">
                             No image
                           </div>
                         )}
@@ -381,19 +381,19 @@ const AllRooms = () => {
                           <Link
                             to={`/rooms/${room._id}`}
                             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                            className="font-playfair text-lg text-slate-900 dark:text-[#E9F1F2] hover:text-[#5077B3] dark:hover:text-[#93B3E0] transition-colors"
+                            className="font-playfair text-lg text-slate-900 dark:text-[#F2EFE8] hover:text-[#183B35] dark:hover:text-[#8FB8A8] transition-colors"
                           >
                             {room.hotel?.name || "Luxury Hotel"}
                           </Link>
                           <div className="flex items-center gap-2 mt-1">
                             <StarRating rating={room.avgRating || 4} />
-                            <span className="text-xs text-slate-400 dark:text-[#6B828A]">{(room.avgRating || 4).toFixed(1)}</span>
+                            <span className="text-xs text-slate-400 dark:text-[#A9AEA7]">{(room.avgRating || 4).toFixed(1)}</span>
                             {room.reviewCount > 0 && (
-                              <span className="text-xs text-slate-400 dark:text-[#6B828A]">({room.reviewCount} reviews)</span>
+                              <span className="text-xs text-slate-400 dark:text-[#A9AEA7]">({room.reviewCount} reviews)</span>
                             )}
                           </div>
-                          <p className="text-sm text-slate-600 dark:text-[#9FB2B8] mt-0.5">{room.roomType || "Signature room"}</p>
-                          <p className="text-xs text-slate-400 dark:text-[#6B828A] mt-1">
+                          <p className="text-sm text-slate-600 dark:text-[#A9AEA7] mt-0.5">{room.roomType || "Signature room"}</p>
+                          <p className="text-xs text-slate-400 dark:text-[#A9AEA7] mt-1">
                             {room.hotel?.city || room.hotel?.address || "Prime location"}
                             {room.capacity ? ` · Up to ${room.capacity} guests` : ''}
                           </p>
@@ -402,7 +402,7 @@ const AllRooms = () => {
                         {room.recommendationReasons && (
                           <div className="flex flex-wrap gap-1.5 mt-3">
                             {room.recommendationReasons.slice(0, 2).map((reason, i) => (
-                              <span key={i} className="px-2 py-0.5 rounded-full bg-[#fbf2e1] dark:bg-[#2E2A1F] text-[#5077B3] dark:text-[#93B3E0] text-[10px]">
+                              <span key={i} className="px-2 py-0.5 rounded-full bg-[#F6EFE3] dark:bg-[#33302A] text-[#183B35] dark:text-[#8FB8A8] text-[10px]">
                                 {reason}
                               </span>
                             ))}
@@ -411,26 +411,26 @@ const AllRooms = () => {
 
                         <div className="flex flex-wrap gap-1.5 mt-3">
                           {room.amenities?.slice(0, 2).map((amenity) => (
-                            <span key={amenity} className="px-2.5 py-1 rounded-full border border-black/[0.06] dark:border-[#1D3842] bg-[#f4f2ef] dark:bg-[#16303A] text-slate-600 dark:text-[#9FB2B8] text-[0.7rem]">
+                            <span key={amenity} className="px-2.5 py-1 rounded-full border border-black/[0.06] dark:border-[#303631] bg-[#EFEEE8] dark:bg-[#222823] text-slate-600 dark:text-[#A9AEA7] text-[0.7rem]">
                               {amenity}
                             </span>
                           ))}
                           {room.amenities?.length > 2 && (
-                            <span className="px-2.5 py-1 rounded-full border border-black/[0.06] dark:border-[#1D3842] bg-[#f4f2ef] dark:bg-[#16303A] text-slate-600 dark:text-[#9FB2B8] text-[0.7rem]">
+                            <span className="px-2.5 py-1 rounded-full border border-black/[0.06] dark:border-[#303631] bg-[#EFEEE8] dark:bg-[#222823] text-slate-600 dark:text-[#A9AEA7] text-[0.7rem]">
                               +{room.amenities.length - 2}
                             </span>
                           )}
                         </div>
 
-                        <div className="flex items-center justify-between mt-5 pt-4 border-t border-black/[0.06] dark:border-[#1D3842]">
+                        <div className="flex items-center justify-between mt-5 pt-4 border-t border-black/[0.06] dark:border-[#303631]">
                           <div>
-                            <span className="text-sm text-slate-400 dark:text-[#6B828A]">Value Score</span>
-                            <span className="text-lg font-bold text-slate-900 dark:text-[#E9F1F2] ml-1">{room.valueScore}</span>
-                            <span className="text-xs text-slate-400 dark:text-[#6B828A]">/100</span>
+                            <span className="text-sm text-slate-400 dark:text-[#A9AEA7]">Value Score</span>
+                            <span className="text-lg font-bold text-slate-900 dark:text-[#F2EFE8] ml-1">{room.valueScore}</span>
+                            <span className="text-xs text-slate-400 dark:text-[#A9AEA7]">/100</span>
                           </div>
                           <div className="text-right">
-                            <span className="text-lg font-semibold text-slate-900 dark:text-[#E9F1F2]">{formatPrice(room.pricePerNight)}</span>
-                            <span className="text-sm text-slate-400 dark:text-[#6B828A] ml-1">/ night</span>
+                            <span className="text-lg font-semibold text-slate-900 dark:text-[#F2EFE8]">{formatPrice(room.pricePerNight)}</span>
+                            <span className="text-sm text-slate-400 dark:text-[#A9AEA7] ml-1">/ night</span>
                           </div>
                         </div>
                         <Link
@@ -467,7 +467,7 @@ const AllRooms = () => {
 const FilterContent = ({ roomTypes, selectedFilters, handleFilterChange, priceRanges, ratingOptions }) => (
   <>
     <div>
-      <label className="block text-xs font-space uppercase tracking-[0.2em] text-slate-500 dark:text-[#8299A0] mb-3">Room Type</label>
+      <label className="block text-xs font-space uppercase tracking-[0.2em] text-slate-500 dark:text-[#A9AEA7] mb-3">Room Type</label>
       <div className="space-y-2">
         {roomTypes.map((room, index) => (
           <Checkbox
@@ -483,7 +483,7 @@ const FilterContent = ({ roomTypes, selectedFilters, handleFilterChange, priceRa
     <div className="luxury-divider" />
 
     <div>
-      <label className="block text-xs font-space uppercase tracking-[0.2em] text-slate-500 dark:text-[#8299A0] mb-3">Price per night</label>
+      <label className="block text-xs font-space uppercase tracking-[0.2em] text-slate-500 dark:text-[#A9AEA7] mb-3">Price per night</label>
       <div className="space-y-2">
         {priceRanges.map((range, index) => (
           <Checkbox
@@ -499,7 +499,7 @@ const FilterContent = ({ roomTypes, selectedFilters, handleFilterChange, priceRa
     <div className="luxury-divider" />
 
     <div>
-      <label className="block text-xs font-space uppercase tracking-[0.2em] text-slate-500 dark:text-[#8299A0] mb-3">Rating</label>
+      <label className="block text-xs font-space uppercase tracking-[0.2em] text-slate-500 dark:text-[#A9AEA7] mb-3">Rating</label>
       <div className="space-y-2">
         {ratingOptions.map((option) => (
           <Checkbox

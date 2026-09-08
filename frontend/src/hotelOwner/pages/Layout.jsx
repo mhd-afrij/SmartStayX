@@ -19,10 +19,10 @@ const Layout = () => {
 
   if (!userLoaded || !roleResolved) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fffaf4] dark:bg-[#003844]">
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F5F0] dark:bg-[#111412]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 rounded-full border-2 border-[#D4A853]/30 border-t-[#D4A853] animate-spin" />
-          <span className="text-sm text-slate-400 dark:text-[#6B828A] font-space">Loading dashboard...</span>
+          <div className="w-8 h-8 rounded-full border-2 border-[#A67C52]/30 border-t-[#A67C52] animate-spin" />
+          <span className="text-sm text-slate-400 dark:text-[#A9AEA7] font-space">Loading dashboard...</span>
         </div>
       </div>
     );
@@ -31,7 +31,7 @@ const Layout = () => {
   if (!user || !canAccess) return null;
 
   return (
-    <div className="owner-shell h-screen bg-[#fffaf4] dark:bg-[#003844] overflow-hidden flex">
+    <div className="owner-shell h-screen bg-[#F7F5F0] dark:bg-[#111412] overflow-hidden flex">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <Navbar />

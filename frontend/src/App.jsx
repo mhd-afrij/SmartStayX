@@ -73,7 +73,7 @@ import PaymentPage from './pages/PaymentPage';
 import BookingWizard from './pages/BookingWizard';
 
 const SuspenseWrap = ({ children }) => (
-  <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[#fffaf4] dark:bg-[#0B1D24]"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[#5077B3] border-t-transparent" /></div>}>
+  <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[#F7F5F0] dark:bg-[#111412]"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[#183B35] border-t-transparent dark:border-[#8FB8A8]" /></div>}>
     {children}
   </Suspense>
 );
@@ -133,7 +133,7 @@ const App = () => {
       {/* Scroll progress indicator */}
       <div className='fixed left-0 top-0 z-[70] h-1 w-full bg-white/5 dark:bg-white/5'>
         <motion.div
-          className='h-full bg-[linear-gradient(90deg,#5077B3_0%,#003844_100%)]'
+          className='h-full bg-[linear-gradient(90deg,#183B35_0%,#2A4A43_100%)]'
           style={{ width: `${scrollProgress}%` }}
         />
       </div>

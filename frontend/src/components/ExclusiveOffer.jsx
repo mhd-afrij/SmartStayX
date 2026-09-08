@@ -51,18 +51,18 @@ const ExclusiveOffer = () => {
               {[1, 2, 3].map((n) => (
                 <div
                   key={n}
-                  className="flex flex-col justify-end overflow-hidden rounded-[28px] border border-black/[0.06] dark:border-[#1D3842] min-h-[22rem] bg-white dark:bg-[#122A32] animate-pulse"
+                  className="flex flex-col justify-end overflow-hidden rounded-[28px] border border-black/[0.06] dark:border-[#303631] min-h-[22rem] bg-white dark:bg-[#1A1E1B] animate-pulse"
                 >
                   <div className="p-6 md:p-7 space-y-3">
-                    <div className="h-6 w-1/2 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
-                    <div className="h-4 w-3/4 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
-                    <div className="h-3 w-1/3 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
-                    <div className="h-4 w-1/4 rounded bg-[#f4f2ef] dark:bg-[#16303A] mt-4" />
+                    <div className="h-6 w-1/2 rounded bg-[#EFEEE8] dark:bg-[#222823]" />
+                    <div className="h-4 w-3/4 rounded bg-[#EFEEE8] dark:bg-[#222823]" />
+                    <div className="h-3 w-1/3 rounded bg-[#EFEEE8] dark:bg-[#222823]" />
+                    <div className="h-4 w-1/4 rounded bg-[#EFEEE8] dark:bg-[#222823] mt-4" />
                   </div>
                 </div>
               ))}
               <div className="lg:col-span-3 flex items-center justify-center py-6">
-                <p className="text-sm text-slate-400 dark:text-[#6B828A]">
+                <p className="text-sm text-slate-400 dark:text-[#A9AEA7]">
                   No active offers — check back soon for exclusive packages.
                 </p>
               </div>
@@ -87,7 +87,7 @@ const ExclusiveOffer = () => {
                 >
                   <TiltCard
                     maxTilt={4}
-                    className="group relative flex flex-col justify-end overflow-hidden rounded-[28px] border border-black/[0.06] dark:border-[#1D3842] min-h-[22rem]"
+                    className="group relative flex flex-col justify-end overflow-hidden rounded-[28px] border border-black/[0.06] dark:border-[#303631] min-h-[22rem]"
                   >
                     {image ? (
                       <img
@@ -96,7 +96,7 @@ const ExclusiveOffer = () => {
                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                     ) : (
-                      <div className="absolute inset-0 bg-[#f4f2ef] dark:bg-[#16303A]" />
+                      <div className="absolute inset-0 bg-[#EFEEE8] dark:bg-[#222823]" />
                     )}
 
                     {/* Bottom gradient overlay */}

@@ -114,8 +114,8 @@ const ServiceManagement = () => {
   // statusBadge — Returns Tailwind class string for a given status badge style
   const statusBadge = (status) => {
     const map = {
-      pending: "bg-[#F4F2F9] dark:bg-[#1B2436] text-amber-700 dark:text-amber-300 border-[#B9B4CE]/45 dark:border-[#3D4660]/45",
-      assigned: "bg-[#EFEDF7] dark:bg-[#1B2436] text-[#B58A2E] dark:text-[#E6C075] border-[#B9B4CE]/45 dark:border-[#3D4660]/45",
+      pending: "bg-[#EFEEE8] dark:bg-[#222823] text-amber-700 dark:text-amber-300 border-[#A67C52]/45 dark:border-[#303631]/45",
+      assigned: "bg-[#EFEAE1] dark:bg-[#222823] text-[#8A643F] dark:text-[#C5A47E] border-[#A67C52]/45 dark:border-[#303631]/45",
       completed: "bg-emerald-50 text-emerald-700 border-emerald-200",
       cancelled: "bg-rose-50 text-rose-700 border-rose-200",
     }
@@ -123,9 +123,9 @@ const ServiceManagement = () => {
   }
 
   const statCards = [
-    { label: "Total", value: stats.total, color: "bg-[#f4f2ef] dark:bg-[#10131D] border-black/[0.06] dark:border-[#232737]", textColor: "text-slate-700 dark:text-[#C1D2D6]" },
-    { label: "Pending", value: stats.pending, color: "bg-[#F4F2F9] dark:bg-[#1B2436] border-amber-100 dark:border-amber-500/25", textColor: "text-amber-700 dark:text-amber-300" },
-    { label: "Assigned", value: stats.assigned, color: "bg-[#EFEDF7] dark:bg-[#1B2436] border-[#E5E1F0]", textColor: "text-[#B58A2E] dark:text-[#E6C075]" },
+    { label: "Total", value: stats.total, color: "bg-[#EFEEE8] dark:bg-[#111412] border-black/[0.06] dark:border-[#303631]", textColor: "text-slate-700 dark:text-[#F2EFE8]" },
+    { label: "Pending", value: stats.pending, color: "bg-[#EFEEE8] dark:bg-[#222823] border-amber-100 dark:border-amber-500/25", textColor: "text-amber-700 dark:text-amber-300" },
+    { label: "Assigned", value: stats.assigned, color: "bg-[#EFEAE1] dark:bg-[#222823] border-[#EFEAE1]", textColor: "text-[#8A643F] dark:text-[#C5A47E]" },
     { label: "Completed", value: stats.completed, color: "bg-emerald-50 border-emerald-100", textColor: "text-emerald-700" },
     { label: "Cancelled", value: stats.cancelled, color: "bg-rose-50 border-rose-100", textColor: "text-rose-700" },
   ]
@@ -133,8 +133,8 @@ const ServiceManagement = () => {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pb-10">
       <div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Service Requests</h1>
-        <p className="text-sm text-slate-400 dark:text-[#6B828A] mt-1">View, filter, and manage all guest service requests across your properties.</p>
+        <h1 className="text-xl font-bold text-slate-900 dark:text-[#F2EFE8] tracking-tight">Service Requests</h1>
+        <p className="text-sm text-slate-400 dark:text-[#A9AEA7] mt-1">View, filter, and manage all guest service requests across your properties.</p>
       </div>
 
       <div className="flex items-center justify-between">
@@ -144,15 +144,15 @@ const ServiceManagement = () => {
             <select
               value={filterHotel}
               onChange={(e) => setFilterHotel(e.target.value)}
-              className="appearance-none pl-9 pr-8 py-2 text-sm rounded-xl border border-black/[0.08] dark:border-[#232737] bg-white dark:bg-[#161925] text-slate-600 dark:text-[#9FB2B8] outline-none focus:border-[#D4A853]/60 transition-colors cursor-pointer"
+              className="appearance-none pl-9 pr-8 py-2 text-sm rounded-xl border border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] text-slate-600 dark:text-[#A9AEA7] outline-none focus:border-[#A67C52]/60 transition-colors cursor-pointer"
             >
               <option value="all">All Properties</option>
               {hotels.map((h) => (
                 <option key={h._id} value={h._id}>{h.name}</option>
               ))}
             </select>
-            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A] pointer-events-none" />
+            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#A9AEA7] pointer-events-none" />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#A9AEA7] pointer-events-none" />
           </div>
         )}
       </div>
@@ -160,14 +160,14 @@ const ServiceManagement = () => {
       <div className="grid gap-4 sm:grid-cols-5">
         {statCards.map((s) => (
           <div key={s.label} className={`rounded-2xl border p-4 ${s.color}`}>
-            <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-[#8299A0]">{s.label}</p>
+            <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-[#A9AEA7]">{s.label}</p>
             <p className={`mt-2 text-2xl font-bold ${s.textColor}`}>{s.value}</p>
           </div>
         ))}
       </div>
 
       <div className="luxury-card overflow-hidden">
-        <div className="p-4 border-b border-black/[0.06] dark:border-[#232737] flex flex-wrap items-center gap-3">
+        <div className="p-4 border-b border-black/[0.06] dark:border-[#303631] flex flex-wrap items-center gap-3">
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
@@ -188,19 +188,19 @@ const ServiceManagement = () => {
               </option>
             ))}
           </select>
-          <span className="text-xs text-slate-400 dark:text-[#6B828A] ml-auto">{filtered.length} request{filtered.length !== 1 ? "s" : ""}</span>
+          <span className="text-xs text-slate-400 dark:text-[#A9AEA7] ml-auto">{filtered.length} request{filtered.length !== 1 ? "s" : ""}</span>
         </div>
 
         {loading ? (
           <div className="p-8 text-center">
-            <div className="h-8 w-8 mx-auto animate-spin rounded-full border-2 border-[#D4A853] border-t-transparent" />
-            <p className="mt-3 text-sm text-slate-400 dark:text-[#6B828A]">Loading requests...</p>
+            <div className="h-8 w-8 mx-auto animate-spin rounded-full border-2 border-[#A67C52] border-t-transparent" />
+            <p className="mt-3 text-sm text-slate-400 dark:text-[#A9AEA7]">Loading requests...</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[700px] text-sm">
               <thead>
-                <tr className="border-b border-black/[0.06] dark:border-[#232737] bg-[#f4f2ef] dark:bg-[#10131D] text-slate-500 dark:text-[#8299A0] text-xs uppercase tracking-[0.15em]">
+                <tr className="border-b border-black/[0.06] dark:border-[#303631] bg-[#EFEEE8] dark:bg-[#111412] text-slate-500 dark:text-[#A9AEA7] text-xs uppercase tracking-[0.15em]">
                   <th className="py-4 px-5 text-left font-medium">Type</th>
                   <th className="py-4 px-5 text-left font-medium">Details</th>
                   <th className="py-4 px-5 text-left font-medium">Room</th>
@@ -213,16 +213,16 @@ const ServiceManagement = () => {
                 {filtered.map((r) => (
                   <tr key={r._id} className="hover:bg-black/[0.02] dark:hover:bg-white/5 transition-colors">
                     <td className="py-4 px-5">
-                      <span className="font-medium text-slate-900 dark:text-[#E9F1F2]">{r.serviceType}</span>
+                      <span className="font-medium text-slate-900 dark:text-[#F2EFE8]">{r.serviceType}</span>
                     </td>
                     <td className="py-4 px-5 max-w-[200px]">
-                      <span className="text-slate-600 dark:text-[#9FB2B8] truncate block">{r.requestDetails || "-"}</span>
+                      <span className="text-slate-600 dark:text-[#A9AEA7] truncate block">{r.requestDetails || "-"}</span>
                     </td>
-                    <td className="py-4 px-5 text-slate-600 dark:text-[#9FB2B8]">
+                    <td className="py-4 px-5 text-slate-600 dark:text-[#A9AEA7]">
                       {r.roomNumber || r.room?.roomNumber ? `Room ${r.roomNumber || r.room?.roomNumber}` : ""}
                       {r.room?.roomType ? (r.roomNumber || r.room?.roomNumber ? ` — ${r.room.roomType}` : r.room.roomType) : (!r.roomNumber && !r.room?.roomNumber ? "N/A" : "")}
                     </td>
-                    <td className="py-4 px-5 text-xs text-slate-400 dark:text-[#6B828A]">{formatDate(r.createdAt)}</td>
+                    <td className="py-4 px-5 text-xs text-slate-400 dark:text-[#A9AEA7]">{formatDate(r.createdAt)}</td>
                     <td className="py-4 px-5">
                       <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${statusBadge(r.status)}`}>
                         {r.status}
@@ -235,7 +235,7 @@ const ServiceManagement = () => {
                             <button
                               onClick={() => handleUpdateStatus(r._id, "completed")}
                               disabled={processingId === r._id}
-                              className="p-2 rounded-lg hover:bg-black/[0.03] dark:hover:bg-white/5 text-slate-400 dark:text-[#6B828A] hover:text-emerald-600 transition-colors disabled:opacity-40"
+                              className="p-2 rounded-lg hover:bg-black/[0.03] dark:hover:bg-white/5 text-slate-400 dark:text-[#A9AEA7] hover:text-emerald-600 transition-colors disabled:opacity-40"
                               title="Mark completed"
                             >
                               <CheckCircle className="w-4 h-4" />
@@ -243,7 +243,7 @@ const ServiceManagement = () => {
                             <button
                               onClick={() => handleUpdateStatus(r._id, "cancelled")}
                               disabled={processingId === r._id}
-                              className="p-2 rounded-lg hover:bg-black/[0.03] dark:hover:bg-white/5 text-slate-400 dark:text-[#6B828A] hover:text-rose-600 transition-colors disabled:opacity-40"
+                              className="p-2 rounded-lg hover:bg-black/[0.03] dark:hover:bg-white/5 text-slate-400 dark:text-[#A9AEA7] hover:text-rose-600 transition-colors disabled:opacity-40"
                               title="Cancel"
                             >
                               <XCircle className="w-4 h-4" />
@@ -254,7 +254,7 @@ const ServiceManagement = () => {
                           <button
                             onClick={() => handleUpdateStatus(r._id, "cancelled")}
                             disabled={processingId === r._id}
-                            className="p-2 rounded-lg hover:bg-black/[0.03] dark:hover:bg-white/5 text-slate-400 dark:text-[#6B828A] hover:text-rose-600 transition-colors disabled:opacity-40"
+                            className="p-2 rounded-lg hover:bg-black/[0.03] dark:hover:bg-white/5 text-slate-400 dark:text-[#A9AEA7] hover:text-rose-600 transition-colors disabled:opacity-40"
                             title="Cancel"
                           >
                             <XCircle className="w-4 h-4" />
@@ -277,8 +277,8 @@ const ServiceManagement = () => {
                 {filtered.length === 0 && (
                   <tr>
                     <td colSpan={7} className="py-16 text-center">
-                      <ConciergeBell className="w-10 h-10 mx-auto text-slate-300 dark:text-[#4E646B] mb-3" />
-                      <p className="text-slate-400 dark:text-[#6B828A]">No service requests found.</p>
+                      <ConciergeBell className="w-10 h-10 mx-auto text-slate-300 dark:text-[#A9AEA7] mb-3" />
+                      <p className="text-slate-400 dark:text-[#A9AEA7]">No service requests found.</p>
                     </td>
                   </tr>
                 )}

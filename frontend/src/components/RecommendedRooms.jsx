@@ -40,10 +40,10 @@ const RecommendedRooms = () => {
           className="mb-8"
         >
           <div className="flex items-center gap-3 mb-2">
-            <Sparkles className="w-5 h-5 text-[#5077B3] dark:text-[#93B3E0]" />
-            <h2 className="text-xl font-playfair text-slate-900 dark:text-[#E9F1F2]">Recommended for You</h2>
+            <Sparkles className="w-5 h-5 text-[#183B35] dark:text-[#8FB8A8]" />
+            <h2 className="text-xl font-playfair text-slate-900 dark:text-[#F2EFE8]">Recommended for You</h2>
           </div>
-          <p className="text-sm text-slate-400 dark:text-[#6B828A]">Personalized picks based on your preferences and past stays</p>
+          <p className="text-sm text-slate-400 dark:text-[#A9AEA7]">Personalized picks based on your preferences and past stays</p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -63,18 +63,18 @@ const RecommendedRooms = () => {
                   alt={room.roomType || "Room"}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
-                <div className="absolute top-2 right-2 px-2 py-1 rounded-lg bg-[#5077B3]/90 text-[10px] font-semibold text-white">
+                <div className="absolute top-2 right-2 px-2 py-1 rounded-lg bg-[#183B35]/90 text-[10px] font-semibold text-white">
                   {room.recommendationScore?.toFixed(0) || "?"}% Match
                 </div>
               </div>
               <div className="p-4 space-y-2">
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-[#E9F1F2] truncate">{room.roomType || "Room"}</h3>
-                <p className="text-xs text-slate-400 dark:text-[#6B828A] truncate">{room.hotel?.name || "Hotel"}</p>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-[#F2EFE8] truncate">{room.roomType || "Room"}</h3>
+                <p className="text-xs text-slate-400 dark:text-[#A9AEA7] truncate">{room.hotel?.name || "Hotel"}</p>
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-[#5077B3] dark:text-[#93B3E0] font-semibold">{formatPrice(room.pricePerNight || 0)}<span className="text-slate-400 dark:text-[#6B828A] font-normal"> / night</span></p>
+                  <p className="text-xs text-[#183B35] dark:text-[#8FB8A8] font-semibold">{formatPrice(room.pricePerNight || 0)}<span className="text-slate-400 dark:text-[#A9AEA7] font-normal"> / night</span></p>
                   {room.recommendationReason?.length > 0 && (
-                    <div className="flex items-center gap-1 text-[10px] text-slate-400 dark:text-[#6B828A]">
-                      <Star className="w-3 h-3 text-[#5077B3] dark:text-[#93B3E0]" />
+                    <div className="flex items-center gap-1 text-[10px] text-slate-400 dark:text-[#A9AEA7]">
+                      <Star className="w-3 h-3 text-[#183B35] dark:text-[#8FB8A8]" />
                       <span className="truncate max-w-[100px]">{room.recommendationReason[0]}</span>
                     </div>
                   )}

@@ -1,6 +1,6 @@
 export const Card = ({ className = '', children, padded = true, ...props }) => (
   <div
-    className={`rounded-2xl border border-[#E8E0D1] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_1px_2px_rgba(0,56,68,0.06)] ${padded ? 'p-6' : ''} ${className}`}
+    className={`rounded-2xl border border-[#E3E0D8] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-[0_1px_2px_rgba(24,59,53,0.06)] ${padded ? 'p-6' : ''} ${className}`}
     {...props}
   >
     {children}
@@ -9,8 +9,8 @@ export const Card = ({ className = '', children, padded = true, ...props }) => (
 
 export const StatCard = ({ label, value, icon: Icon, trend, tone = 'primary' }) => {
   const toneClasses = {
-    primary: 'bg-[#D4A853]/10 text-[#B58A2E] dark:text-[#E6C075]',
-    gold: 'bg-[#D4A853]/15 text-[#92660f] dark:text-[#E6C075]',
+    primary: 'bg-[#A67C52]/10 text-[#8A643F] dark:text-[#C5A47E]',
+    gold: 'bg-[#A67C52]/15 text-[#8A643F] dark:text-[#C5A47E]',
     success: 'bg-green-50 text-green-700 dark:text-green-300',
     danger: 'bg-red-50 text-red-700 dark:text-red-300',
   };
@@ -22,9 +22,9 @@ export const StatCard = ({ label, value, icon: Icon, trend, tone = 'primary' }) 
         </div>
       )}
       <div className="min-w-0">
-        <p className="text-xs font-medium text-[#4D6166] dark:text-[#9FB2B8] uppercase tracking-wide">{label}</p>
+        <p className="text-xs font-medium text-[#5C6B64] dark:text-[#A9AEA7] uppercase tracking-wide">{label}</p>
         <div className="flex items-baseline gap-2 mt-0.5">
-          <p className="text-xl font-semibold text-[#003844] dark:text-[#E9F1F2] truncate">{value}</p>
+          <p className="text-xl font-semibold text-[#183B35] dark:text-[#F2EFE8] truncate">{value}</p>
           {trend != null && (
             <span className={`text-xs font-medium ${trend >= 0 ? 'text-green-600 dark:text-green-300' : 'text-red-600 dark:text-red-300'}`}>
               {trend >= 0 ? '+' : ''}{trend}%
