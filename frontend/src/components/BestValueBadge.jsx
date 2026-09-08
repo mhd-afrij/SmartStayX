@@ -20,8 +20,8 @@ const BestValueBadge = ({ score, savingsPercent, size = 'sm' }) => {
     <span
       className={`inline-flex items-center gap-1 font-semibold uppercase tracking-wider rounded-full ${
         savingsPercent >= 15
-          ? 'bg-green-50 text-green-700 border border-green-200'
-          : 'bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/25'
+          ? 'bg-green-50 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-500/25'
+          : 'bg-[#5077B3]/10 text-[#5077B3] dark:text-[#93B3E0] border border-[#5077B3]/25'
       } ${sizeClasses}`}
     >
       <Zap className="w-3 h-3" />

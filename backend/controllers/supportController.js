@@ -3,6 +3,11 @@ import SupportTicket from "../models/SupportTicket.js";
 
 export const getTickets = async (req, res) => {
   try {
+    // Listing every support ticket is a staff capability, not a guest one.
+    const role = req.user?.role;
+    if (!["super_admin", "hotel_manager", "receptionist"].includes(role)) {
+      return res.status(403).json({ success: false, message: "Not authorized to view all tickets" });
+    }
     const tickets = await SupportTicket.find().sort({ createdAt: -1 });
     res.json({ success: true, data: tickets });
   } catch (error) {
@@ -36,12 +41,14 @@ export const createTicket = async (req, res) => {
 export const updateTicketStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const ticket = await SupportTicket.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
+    const role = req.user?.role;
+    if (!["super_admin", "hotel_manager", "receptionist"].includes(role)) {
+      return res.status(403).json({ success: false, message: "Not authorized to update tickets" });
+    }
+    const ticket = await SupportTicket.findById(req.params.id);
     if (!ticket) return res.status(404).json({ success: false, message: "Ticket not found" });
+    ticket.status = status;
+    await ticket.save();
     res.json({ success: true, data: ticket });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

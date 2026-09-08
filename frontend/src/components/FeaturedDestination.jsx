@@ -7,13 +7,13 @@ import { useAppContext } from "../context/AppContext";
 
 const SkeletonCard = () => (
   <div className="w-72 flex-shrink-0 animate-pulse">
-    <div className="rounded-[24px] border border-black/[0.06] overflow-hidden bg-white">
-      <div className="h-48 bg-[#f4f2ef]" />
+    <div className="rounded-[24px] border border-black/[0.06] dark:border-[#1D3842] overflow-hidden bg-white dark:bg-[#122A32]">
+      <div className="h-48 bg-[#f4f2ef] dark:bg-[#16303A]" />
       <div className="p-5 space-y-3">
-        <div className="h-4 w-3/4 rounded bg-[#f4f2ef]" />
-        <div className="h-3 w-1/2 rounded bg-[#f4f2ef]" />
-        <div className="h-3 w-2/3 rounded bg-[#f4f2ef]" />
-        <div className="h-10 w-full rounded bg-[#f4f2ef] mt-4" />
+        <div className="h-4 w-3/4 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
+        <div className="h-3 w-1/2 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
+        <div className="h-3 w-2/3 rounded bg-[#f4f2ef] dark:bg-[#16303A]" />
+        <div className="h-10 w-full rounded bg-[#f4f2ef] dark:bg-[#16303A] mt-4" />
       </div>
     </div>
   </div>
@@ -42,7 +42,7 @@ const FeaturedDestination = () => {
           <div className="relative w-full group/scroll">
             <button
               onClick={() => scroll(-1)}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full bg-white border border-black/[0.08] text-slate-500 hover:text-slate-900 hover:border-black/[0.15] shadow-[0_10px_30px_rgba(15,23,42,0.08)] opacity-0 group-hover/scroll:opacity-100 transition-all"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-[#122A32] border border-black/[0.08] dark:border-[#1D3842] text-slate-500 dark:text-[#8299A0] hover:text-slate-900 dark:hover:text-[#E9F1F2] hover:border-black/[0.15] dark:hover:border-[#1D3842] shadow-[0_10px_30px_rgba(0,56,68,0.08)] opacity-0 group-hover/scroll:opacity-100 transition-all"
               aria-label="Scroll left"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -67,7 +67,7 @@ const FeaturedDestination = () => {
             </div>
             <button
               onClick={() => scroll(1)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full bg-white border border-black/[0.08] text-slate-500 hover:text-slate-900 hover:border-black/[0.15] shadow-[0_10px_30px_rgba(15,23,42,0.08)] opacity-0 group-hover/scroll:opacity-100 transition-all"
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-[#122A32] border border-black/[0.08] dark:border-[#1D3842] text-slate-500 dark:text-[#8299A0] hover:text-slate-900 dark:hover:text-[#E9F1F2] hover:border-black/[0.15] dark:hover:border-[#1D3842] shadow-[0_10px_30px_rgba(0,56,68,0.08)] opacity-0 group-hover/scroll:opacity-100 transition-all"
               aria-label="Scroll right"
             >
               <ChevronRight className="h-4 w-4" />

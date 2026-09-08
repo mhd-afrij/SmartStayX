@@ -14,7 +14,6 @@ const API_ENDPOINTS = {
     owner: "/api/rooms/owner",
     ownerLegacy: "/api/rooms/Owner",
     toggleAvailability: "/api/rooms/toggle-availability",
-    byHotel: (hotelId) => `/api/rooms/hotel/${hotelId}`,
   },
   bookings: {
     base: "/api/bookings",
@@ -57,9 +56,6 @@ const API_ENDPOINTS = {
     attractions: "/api/places/attractions",
     restaurants: "/api/places/restaurants",
   },
-  routes: {
-    directions: "/api/routes",
-  },
   pricing: {
     suggest: "/api/pricing/suggest",
     occupancy: "/api/pricing/occupancy",
@@ -89,8 +85,8 @@ const API_ENDPOINTS = {
 
   checkin: {
     initiate: "/api/checkin",
-    verify: "/api/checkin/verify",
-    submit: "/api/checkin/submit",
+    approve: (id) => `/api/checkin/${id}/approve`,
+    checkout: "/api/checkin/checkout",
   },
   invoice: {
     base: "/api/invoice",
@@ -100,18 +96,14 @@ const API_ENDPOINTS = {
     export: "/api/invoice/export",
   },
   pricingML: {
-    enhanced: "/api/pricing/enhanced",
+    enhanced: "/api/pricing/ml/enhanced",
   },
   payments: {
     available: "/api/payments/available",
     create: "/api/payments/create",
     paypalCapture: "/api/payments/paypal/capture",
   },
-  tripNotifications: {
-    alerts: "/api/trip-notifications/alerts",
-    reminder: (tripId) => `/api/trip-notifications/reminder/${tripId}`,
-    upcoming: "/api/trip-notifications/upcoming",
-  },
+
   roomAssignment: {
     bestRoom: "/api/room-assignment/best-room",
     assign: "/api/room-assignment/assign",
@@ -124,6 +116,7 @@ const API_ENDPOINTS = {
   },
   guestAssistant: {
     chat: "/api/guest-assistant/chat",
+    chatStream: "/api/guest-assistant/chat/stream",
   },
 };
 

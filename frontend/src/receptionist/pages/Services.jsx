@@ -7,10 +7,10 @@ import toast from "react-hot-toast";
 const PER_PAGE = 15;
 
 const statusConfig = {
-  pending: { label: "Pending", color: "border-amber-200 bg-amber-50 text-amber-700" },
+  pending: { label: "Pending", color: "border-[#B9B4CE]/45 dark:border-[#3D4660]/45 bg-[#F4F2F9] dark:bg-[#1B2436] text-amber-700 dark:text-amber-300" },
   assigned: { label: "Assigned", color: "border-indigo-200 bg-indigo-50 text-indigo-700" },
-  completed: { label: "Completed", color: "border-green-200 bg-green-50 text-green-700" },
-  cancelled: { label: "Cancelled", color: "border-red-200 bg-red-50 text-red-600" },
+  completed: { label: "Completed", color: "border-green-200 dark:border-green-500/25 bg-green-50 text-green-700 dark:text-green-300" },
+  cancelled: { label: "Cancelled", color: "border-red-200 dark:border-red-500/25 bg-red-50 text-red-600 dark:text-red-300" },
 };
 
 const Services = () => {
@@ -73,44 +73,44 @@ const Services = () => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pb-10">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Service Requests</h1>
-          <p className="text-sm text-slate-500 mt-1">View and manage guest service requests</p>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2] tracking-tight">Service Requests</h1>
+          <p className="text-sm text-slate-500 dark:text-[#8299A0] mt-1">View and manage guest service requests</p>
         </div>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-[#6B828A]" />
           <input type="text" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)}
             className="luxury-input w-48 h-auto py-2 pl-9 pr-3 text-xs" />
         </div>
       </div>
 
-      <div className="rounded-2xl border border-black/[0.06] bg-white shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-black/[0.06]">
+      <div className="rounded-2xl border border-black/[0.06] dark:border-[#1D3842] bg-white dark:bg-[#122A32] shadow-sm overflow-hidden">
+        <div className="p-5 border-b border-black/[0.06] dark:border-[#1D3842]">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-violet-50 border border-violet-200 flex items-center justify-center">
               <ConciergeBell className="w-4 h-4 text-violet-600" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-slate-900">All Service Requests</h3>
-              <p className="text-xs text-slate-500">{filtered.length} request{filtered.length !== 1 ? "s" : ""}</p>
+              <h3 className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">All Service Requests</h3>
+              <p className="text-xs text-slate-500 dark:text-[#8299A0]">{filtered.length} request{filtered.length !== 1 ? "s" : ""}</p>
             </div>
           </div>
         </div>
 
         {loading ? (
           <div className="p-8 flex items-center gap-3">
-            <div className="w-5 h-5 rounded-full border-2 border-[#2563EB]/25 border-t-[#2563EB] animate-spin" />
-            <span className="text-sm text-slate-500">Loading...</span>
+            <div className="w-5 h-5 rounded-full border-2 border-[#5077B3]/25 border-t-[#5077B3] animate-spin" />
+            <span className="text-sm text-slate-500 dark:text-[#8299A0]">Loading...</span>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 text-sm">No service requests found.</div>
+          <div className="p-8 text-center text-slate-400 dark:text-[#6B828A] text-sm">No service requests found.</div>
         ) : (
           <>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-[#f4f2ef] border-b border-black/[0.06]">
+                  <tr className="bg-[#f4f2ef] dark:bg-[#16303A] border-b border-black/[0.06] dark:border-[#1D3842]">
                     {["Type", "Details", "Room", "Requested", "Status", "Actions"].map((h) => (
-                      <th key={h} className="py-3 px-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">{h}</th>
+                      <th key={h} className="py-3 px-4 text-left text-xs font-medium text-slate-500 dark:text-[#8299A0] uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -118,13 +118,13 @@ const Services = () => {
                   {paginated.map((item) => {
                     const st = statusConfig[item.status] || statusConfig.pending;
                     return (
-                      <tr key={item._id} className="border-b border-black/[0.06] hover:bg-black/[0.02] transition-colors">
+                      <tr key={item._id} className="border-b border-black/[0.06] dark:border-[#1D3842] hover:bg-black/[0.02] dark:hover:bg-white/5 transition-colors">
                         <td className="py-3 px-4">
-                          <span className="text-slate-700">{item.serviceType}</span>
+                          <span className="text-slate-700 dark:text-[#C1D2D6]">{item.serviceType}</span>
                         </td>
-                        <td className="py-3 px-4 text-slate-500 max-w-[200px] truncate">{item.requestDetails || "—"}</td>
-                        <td className="py-3 px-4 text-slate-500">Room {item.roomNumber || item.room?.roomNumber || "—"}</td>
-                        <td className="py-3 px-4 text-slate-400 text-xs">
+                        <td className="py-3 px-4 text-slate-500 dark:text-[#8299A0] max-w-[200px] truncate">{item.requestDetails || "—"}</td>
+                        <td className="py-3 px-4 text-slate-500 dark:text-[#8299A0]">Room {item.roomNumber || item.room?.roomNumber || "—"}</td>
+                        <td className="py-3 px-4 text-slate-400 dark:text-[#6B828A] text-xs">
                           {new Date(item.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                         </td>
                         <td className="py-3 px-4">
@@ -140,13 +140,13 @@ const Services = () => {
                             )}
                             {["pending", "assigned"].includes(item.status) && (
                               <button onClick={() => handleStatusUpdate(item._id, "completed")} disabled={updatingId === item._id}
-                                className="px-2 py-1 text-[10px] rounded-lg border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-all disabled:opacity-50">
+                                className="px-2 py-1 text-[10px] rounded-lg border border-green-200 dark:border-green-500/25 bg-green-50 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-500/10 transition-all disabled:opacity-50">
                                 Complete
                               </button>
                             )}
                             {["pending", "assigned"].includes(item.status) && (
                               <button onClick={() => handleStatusUpdate(item._id, "cancelled")} disabled={updatingId === item._id}
-                                className="px-2 py-1 text-[10px] rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-all disabled:opacity-50">
+                                className="px-2 py-1 text-[10px] rounded-lg border border-red-200 dark:border-red-500/25 text-red-600 dark:text-red-300 hover:bg-red-50 transition-all disabled:opacity-50">
                                 Cancel
                               </button>
                             )}
@@ -158,21 +158,21 @@ const Services = () => {
                 </tbody>
               </table>
             </div>
-            <div className="flex items-center justify-between px-4 py-4 border-t border-black/[0.06]">
-              <span className="text-xs text-slate-400">Showing {page * PER_PAGE + 1}-{Math.min((page + 1) * PER_PAGE, filtered.length)} of {filtered.length}</span>
+            <div className="flex items-center justify-between px-4 py-4 border-t border-black/[0.06] dark:border-[#1D3842]">
+              <span className="text-xs text-slate-400 dark:text-[#6B828A]">Showing {page * PER_PAGE + 1}-{Math.min((page + 1) * PER_PAGE, filtered.length)} of {filtered.length}</span>
               <div className="flex items-center gap-1">
                 <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0}
-                  className="p-1.5 rounded-lg border border-black/[0.06] text-slate-400 hover:text-slate-700 hover:bg-black/[0.04] transition-all disabled:opacity-30">
+                  className="p-1.5 rounded-lg border border-black/[0.06] dark:border-[#1D3842] text-slate-400 dark:text-[#6B828A] hover:text-slate-700 dark:hover:text-[#C1D2D6] hover:bg-black/[0.04] dark:hover:bg-white/5 transition-all disabled:opacity-30">
                   <ChevronLeft className="w-3.5 h-3.5" />
                 </button>
                 {Array.from({ length: pages }, (_, i) => (
                   <button key={i} onClick={() => setPage(i)}
-                    className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${i === page ? "bg-indigo-50 text-indigo-700 border border-indigo-200" : "text-slate-400 hover:text-slate-700 hover:bg-black/[0.04] border border-transparent"}`}>
+                    className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${i === page ? "bg-indigo-50 text-indigo-700 border border-indigo-200" : "text-slate-400 dark:text-[#6B828A] hover:text-slate-700 dark:hover:text-[#C1D2D6] hover:bg-black/[0.04] dark:hover:bg-white/5 border border-transparent"}`}>
                     {i + 1}
                   </button>
                 ))}
                 <button onClick={() => setPage(Math.min(pages - 1, page + 1))} disabled={page >= pages - 1}
-                  className="p-1.5 rounded-lg border border-black/[0.06] text-slate-400 hover:text-slate-700 hover:bg-black/[0.04] transition-all disabled:opacity-30">
+                  className="p-1.5 rounded-lg border border-black/[0.06] dark:border-[#1D3842] text-slate-400 dark:text-[#6B828A] hover:text-slate-700 dark:hover:text-[#C1D2D6] hover:bg-black/[0.04] dark:hover:bg-white/5 transition-all disabled:opacity-30">
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>

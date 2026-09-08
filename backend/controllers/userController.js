@@ -1,8 +1,10 @@
-// userController.js — User profile, search history, and preferences
+// userController.js — User profile, search history, preferences, and team management
 import { clerkClient } from "@clerk/express";
 import User from "../models/User.js";
 import Role from "../models/Role.js";
-import { resolveDashboardAccess } from "../configs/adminAccess.js";
+import Booking from "../models/Booking.js";
+import AuditLog from "../models/AuditLog.js";
+import { resolveDashboardAccess, isAdminEmail } from "../configs/adminAccess.js";
 
 // Get authenticated user's role, profile, recent searches, and basic info
 export const getUserData = async (req, res) => {
@@ -29,6 +31,7 @@ export const getUserData = async (req, res) => {
       role: req.user.role,
       status: req.user.status,
       dashboardAccess,
+      assignedHotel: req.user.assignedHotel || null,
       recentSearchedCities,
       profile,
       orgId: req.orgId || null,
@@ -82,7 +85,6 @@ export const upsertGuestProfile = async (req, res) => {
       preferences = {},
     } = req.body || {};
 
-    // Sanitize array fields: ensure array, trim strings, remove empty, limit to 12
     const safeList = (value) => {
       if (!Array.isArray(value)) return [];
       return value
@@ -92,7 +94,16 @@ export const upsertGuestProfile = async (req, res) => {
     };
 
     if (name) user.name = String(name).trim();
-    if (email) user.email = String(email).trim();
+    if (email) {
+      const newEmail = String(email).trim();
+      if (isAdminEmail(newEmail) && !isAdminEmail(user.email)) {
+        return res.json({
+          success: false,
+          message: "This email address cannot be used for your profile.",
+        });
+      }
+      user.email = newEmail;
+    }
 
     user.profile = {
       phone: String(phone || "").trim(),
@@ -121,10 +132,10 @@ export const upsertGuestProfile = async (req, res) => {
   }
 };
 
-// Admin only: Search users by email (also fetches from Clerk API if not found locally)
+// Search users by email
 export const searchUsers = async (req, res) => {
   try {
-    if (!["owner", "staff"].includes(req.user.role)) {
+    if (!["super_admin", "hotel_manager", "receptionist"].includes(req.user.role)) {
       return res.json({ success: false, message: "Unauthorized" });
     }
     const { email } = req.query;
@@ -141,13 +152,13 @@ export const searchUsers = async (req, res) => {
   }
 };
 
-// Admin only: Assign a role to a user (also fetches from Clerk API if not found locally)
+// Assign a role to a user
 export const assignRole = async (req, res) => {
   try {
-    if (req.user.role !== "owner" && req.user.role !== "admin") {
-      return res.json({ success: false, message: "Unauthorized. Only hotel owners or admins can assign roles." });
+    if (!["super_admin", "hotel_manager"].includes(req.user.role)) {
+      return res.json({ success: false, message: "Unauthorized. Only super admins or hotel managers can assign roles." });
     }
-    const { userId, role } = req.body;
+    const { userId, role, assignedHotel } = req.body;
     if (!userId || !role) {
       return res.json({ success: false, message: "userId and role are required" });
     }
@@ -155,17 +166,141 @@ export const assignRole = async (req, res) => {
     if (!roleDoc) {
       return res.json({ success: false, message: `Role "${role}" does not exist. Create it first in Role Management.` });
     }
+
+    // Hotel managers can only assign roles within their hotel scope
+    if (req.user.role === "hotel_manager" && ["super_admin"].includes(role)) {
+      return res.json({ success: false, message: "Hotel managers cannot assign super_admin roles." });
+    }
+
     let user = await User.findById(userId).select("_id name email username role");
     if (!user) {
       return res.json({ success: false, message: "User not found" });
     }
     try {
-      await clerkClient.users.updateUserMetadata(userId, { publicMetadata: { role } });
+      const metadata = { role };
+      if (assignedHotel) metadata.hotelId = assignedHotel;
+      await clerkClient.users.updateUserMetadata(userId, { publicMetadata: metadata });
     } catch (clerkError) {
       return res.json({ success: false, message: `Failed to update role in Clerk: ${clerkError.message}` });
     }
-    user = await User.findByIdAndUpdate(userId, { role }, { new: true }).select("_id name email username role status");
+    const updates = { role };
+    if (assignedHotel) updates.assignedHotel = assignedHotel;
+    user = await User.findByIdAndUpdate(userId, { $set: updates }, { new: true }).select("_id name email username role status assignedHotel");
+    await AuditLog.create({
+      actor: req.user._id,
+      action: "assign_role",
+      module: "user",
+      recordId: userId,
+      newValue: updates,
+      ip: req.ip,
+    });
     res.json({ success: true, message: `Role updated to ${role}`, user });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// List the team (all non-guest users)
+const isTeamManager = (user) => ["super_admin", "hotel_manager"].includes(user?.role);
+
+export const getTeam = async (req, res) => {
+  try {
+    if (!isTeamManager(req.user)) {
+      return res.json({ success: false, message: "Unauthorized. Only super admins or hotel managers can manage staff." });
+    }
+    const { page = 1, limit = 50, role, search } = req.query;
+    const query = { role: { $ne: "guest" } };
+
+    // Hotel managers can only see their hotel's staff
+    if (req.user.role === "hotel_manager" && req.user.assignedHotel) {
+      query.assignedHotel = req.user.assignedHotel;
+    }
+
+    if (role) query.role = role;
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
+    const [users, total] = await Promise.all([
+      User.find(query)
+        .select("_id name email username image role status assignedHotel createdAt")
+        .populate("assignedHotel", "name city")
+        .sort({ createdAt: -1 })
+        .skip((Number(page) - 1) * Number(limit))
+        .limit(Number(limit)),
+      User.countDocuments(query),
+    ]);
+    res.json({
+      success: true,
+      users,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / Number(limit)),
+    });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// Recent staff activity derived from booking status changes
+export const getTeamActivity = async (req, res) => {
+  try {
+    if (!isTeamManager(req.user)) {
+      return res.json({ success: false, message: "Unauthorized. Only super admins or hotel managers can view staff activity." });
+    }
+    const limit = Math.min(Number(req.query.limit) || 20, 50);
+
+    const matchQuery = { "statusHistory.actor": { $ne: null } };
+
+    // Hotel managers: only their hotel's activity
+    if (req.user.role === "hotel_manager" && req.user.assignedHotel) {
+      matchQuery.hotel = req.user.assignedHotel;
+    }
+
+    const bookings = await Booking.find(matchQuery)
+      .sort({ updatedAt: -1 })
+      .limit(100)
+      .populate("hotel", "name")
+      .lean();
+
+    const activity = [];
+    bookings.forEach((b) => {
+      (b.statusHistory || []).forEach((h) => {
+        if (!h.actor) return;
+        activity.push({
+          type: "booking",
+          actor: String(h.actor),
+          action: `Updated booking to ${h.to}`,
+          detail: [b.hotel?.name, b.guestDisplayName].filter(Boolean).join(" · "),
+          at: h.at || b.updatedAt,
+        });
+      });
+    });
+
+    const actorIds = [...new Set(activity.map((a) => a.actor))];
+    const users = await User.find({ _id: { $in: actorIds } })
+      .select("_id name email image role")
+      .lean();
+    const userMap = new Map(users.map((u) => [String(u._id), u]));
+
+    const staffActivity = activity
+      .map((a) => {
+        const u = userMap.get(a.actor);
+        if (!u || u.role === "guest") return null;
+        return {
+          ...a,
+          actorName: u.name || u.email || "Team member",
+          actorRole: u.role,
+          actorImage: u.image || "",
+        };
+      })
+      .filter(Boolean)
+      .sort((x, y) => new Date(y.at) - new Date(x.at))
+      .slice(0, limit);
+
+    res.json({ success: true, activity: staffActivity });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
@@ -173,8 +308,8 @@ export const assignRole = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
-    if (req.user.role !== "owner" && req.user.role !== "admin") {
-      return res.json({ success: false, message: "Unauthorized. Only hotel owners or admins can delete users." });
+    if (!["super_admin"].includes(req.user.role)) {
+      return res.json({ success: false, message: "Unauthorized. Only super admins can delete users." });
     }
     const { id } = req.params;
     if (!id) {
@@ -184,6 +319,14 @@ export const deleteUser = async (req, res) => {
     if (!user) {
       return res.json({ success: false, message: "User not found" });
     }
+    await AuditLog.create({
+      actor: req.user._id,
+      action: "delete_user",
+      module: "user",
+      recordId: id,
+      newValue: { email: user.email, role: user.role },
+      ip: req.ip,
+    });
     res.json({ success: true, message: "User deleted successfully" });
   } catch (error) {
     res.json({ success: false, message: error.message });

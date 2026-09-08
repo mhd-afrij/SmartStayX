@@ -12,7 +12,7 @@ export const createDestination = async (req, res) => {
 
     let image = "";
     if (req.file) {
-      const uploadRes = await cloudinary.uploader.upload(req.file.path);
+      const uploadRes = await cloudinary.uploader.upload(req.file.buffer, { resource_type: "auto" });
       image = uploadRes.secure_url;
     }
 
@@ -75,7 +75,7 @@ export const updateDestination = async (req, res) => {
     if (featured !== undefined) destination.featured = featured === "true" || featured === true;
 
     if (req.file) {
-      const uploadRes = await cloudinary.uploader.upload(req.file.path);
+      const uploadRes = await cloudinary.uploader.upload(req.file.buffer, { resource_type: "auto" });
       destination.image = uploadRes.secure_url;
     }
 

@@ -2,21 +2,28 @@
 import Testimonial from "../models/Testimonial.js";
 import Review from "../models/Review.js";
 import Hotel from "../models/Hotel.js";
+import { clerkClient } from "@clerk/express";
 import { DEFAULT_TESTIMONIALS } from "../configs/runtimeDefaults.js";
 
 // Testimonial management — combines manual testimonials with positive reviews for display.
-// Ensure the user is a Admin (auto-promote if they own a hotel)
+// Only hotel owners (or admins) may manage testimonials; users who own a hotel are auto-promoted.
 const ensureOwner = async (req, res) => {
-  if (req.user?.role === "hotelOwner") return true;
+  if (req.user?.role === "hotel_manager" || req.user?.role === "super_admin") return true;
 
   const hasHotel = await Hotel.exists({ owner: req.user?._id });
   if (hasHotel) {
-    await req.user.constructor.findByIdAndUpdate(req.user._id, { role: "hotelOwner" });
-    req.user.role = "hotelOwner";
+    await req.user.constructor.findByIdAndUpdate(req.user._id, { role: "hotel_manager" });
+    // Persist to Clerk metadata so the auth middleware's role re-sync keeps it.
+    try {
+      await clerkClient.users.updateUserMetadata(req.user._id, { publicMetadata: { role: "hotel_manager" } });
+    } catch (clerkError) {
+      console.warn("Failed to sync hotel_manager role to Clerk metadata:", clerkError.message);
+    }
+    req.user.role = "hotel_manager";
     return true;
   }
 
-  res.json({ success: false, message: "Only Admins can manage testimonials" });
+  res.json({ success: false, message: "Only hotel owners can manage testimonials" });
   return false;
 };
 

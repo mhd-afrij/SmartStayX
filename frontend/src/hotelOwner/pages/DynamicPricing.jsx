@@ -85,12 +85,12 @@ const DynamicPricing = () => {
   };
 
   const confidenceBadge = (c) => {
-    const colors = { high: "bg-green-50 text-green-700", medium: "bg-amber-50 text-amber-700", low: "bg-red-50 text-red-600" };
+    const colors = { high: "bg-green-50 text-green-700 dark:text-green-300", medium: "bg-[#F4F2F9] dark:bg-[#1B2436] text-amber-700 dark:text-amber-300", low: "bg-red-50 text-red-600 dark:text-red-300" };
     return <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${colors[c] || colors.low}`}>{c}</span>;
   };
 
-  const mlConfidenceBadge = (score) => {
-    if (score == null) return <span className="text-slate-400 text-[10px]">—</span>;
+  const mlAgreementBadge = (score) => {
+    if (score == null) return <span className="text-slate-400 dark:text-[#6B828A] text-[10px]">—</span>;
     const level = score >= 0.7 ? "high" : score >= 0.4 ? "medium" : "low";
     return confidenceBadge(level);
   };
@@ -99,26 +99,26 @@ const DynamicPricing = () => {
     <div className="max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">AI Dynamic Pricing</h1>
-          <p className="text-slate-500 text-sm mt-1">ML-driven pricing predictions based on demand, seasonality, occupancy, and competitor data</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-[#E9F1F2]">AI Dynamic Pricing</h1>
+          <p className="text-slate-500 dark:text-[#8299A0] text-sm mt-1">ML-driven pricing predictions based on demand, seasonality, occupancy, and competitor data</p>
         </div>
       </div>
 
-      <div className="bg-white border border-black/[0.06] rounded-2xl p-6 mb-6 shadow-sm">
+      <div className="bg-white dark:bg-[#161925] border border-black/[0.06] dark:border-[#232737] rounded-2xl p-6 mb-6 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-xs text-slate-500 mb-1">Hotel</label>
+            <label className="block text-xs text-slate-500 dark:text-[#8299A0] mb-1">Hotel</label>
             <select value={hotelId} onChange={(e) => setHotelId(e.target.value)} className="luxury-select h-auto py-2 px-3 text-sm">
               <option value="">Select hotel</option>
               {hotels.map((h) => <option key={h._id} value={h._id}>{h.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-500 mb-1">Room Type</label>
+            <label className="block text-xs text-slate-500 dark:text-[#8299A0] mb-1">Room Type</label>
             <input value={roomType} onChange={(e) => setRoomType(e.target.value)} className="luxury-input h-auto py-2 px-3 text-sm" placeholder="Optional" />
           </div>
           <div>
-            <label className="block text-xs text-slate-500 mb-1">Range</label>
+            <label className="block text-xs text-slate-500 dark:text-[#8299A0] mb-1">Range</label>
             <select value={range} onChange={(e) => setRange(e.target.value)} className="luxury-select h-auto py-2 px-3 text-sm">
               <option value="7d">Last 7 days</option>
               <option value="30d">Last 30 days</option>
@@ -137,68 +137,68 @@ const DynamicPricing = () => {
       {result && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white border border-black/[0.06] rounded-2xl p-5 shadow-sm">
-              <div className="text-slate-500 text-xs mb-1">Total Bookings</div>
-              <div className="text-2xl font-bold text-slate-900">{result.totalBookings}</div>
+            <div className="bg-white dark:bg-[#161925] border border-black/[0.06] dark:border-[#232737] rounded-2xl p-5 shadow-sm">
+              <div className="text-slate-500 dark:text-[#8299A0] text-xs mb-1">Total Bookings</div>
+              <div className="text-2xl font-bold text-slate-900 dark:text-[#E9F1F2]">{result.totalBookings}</div>
             </div>
-            <div className="bg-white border border-black/[0.06] rounded-2xl p-5 shadow-sm">
-              <div className="text-slate-500 text-xs mb-1">Revenue</div>
-              <div className="text-2xl font-bold text-slate-900">{result.totalRevenue?.toLocaleString()}</div>
+            <div className="bg-white dark:bg-[#161925] border border-black/[0.06] dark:border-[#232737] rounded-2xl p-5 shadow-sm">
+              <div className="text-slate-500 dark:text-[#8299A0] text-xs mb-1">Revenue</div>
+              <div className="text-2xl font-bold text-slate-900 dark:text-[#E9F1F2]">{result.totalRevenue?.toLocaleString()}</div>
             </div>
-            <div className="bg-white border border-black/[0.06] rounded-2xl p-5 shadow-sm">
-              <div className="text-slate-500 text-xs mb-1">Avg Rate</div>
-              <div className="text-2xl font-bold text-slate-900">{result.averageRate?.toLocaleString()}</div>
+            <div className="bg-white dark:bg-[#161925] border border-black/[0.06] dark:border-[#232737] rounded-2xl p-5 shadow-sm">
+              <div className="text-slate-500 dark:text-[#8299A0] text-xs mb-1">Avg Rate</div>
+              <div className="text-2xl font-bold text-slate-900 dark:text-[#E9F1F2]">{result.averageRate?.toLocaleString()}</div>
             </div>
-            <div className="bg-white border border-black/[0.06] rounded-2xl p-5 shadow-sm">
-              <div className="text-slate-500 text-xs mb-1">Generated</div>
-              <div className="text-sm font-medium text-slate-700">{new Date(result.generatedAt).toLocaleString()}</div>
+            <div className="bg-white dark:bg-[#161925] border border-black/[0.06] dark:border-[#232737] rounded-2xl p-5 shadow-sm">
+              <div className="text-slate-500 dark:text-[#8299A0] text-xs mb-1">Generated</div>
+              <div className="text-sm font-medium text-slate-700 dark:text-[#C1D2D6]">{new Date(result.generatedAt).toLocaleString()}</div>
             </div>
           </div>
 
           {result.marketInsights && (
-            <div className="bg-white border border-black/[0.06] rounded-2xl p-5 shadow-sm">
-              <h3 className="text-slate-900 font-semibold mb-4 flex items-center gap-2"><BarChart3 className="w-4 h-4 text-[#2563EB]" /> Market Insights</h3>
+            <div className="bg-white dark:bg-[#161925] border border-black/[0.06] dark:border-[#232737] rounded-2xl p-5 shadow-sm">
+              <h3 className="text-slate-900 dark:text-[#E9F1F2] font-semibold mb-4 flex items-center gap-2"><BarChart3 className="w-4 h-4 text-[#B58A2E] dark:text-[#E6C075]" /> Market Insights</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
-                  <span className="text-slate-500">Peak Days</span>
-                  <p className="text-slate-900 font-medium">{result.marketInsights.peakDays?.join(", ") || "None"}</p>
+                  <span className="text-slate-500 dark:text-[#8299A0]">Peak Days</span>
+                  <p className="text-slate-900 dark:text-[#E9F1F2] font-medium">{result.marketInsights.peakDays?.join(", ") || "None"}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Peak Season</span>
-                  <p className={`font-medium ${result.marketInsights.isPeakSeason ? "text-amber-600" : "text-green-600"}`}>
+                  <span className="text-slate-500 dark:text-[#8299A0]">Peak Season</span>
+                  <p className={`font-medium ${result.marketInsights.isPeakSeason ? "text-amber-600 dark:text-amber-300" : "text-green-600 dark:text-green-300"}`}>
                     {result.marketInsights.isPeakSeason ? "Active" : "Off"}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Holiday Season</span>
-                  <p className={`font-medium ${result.marketInsights.isHolidaySeason ? "text-amber-600" : "text-green-600"}`}>
+                  <span className="text-slate-500 dark:text-[#8299A0]">Holiday Season</span>
+                  <p className={`font-medium ${result.marketInsights.isHolidaySeason ? "text-amber-600 dark:text-amber-300" : "text-green-600 dark:text-green-300"}`}>
                     {result.marketInsights.isHolidaySeason ? "Active" : "Off"}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Occupancy Rate</span>
-                  <p className="text-slate-900 font-medium">{(result.marketInsights.occupancyRate * 100).toFixed(1)}%</p>
+                  <span className="text-slate-500 dark:text-[#8299A0]">Occupancy Rate</span>
+                  <p className="text-slate-900 dark:text-[#E9F1F2] font-medium">{(result.marketInsights.occupancyRate * 100).toFixed(1)}%</p>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="bg-white border border-black/[0.06] rounded-2xl p-5 shadow-sm">
-            <h3 className="text-slate-900 font-semibold mb-4 flex items-center gap-2">
-              <Target className="w-4 h-4 text-[#2563EB]" /> Price Suggestions
+          <div className="bg-white dark:bg-[#161925] border border-black/[0.06] dark:border-[#232737] rounded-2xl p-5 shadow-sm">
+            <h3 className="text-slate-900 dark:text-[#E9F1F2] font-semibold mb-4 flex items-center gap-2">
+              <Target className="w-4 h-4 text-[#B58A2E] dark:text-[#E6C075]" /> Price Suggestions
               {result.mlServiceAvailable && (
-                <span className="ml-2 flex items-center gap-1 text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full">
+                <span className="ml-2 flex items-center gap-1 text-[10px] bg-green-50 text-green-700 dark:text-green-300 px-2 py-0.5 rounded-full">
                   <Cpu className="w-3 h-3" /> ML Active
                 </span>
               )}
             </h3>
             {result.suggestions.length === 0 ? (
-              <p className="text-slate-400 text-sm">No historical data available for suggestions.</p>
+              <p className="text-slate-400 dark:text-[#6B828A] text-sm">No historical data available for suggestions.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="text-slate-500 uppercase text-xs border-b border-black/[0.06]">
+                    <tr className="text-slate-500 dark:text-[#8299A0] uppercase text-xs border-b border-black/[0.06] dark:border-[#232737]">
                       <th className="pb-3 font-medium">Room</th>
                       <th className="pb-3 font-medium">Current</th>
                       <th className="pb-3 font-medium">ML Price</th>
@@ -212,28 +212,28 @@ const DynamicPricing = () => {
                   </thead>
                   <tbody className="divide-y divide-black/[0.06]">
                     {result.suggestions.map((s, i) => (
-                      <tr key={i} className="hover:bg-black/[0.02]">
-                        <td className="py-3 text-slate-900 whitespace-nowrap">{s.roomType || s.roomId}</td>
-                        <td className="py-3 text-slate-600">{s.currentPrice?.toLocaleString()}</td>
-                        <td className="py-3 text-[#2563EB] font-medium">
-                          {s.mlPredictedPrice ? s.mlPredictedPrice.toLocaleString() : <span className="text-slate-400">—</span>}
+                      <tr key={i} className="hover:bg-black/[0.02] dark:hover:bg-white/5">
+                        <td className="py-3 text-slate-900 dark:text-[#E9F1F2] whitespace-nowrap">{s.roomType || s.roomId}</td>
+                        <td className="py-3 text-slate-600 dark:text-[#9FB2B8]">{s.currentPrice?.toLocaleString()}</td>
+                        <td className="py-3 text-[#B58A2E] dark:text-[#E6C075] font-medium">
+                          {s.mlPredictedPrice ? s.mlPredictedPrice.toLocaleString() : <span className="text-slate-400 dark:text-[#6B828A]">—</span>}
                         </td>
-                        <td className="py-3 text-slate-600">{s.suggestedPrice?.toLocaleString()}</td>
-                        <td className={`py-3 ${s.mlChangePercent >= 0 ? "text-green-600" : "text-red-600"}`}>
-                          {s.mlChangePercent != null ? `${s.mlChangePercent > 0 ? "+" : ""}${s.mlChangePercent}%` : <span className="text-slate-400">—</span>}
+                        <td className="py-3 text-slate-600 dark:text-[#9FB2B8]">{s.suggestedPrice?.toLocaleString()}</td>
+                        <td className={`py-3 ${s.mlChangePercent >= 0 ? "text-green-600 dark:text-green-300" : "text-red-600 dark:text-red-300"}`}>
+                          {s.mlChangePercent != null ? `${s.mlChangePercent > 0 ? "+" : ""}${s.mlChangePercent}%` : <span className="text-slate-400 dark:text-[#6B828A]">—</span>}
                         </td>
-                        <td className={`py-3 ${s.changePercent >= 0 ? "text-green-600" : "text-red-600"}`}>
+                        <td className={`py-3 ${s.changePercent >= 0 ? "text-green-600 dark:text-green-300" : "text-red-600 dark:text-red-300"}`}>
                           {s.changePercent > 0 ? "+" : ""}{s.changePercent}%
                         </td>
-                        <td className="py-3">{mlConfidenceBadge(s.mlConfidence)}</td>
-                        <td className="py-3 text-slate-600">{s.demandFactor}x</td>
+                        <td className="py-3">{mlAgreementBadge(s.mlAgreement)}</td>
+                        <td className="py-3 text-slate-600 dark:text-[#9FB2B8]">{s.demandFactor}x</td>
                         <td className="py-3 flex gap-1">
                           {s.mlPredictedPrice && (
-                            <button onClick={() => applyMLPrice(s)} disabled={savingPrice === s.roomId} className="px-2 py-1 bg-amber-50 text-[#2563EB] border border-amber-200 rounded-lg text-[10px] hover:bg-amber-100 disabled:opacity-50 whitespace-nowrap">
+                            <button onClick={() => applyMLPrice(s)} disabled={savingPrice === s.roomId} className="px-2 py-1 bg-[#F4F2F9] dark:bg-[#1B2436] text-[#B58A2E] dark:text-[#E6C075] border border-[#B9B4CE]/45 dark:border-[#3D4660]/45 rounded-lg text-[10px] hover:bg-[#E5E1F0] disabled:opacity-50 whitespace-nowrap">
                               {savingPrice === s.roomId ? "..." : "ML Apply"}
                             </button>
                           )}
-                          <button onClick={() => applyPrice(s)} disabled={savingPrice === s.roomId} className="px-2 py-1 bg-[#f4f2ef] border border-black/[0.06] rounded-lg text-slate-700 text-[10px] hover:bg-black/[0.05] disabled:opacity-50 whitespace-nowrap">
+                          <button onClick={() => applyPrice(s)} disabled={savingPrice === s.roomId} className="px-2 py-1 bg-[#f4f2ef] dark:bg-[#10131D] border border-black/[0.06] dark:border-[#232737] rounded-lg text-slate-700 dark:text-[#C1D2D6] text-[10px] hover:bg-black/[0.05] dark:hover:bg-white/5 disabled:opacity-50 whitespace-nowrap">
                             {savingPrice === s.roomId ? "..." : "Rule Apply"}
                           </button>
                         </td>
@@ -245,12 +245,12 @@ const DynamicPricing = () => {
             )}
           </div>
 
-          <div className="bg-white border border-black/[0.06] rounded-2xl p-5 shadow-sm">
-            <h3 className="text-slate-900 font-semibold mb-4 flex items-center gap-2"><Brain className="w-4 h-4 text-[#2563EB]" /> Pricing Factors Breakdown</h3>
+          <div className="bg-white dark:bg-[#161925] border border-black/[0.06] dark:border-[#232737] rounded-2xl p-5 shadow-sm">
+            <h3 className="text-slate-900 dark:text-[#E9F1F2] font-semibold mb-4 flex items-center gap-2"><Brain className="w-4 h-4 text-[#B58A2E] dark:text-[#E6C075]" /> Pricing Factors Breakdown</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="text-slate-500 uppercase text-xs border-b border-black/[0.06]">
+                  <tr className="text-slate-500 dark:text-[#8299A0] uppercase text-xs border-b border-black/[0.06] dark:border-[#232737]">
                     <th className="pb-3 font-medium">Room</th>
                     <th className="pb-3 font-medium">Season</th>
                     <th className="pb-3 font-medium">Amenity</th>
@@ -261,14 +261,14 @@ const DynamicPricing = () => {
                 </thead>
                 <tbody className="divide-y divide-black/[0.06]">
                   {result.suggestions.map((s, i) => (
-                    <tr key={i} className="hover:bg-black/[0.02]">
-                      <td className="py-3 text-slate-900">{s.roomType || s.roomId}</td>
-                      <td className="py-3 text-slate-600">{s.seasonMultiplier}x</td>
-                      <td className="py-3 text-slate-600">{s.amenityFactor}x</td>
-                      <td className="py-3 text-slate-600">{s.occupancyFactor}x</td>
-                      <td className="py-3 text-slate-600">{(s.weekendSurcharge * 100).toFixed(0)}%</td>
+                    <tr key={i} className="hover:bg-black/[0.02] dark:hover:bg-white/5">
+                      <td className="py-3 text-slate-900 dark:text-[#E9F1F2]">{s.roomType || s.roomId}</td>
+                      <td className="py-3 text-slate-600 dark:text-[#9FB2B8]">{s.seasonMultiplier}x</td>
+                      <td className="py-3 text-slate-600 dark:text-[#9FB2B8]">{s.amenityFactor}x</td>
+                      <td className="py-3 text-slate-600 dark:text-[#9FB2B8]">{s.occupancyFactor}x</td>
+                      <td className="py-3 text-slate-600 dark:text-[#9FB2B8]">{(s.weekendSurcharge * 100).toFixed(0)}%</td>
                       <td className="py-3">
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded ${s.factors?.isPeakSeason ? "bg-amber-50 text-amber-700" : "bg-green-50 text-green-700"}`}>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded ${s.factors?.isPeakSeason ? "bg-[#F4F2F9] dark:bg-[#1B2436] text-amber-700 dark:text-amber-300" : "bg-green-50 text-green-700 dark:text-green-300"}`}>
                           {s.factors?.isPeakSeason ? "Peak" : "Off-Peak"}
                         </span>
                       </td>
@@ -282,20 +282,20 @@ const DynamicPricing = () => {
       )}
 
       {occupancy && (
-        <div className="mt-6 bg-white border border-black/[0.06] rounded-2xl p-5 shadow-sm">
-          <h3 className="text-slate-900 font-semibold mb-4 flex items-center gap-2"><BarChart3 className="w-4 h-4 text-[#2563EB]" /> Occupancy Overview</h3>
+        <div className="mt-6 bg-white dark:bg-[#161925] border border-black/[0.06] dark:border-[#232737] rounded-2xl p-5 shadow-sm">
+          <h3 className="text-slate-900 dark:text-[#E9F1F2] font-semibold mb-4 flex items-center gap-2"><BarChart3 className="w-4 h-4 text-[#B58A2E] dark:text-[#E6C075]" /> Occupancy Overview</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <div className="text-slate-500 text-xs">Total Bookings</div>
-              <div className="text-xl font-bold text-slate-900">{occupancy.overall?.totalBookings || 0}</div>
+              <div className="text-slate-500 dark:text-[#8299A0] text-xs">Total Bookings</div>
+              <div className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2]">{occupancy.overall?.totalBookings || 0}</div>
             </div>
             <div>
-              <div className="text-slate-500 text-xs">Total Revenue</div>
-              <div className="text-xl font-bold text-slate-900">{occupancy.overall?.totalRevenue?.toLocaleString() || 0}</div>
+              <div className="text-slate-500 dark:text-[#8299A0] text-xs">Total Revenue</div>
+              <div className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2]">{occupancy.overall?.totalRevenue?.toLocaleString() || 0}</div>
             </div>
             <div>
-              <div className="text-slate-500 text-xs">Rooms with Bookings</div>
-              <div className="text-xl font-bold text-slate-900">{occupancy.overall?.roomsWithBookings || 0}</div>
+              <div className="text-slate-500 dark:text-[#8299A0] text-xs">Rooms with Bookings</div>
+              <div className="text-xl font-bold text-slate-900 dark:text-[#E9F1F2]">{occupancy.overall?.roomsWithBookings || 0}</div>
             </div>
           </div>
         </div>

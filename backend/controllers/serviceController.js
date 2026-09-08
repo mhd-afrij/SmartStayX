@@ -5,6 +5,12 @@ import Room from "../models/Room.js";
 import Hotel from "../models/Hotel.js";
 import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 
+// True when the user owns the given hotel.
+const isHotelOwner = async (userId, hotelId) => {
+  if (!userId || !hotelId) return false;
+  return Boolean(await Hotel.exists({ _id: hotelId, owner: userId }));
+};
+
 // Create a service request from a guest
 export const requestService = async (req, res) => {
   try {
@@ -59,6 +65,17 @@ export const updateServiceStatus = async (req, res) => {
 
     const request = await ServiceRequest.findById(requestId);
     if (!request) return res.json({ success: false, message: "Request not found" });
+
+    // Only staff attached to the request's hotel may change its status.
+    const role = req.user?.role;
+    const hotelId = String(request.hotel || "");
+    const isStaffForHotel =
+      role === "super_admin" ||
+      (req.user?.assignedHotel && String(req.user.assignedHotel) === hotelId) ||
+      (role === "hotel_manager" && (await isHotelOwner(req.user._id, hotelId)));
+    if (!isStaffForHotel) {
+      return res.json({ success: false, message: "Not authorized to update this service request" });
+    }
 
     if (status === "completed") {
       request.status = "completed";

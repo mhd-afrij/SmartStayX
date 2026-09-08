@@ -6,7 +6,7 @@ import { BOOKING_STATUS } from '../constants/bookingStatuses.js';
 
 // Create a refund request for a paid booking
 const requestRefund = async ({ bookingId, userId, reason }) => {
-  const booking = await Booking.findOne({ _id: bookingId, user: userId });
+  const booking = await Booking.findOne({ _id: bookingId, user: userId }).populate('hotel', 'currency');
   if (!booking) {
     throw Object.assign(new Error('Booking not found'), { status: 404 });
   }
@@ -36,7 +36,7 @@ const requestRefund = async ({ bookingId, userId, reason }) => {
     booking: bookingId,
     user: userId,
     amount: booking.totalPrice,
-    currency: 'usd',
+    currency: (booking.hotel?.currency || process.env.DEFAULT_CURRENCY || 'usd').toLowerCase(),
     reason: reason || '',
     status: 'requested',
   });

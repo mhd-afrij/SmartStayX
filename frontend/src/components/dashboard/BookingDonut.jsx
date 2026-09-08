@@ -8,9 +8,9 @@ const COLORS = {
   pending: "#F59E0B",
   confirmed: "#4F46E5",
   checked_in: "#22C55E",
-  checked_out: "#2563EB",
+  checked_out: "#D4A853",
   cancelled: "#EF4444",
-  expired: "#94A3B8",
+  expired: "#879497",
 };
 
 // Human-readable labels for each booking status
@@ -72,7 +72,7 @@ const BookingDonut = ({ bookings = [] }) => {
     .map(([k, v]) => ({
       name: k,
       value: v,
-      color: COLORS[k] || "#94A3B8",
+      color: COLORS[k] || "#879497",
       label: LABELS[k] || k,
     }));
 
@@ -84,15 +84,15 @@ const BookingDonut = ({ bookings = [] }) => {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="relative rounded-2xl border border-black/[0.06] bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)] overflow-hidden p-6"
+        className="relative rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] overflow-hidden p-6"
       >
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-[#2563EB]/10 border border-[#2563EB]/20 flex items-center justify-center">
-            <CalendarCheck className="w-4 h-4 text-[#2563EB]" />
+          <div className="w-8 h-8 rounded-lg bg-[#D4A853]/10 border border-[#D4A853]/40 flex items-center justify-center">
+            <CalendarCheck className="w-4 h-4 text-[#B58A2E] dark:text-[#E6C075]" />
           </div>
           <div>
-            <h3 className="text-sm font-medium text-slate-900">Booking Summary</h3>
-            <p className="text-xs text-slate-400">No booking data available</p>
+            <h3 className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">Booking Summary</h3>
+            <p className="text-xs text-slate-400 dark:text-[#6B828A]">No booking data available</p>
           </div>
         </div>
       </motion.div>
@@ -104,17 +104,17 @@ const BookingDonut = ({ bookings = [] }) => {
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className="relative rounded-2xl border border-black/[0.06] bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)] overflow-hidden"
+      className="relative rounded-2xl border border-black/[0.06] dark:border-[#232737] bg-white dark:bg-[#161925] shadow-[0_20px_60px_rgba(0,56,68,0.06)] overflow-hidden"
     >
       {/* Donut summary header */}
       <div className="p-6">
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-[#2563EB]/10 border border-[#2563EB]/20 flex items-center justify-center">
-            <CalendarCheck className="w-4 h-4 text-[#2563EB]" />
+          <div className="w-8 h-8 rounded-lg bg-[#D4A853]/10 border border-[#D4A853]/40 flex items-center justify-center">
+            <CalendarCheck className="w-4 h-4 text-[#B58A2E] dark:text-[#E6C075]" />
           </div>
           <div>
-            <h3 className="text-sm font-medium text-slate-900">Booking Summary</h3>
-            <p className="text-xs text-slate-400">{total} total bookings</p>
+            <h3 className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2]">Booking Summary</h3>
+            <p className="text-xs text-slate-400 dark:text-[#6B828A]">{total} total bookings</p>
           </div>
         </div>
 
@@ -158,11 +158,11 @@ const BookingDonut = ({ bookings = [] }) => {
                     className="w-2.5 h-2.5 rounded-sm"
                     style={{ backgroundColor: item.color }}
                   />
-                  <span className="text-xs text-slate-500">{item.label}</span>
+                  <span className="text-xs text-slate-500 dark:text-[#8299A0]">{item.label}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-slate-900 font-space">{item.value}</span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-sm font-medium text-slate-900 dark:text-[#E9F1F2] font-space">{item.value}</span>
+                  <span className="text-xs text-slate-400 dark:text-[#6B828A]">
                     {total > 0 ? ((item.value / total) * 100).toFixed(0) : 0}%
                   </span>
                 </div>

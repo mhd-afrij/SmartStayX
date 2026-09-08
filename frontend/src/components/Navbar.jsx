@@ -5,6 +5,7 @@ import { useAppContext } from "../context/AppContext";
 import { UserButton } from "@clerk/clerk-react";
 import { User, Bell, LifeBuoy, LogOut, CalendarDays, LayoutDashboard, Building2, ChevronDown, Menu } from "lucide-react";
 import { assets } from "../assets/assets";
+import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
   const navLinks = [
@@ -26,7 +27,7 @@ const Navbar = () => {
   const currencyRef = useRef(null);
   const userMenuRef = useRef(null);
 
-  const { user, navigate, isOwner, isReceptionist, translate, selectedLanguage, setSelectedLanguage, languageOptions, selectedCurrency, setSelectedCurrency, currencyOptions, logout } = useAppContext();
+  const { user, navigate, isOwner, isReceptionist, isSuperAdmin, translate, selectedLanguage, setSelectedLanguage, languageOptions, selectedCurrency, setSelectedCurrency, currencyOptions, logout } = useAppContext();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,7 +54,7 @@ const Navbar = () => {
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 z-50 w-full flex h-16 items-center justify-between px-4 md:px-8 lg:px-12 transition-all duration-300 ${
         isScrolled
-          ? "bg-white/85 backdrop-blur-xl shadow-[0_4px_30px_rgba(15,23,42,0.06)] border-b border-black/[0.06]"
+          ? "bg-white/85 dark:bg-[#0E242C]/85 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,56,68,0.06)] border-b border-black/[0.06] dark:border-[#1D3842]"
           : "bg-transparent"
       }`}
     >
@@ -74,10 +75,11 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-2">
+        <ThemeToggle />
         <div className="relative hidden md:block" ref={langRef}>
           <button
             onClick={() => { setLangOpen(!langOpen); setCurrencyOpen(false); }}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs uppercase tracking-[0.12em] text-slate-600 hover:text-slate-900 border border-black/[0.08] hover:border-[#2563EB]/30 rounded-lg transition-all"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs uppercase tracking-[0.12em] text-slate-600 dark:text-[#9FB2B8] hover:text-slate-900 dark:hover:text-[#E9F1F2] border border-black/[0.08] dark:border-[#1D3842] hover:border-[#5077B3]/30 rounded-lg transition-all"
           >
             <span>{selectedLanguage.toUpperCase()}</span>
             <ChevronDown className={`w-3 h-3 transition-transform ${langOpen ? "rotate-180" : ""}`} />
@@ -89,7 +91,7 @@ const Navbar = () => {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -6, scale: 0.96 }}
                 transition={{ duration: 0.15 }}
-                className="absolute right-0 mt-2 w-36 bg-white border border-black/[0.08] rounded-xl shadow-2xl backdrop-blur-xl overflow-hidden z-50"
+                className="absolute right-0 mt-2 w-36 bg-white dark:bg-[#122A32] border border-black/[0.08] dark:border-[#1D3842] rounded-xl shadow-2xl backdrop-blur-xl overflow-hidden z-50"
               >
                 {languageOptions.map((lang) => (
                   <button
@@ -97,8 +99,8 @@ const Navbar = () => {
                     onClick={() => { setSelectedLanguage(lang.code); setLangOpen(false); }}
                     className={`w-full text-left px-3.5 py-2.5 text-xs uppercase tracking-[0.1em] transition-colors ${
                       selectedLanguage === lang.code
-                        ? "text-[#2563EB] bg-[#2563EB]/10"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-white/6"
+                        ? "text-[#5077B3] dark:text-[#93B3E0] bg-[#5077B3]/10"
+                        : "text-slate-600 dark:text-[#9FB2B8] hover:text-slate-900 dark:hover:text-[#E9F1F2] hover:bg-white/6 dark:hover:bg-white/5"
                     }`}
                   >
                     {lang.label}
@@ -112,7 +114,7 @@ const Navbar = () => {
         <div className="relative hidden md:block" ref={currencyRef}>
           <button
             onClick={() => { setCurrencyOpen(!currencyOpen); setLangOpen(false); }}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs uppercase tracking-[0.12em] text-slate-600 hover:text-slate-900 border border-black/[0.08] hover:border-[#2563EB]/30 rounded-lg transition-all"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs uppercase tracking-[0.12em] text-slate-600 dark:text-[#9FB2B8] hover:text-slate-900 dark:hover:text-[#E9F1F2] border border-black/[0.08] dark:border-[#1D3842] hover:border-[#5077B3]/30 rounded-lg transition-all"
           >
             <span>{selectedCurrency}</span>
             <ChevronDown className={`w-3 h-3 transition-transform ${currencyOpen ? "rotate-180" : ""}`} />
@@ -124,7 +126,7 @@ const Navbar = () => {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -6, scale: 0.96 }}
                 transition={{ duration: 0.15 }}
-                className="absolute right-0 mt-2 w-40 bg-white border border-black/[0.08] rounded-xl shadow-2xl backdrop-blur-xl overflow-hidden z-50"
+                className="absolute right-0 mt-2 w-40 bg-white dark:bg-[#122A32] border border-black/[0.08] dark:border-[#1D3842] rounded-xl shadow-2xl backdrop-blur-xl overflow-hidden z-50"
               >
                 {currencyOptions.map((cur) => (
                   <button
@@ -132,8 +134,8 @@ const Navbar = () => {
                     onClick={() => { setSelectedCurrency(cur.code); setCurrencyOpen(false); }}
                     className={`w-full text-left px-3.5 py-2.5 text-xs uppercase tracking-[0.1em] transition-colors ${
                       selectedCurrency === cur.code
-                        ? "text-[#2563EB] bg-[#2563EB]/10"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-white/6"
+                        ? "text-[#5077B3] dark:text-[#93B3E0] bg-[#5077B3]/10"
+                        : "text-slate-600 dark:text-[#9FB2B8] hover:text-slate-900 dark:hover:text-[#E9F1F2] hover:bg-white/6 dark:hover:bg-white/5"
                     }`}
                   >
                     {cur.symbol} — {cur.label}
@@ -168,11 +170,11 @@ const Navbar = () => {
                   labelIcon={<LifeBuoy className="w-3.5 h-3.5" />}
                   onClick={() => navigate("/support")}
                 />
-                {(isOwner || isReceptionist) && (
+                {(isOwner || isReceptionist || isSuperAdmin) && (
                   <UserButton.Action
-                    label={isOwner ? "Owner Dashboard" : "Receptionist Dashboard"}
+                    label={isSuperAdmin ? "Admin Dashboard" : isOwner ? "Manager Dashboard" : "Receptionist Dashboard"}
                     labelIcon={<LayoutDashboard className="w-3.5 h-3.5" />}
-                    onClick={() => navigate(isOwner ? "/Owner" : "/Receptionist")}
+                    onClick={() => navigate(isSuperAdmin ? "/super-admin" : isOwner ? "/manager" : "/receptionist")}
                   />
                 )}
               </UserButton.MenuItems>
@@ -199,7 +201,7 @@ const Navbar = () => {
 
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="md:hidden text-slate-600 hover:text-slate-900 transition-colors"
+          className="md:hidden text-slate-600 dark:text-[#9FB2B8] hover:text-slate-900 dark:hover:text-[#E9F1F2] dark:text-[#9FB2B8] dark:hover:text-[#E9F1F2] transition-colors"
         >
           <Menu className="w-6 h-6" />
         </button>
@@ -209,7 +211,7 @@ const Navbar = () => {
         <motion.div
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="absolute top-full left-0 w-full bg-white/97 backdrop-blur-xl border-b border-black/[0.06] px-6 py-6 md:hidden"
+          className="absolute top-full left-0 w-full bg-white/97 dark:bg-[#0E242C]/97 backdrop-blur-xl border-b border-black/[0.06] dark:border-[#1D3842] px-6 py-6 md:hidden"
         >
           <div className="flex flex-col gap-4">
             {navLinks.map((link, i) => (
@@ -222,42 +224,42 @@ const Navbar = () => {
                 {translate(link.key)}
               </a>
             ))}
-            <div className="flex gap-3 pt-4 border-t border-black/[0.06]">
+            <div className="flex gap-3 pt-4 border-t border-black/[0.06] dark:border-[#1D3842]">
               <div className="flex gap-2 flex-1">
                 <select
                   value={selectedLanguage}
                   onChange={(e) => setSelectedLanguage(e.target.value)}
-                  className="flex-1 bg-white border border-black/[0.08] rounded-lg px-3 py-2.5 text-xs uppercase tracking-[0.1em] text-slate-700 outline-none focus:border-[#2563EB]/50"
+                  className="flex-1 bg-white dark:bg-[#122A32] border border-black/[0.08] dark:border-[#1D3842] rounded-lg px-3 py-2.5 text-xs uppercase tracking-[0.1em] text-slate-700 dark:text-[#C1D2D6] outline-none focus:border-[#5077B3]/50"
                 >
                   {languageOptions.map((lang) => (
-                    <option key={lang.code} value={lang.code} className="bg-white">{lang.label}</option>
+                    <option key={lang.code} value={lang.code} className="bg-white dark:bg-[#122A32]">{lang.label}</option>
                   ))}
                 </select>
                 <select
                   value={selectedCurrency}
                   onChange={(e) => setSelectedCurrency(e.target.value)}
-                  className="flex-1 bg-white border border-black/[0.08] rounded-lg px-3 py-2.5 text-xs uppercase tracking-[0.1em] text-slate-700 outline-none focus:border-[#2563EB]/50"
+                  className="flex-1 bg-white dark:bg-[#122A32] border border-black/[0.08] dark:border-[#1D3842] rounded-lg px-3 py-2.5 text-xs uppercase tracking-[0.1em] text-slate-700 dark:text-[#C1D2D6] outline-none focus:border-[#5077B3]/50"
                 >
                   {currencyOptions.map((cur) => (
-                    <option key={cur.code} value={cur.code} className="bg-white">{cur.symbol} — {cur.label}</option>
+                    <option key={cur.code} value={cur.code} className="bg-white dark:bg-[#122A32]">{cur.symbol} — {cur.label}</option>
                   ))}
                 </select>
               </div>
             </div>
-            <div className="flex flex-col gap-2 pt-2 border-t border-black/[0.06]">
+            <div className="flex flex-col gap-2 pt-2 border-t border-black/[0.06] dark:border-[#1D3842]">
               {user ? (
                 <>
                   <div className="flex items-center gap-2 px-2 py-1">
-                    <Building2 className="w-3.5 h-3.5 text-[#2563EB]" />
-                    <span className="text-[10px] uppercase tracking-[0.12em] text-slate-400">Organization</span>
+                    <Building2 className="w-3.5 h-3.5 text-[#5077B3] dark:text-[#93B3E0]" />
+                    <span className="text-[10px] uppercase tracking-[0.12em] text-slate-400 dark:text-[#6B828A]">Organization</span>
                   </div>
                   <button onClick={() => { navigate("/profile"); setIsMenuOpen(false); }} className="ghost-button flex-1 px-4 py-3 text-xs uppercase tracking-[0.18em]">Profile</button>
                   <button onClick={() => { navigate("/my-bookings"); setIsMenuOpen(false); }} className="ghost-button flex-1 px-4 py-3 text-xs uppercase tracking-[0.18em]">My Bookings</button>
                   <button onClick={() => { navigate("/notifications"); setIsMenuOpen(false); }} className="ghost-button flex-1 px-4 py-3 text-xs uppercase tracking-[0.18em]">Notifications</button>
                   <button onClick={() => { navigate("/support"); setIsMenuOpen(false); }} className="ghost-button flex-1 px-4 py-3 text-xs uppercase tracking-[0.18em]">Support</button>
-                  {(isOwner || isReceptionist) && (
-                    <button onClick={() => { navigate(isOwner ? "/Owner" : "/Receptionist"); setIsMenuOpen(false); }} className="gold-button flex-1 px-4 py-3 text-xs uppercase tracking-[0.18em]">
-                      {isOwner ? "Dashboard" : "Receptionist"}
+                  {(isOwner || isReceptionist || isSuperAdmin) && (
+                    <button onClick={() => { navigate(isSuperAdmin ? "/super-admin" : isOwner ? "/manager" : "/receptionist"); setIsMenuOpen(false); }} className="gold-button flex-1 px-4 py-3 text-xs uppercase tracking-[0.18em]">
+                      {isSuperAdmin ? "Admin Dashboard" : isOwner ? "Dashboard" : "Receptionist"}
                     </button>
                   )}
                   <button onClick={logout} className="px-4 py-3 text-xs uppercase tracking-[0.18em] text-[#EF4444]/70 border border-[#EF4444]/20 rounded-xl hover:bg-[#EF4444]/10 transition-colors">Sign Out</button>

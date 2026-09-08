@@ -44,7 +44,7 @@ const ItineraryTimeline = ({ items = [], onRemove, onReplace }) => {
   if (days.length === 0) {
     return (
       <div className="luxury-card-soft p-8 text-center">
-        <p className="text-[#64748B] text-sm">No itinerary items yet.</p>
+        <p className="text-[#4D6166] dark:text-[#9FB2B8] text-sm">No itinerary items yet.</p>
       </div>
     )
   }
@@ -59,17 +59,17 @@ const ItineraryTimeline = ({ items = [], onRemove, onReplace }) => {
             <button
               type="button"
               onClick={() => setOpenDay(isOpen ? null : day)}
-              className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#F8FAFC] transition-colors"
+              className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#FFFAF4] dark:hover:bg-[#0B1D24] transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-space font-bold ${isOpen ? 'bg-[#D4A853] text-[#0F172A]' : 'bg-[#F1F5F9] text-[#64748B]'}`}>
+                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-space font-bold ${isOpen ? 'bg-[#D4A853] text-[#003844] dark:text-[#E9F1F2]' : 'bg-[#F3ECDE] dark:bg-[#16303A] text-[#4D6166] dark:text-[#9FB2B8]'}`}>
                   {day}
                 </div>
-                <p className="text-sm font-playfair font-bold text-[#0F172A]">Day {day}</p>
+                <p className="text-sm font-playfair font-bold text-[#003844] dark:text-[#E9F1F2]">Day {day}</p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#94A3B8] font-space">{dayItems.length} items</span>
-                <ChevronDown className={`h-4 w-4 text-[#64748B] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                <span className="text-xs text-[#879497] dark:text-[#6B828A] font-space">{dayItems.length} items</span>
+                <ChevronDown className={`h-4 w-4 text-[#4D6166] dark:text-[#9FB2B8] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
               </div>
             </button>
 
@@ -82,9 +82,9 @@ const ItineraryTimeline = ({ items = [], onRemove, onReplace }) => {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <div className="px-5 pb-5 space-y-3 border-t border-[#E2E8F0] pt-4">
+                  <div className="px-5 pb-5 space-y-3 border-t border-[#E8E0D1] dark:border-[#1D3842] pt-4">
                     {dayItems.map((item) => (
-                      <div key={item._id} className="rounded-xl border border-[#E2E8F0] bg-white p-4">
+                      <div key={item._id} className="rounded-xl border border-[#E8E0D1] dark:border-[#1D3842] bg-white dark:bg-[#122A32] p-4">
                         {editingId === item._id ? (
                           <div className="space-y-2">
                             <Input label="Title" value={editForm.title} onChange={(e) => setEditForm((f) => ({ ...f, title: e.target.value }))} />
@@ -103,40 +103,40 @@ const ItineraryTimeline = ({ items = [], onRemove, onReplace }) => {
                           </div>
                         ) : (
                           <div className="flex items-start gap-3">
-                            <div className="h-14 w-14 shrink-0 rounded-lg bg-[#F1F5F9] overflow-hidden flex items-center justify-center">
+                            <div className="h-14 w-14 shrink-0 rounded-lg bg-[#F3ECDE] dark:bg-[#16303A] overflow-hidden flex items-center justify-center">
                               {item.photoUrl ? (
                                 <img src={item.photoUrl} alt={item.title} className="h-full w-full object-cover" />
                               ) : (
-                                <MapPin className="h-5 w-5 text-[#94A3B8]" />
+                                <MapPin className="h-5 w-5 text-[#879497] dark:text-[#6B828A]" />
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-[#F1F5F9] text-[#64748B]">
+                                <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-[#F3ECDE] dark:bg-[#16303A] text-[#4D6166] dark:text-[#9FB2B8]">
                                   {TYPE_LABEL[item.type] || item.type}
                                 </span>
                                 {item.rating > 0 && (
-                                  <span className="flex items-center gap-0.5 text-[10px] text-[#92660f]">
+                                  <span className="flex items-center gap-0.5 text-[10px] text-[#92660f] dark:text-[#E6C075]">
                                     <Star className="h-3 w-3 fill-current" /> {item.rating}
                                   </span>
                                 )}
                               </div>
-                              <p className="text-sm font-semibold text-[#0F172A] mt-1">{item.title}</p>
-                              {item.address && <p className="text-xs text-[#64748B] mt-0.5">{item.address}</p>}
-                              {item.notes && <p className="text-xs text-[#94A3B8] mt-1">{item.notes}</p>}
+                              <p className="text-sm font-semibold text-[#003844] dark:text-[#E9F1F2] mt-1">{item.title}</p>
+                              {item.address && <p className="text-xs text-[#4D6166] dark:text-[#9FB2B8] mt-0.5">{item.address}</p>}
+                              {item.notes && <p className="text-xs text-[#879497] dark:text-[#6B828A] mt-1">{item.notes}</p>}
                               <div className="flex items-center gap-3 mt-2">
                                 <a
                                   href={directionsUrl(item)}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="inline-flex items-center gap-1 text-xs text-[#2563EB] font-medium hover:underline"
+                                  className="inline-flex items-center gap-1 text-xs text-[#5077B3] dark:text-[#93B3E0] font-medium hover:underline"
                                 >
                                   <Navigation className="h-3 w-3" /> Directions
                                 </a>
                                 <button
                                   type="button"
                                   onClick={() => startEdit(item)}
-                                  className="inline-flex items-center gap-1 text-xs text-[#64748B] hover:text-[#0F172A]"
+                                  className="inline-flex items-center gap-1 text-xs text-[#4D6166] dark:text-[#9FB2B8] hover:text-[#003844] dark:hover:text-[#E9F1F2]"
                                 >
                                   <Pencil className="h-3 w-3" /> Replace
                                 </button>

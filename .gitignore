@@ -11,5 +11,9 @@ __pycache__/
 .venv/
 venv/
 
-# ML artifacts — regenerate with `python ml-service/train.py`
+# ML artifacts — regenerate with `python ml-service/training/train_pricing.py`
 *.pkl
+ml-service/datasets/*
+!ml-service/datasets/README.md
+ml-service/saved_models/*
+!ml-service/saved_models/.gitkeep

@@ -121,7 +121,7 @@ const Hero = () => {
             key={i}
             onClick={() => setCurrentIndex(i)}
             className={`h-1.5 rounded-full transition-all duration-500 ${
-              i === currentIndex ? 'w-8 bg-[#2563EB]' : 'w-1.5 bg-white/50 hover:bg-white/80'
+              i === currentIndex ? 'w-8 bg-[#5077B3]' : 'w-1.5 bg-white/50 dark:bg-[#0E242C]/50 hover:bg-white/80 dark:hover:bg-[#0E242C]/80'
             }`}
           />
         ))}
@@ -155,8 +155,8 @@ const Hero = () => {
           custom={0.05}
           className="max-w-2xl lg:self-center"
         >
-          <div className="luxury-kicker inline-flex items-center gap-4 rounded-full border border-white/25 bg-white/15 px-4 py-2 text-white">
-            <span className="h-px w-8 bg-gradient-to-r from-transparent via-[#2563EB] to-transparent" />
+          <div className="luxury-kicker inline-flex items-center gap-4 rounded-full border border-white/25 bg-white/15 dark:bg-white/5 px-4 py-2 text-white">
+            <span className="h-px w-8 bg-gradient-to-r from-transparent via-[#5077B3] to-transparent" />
             The Ultimate Hotel Experience
           </div>
 
@@ -190,7 +190,7 @@ const Hero = () => {
           <motion.div
             animate={{ y: [0, -6, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-            className="luxury-card relative overflow-hidden p-4 md:p-6 shadow-[0_20px_60px_rgba(15,23,42,0.1)]"
+            className="luxury-card relative overflow-hidden p-4 md:p-6 shadow-[0_20px_60px_rgba(0,56,68,0.1)]"
           >
             <form onSubmit={handleSearch} className="relative space-y-4">
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-[1.45fr_1fr_1fr_0.9fr]">

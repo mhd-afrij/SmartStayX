@@ -55,7 +55,7 @@ const ExperienceShowcase = () => {
             <TiltCard
               key={experience.title}
               maxTilt={5}
-              className={`relative min-w-[18rem] flex-1 overflow-hidden rounded-[28px] border border-black/[0.06] shadow-[0_20px_60px_rgba(15,23,42,0.08)] ${
+              className={`relative min-w-[18rem] flex-1 overflow-hidden rounded-[28px] border border-black/[0.06] dark:border-[#1D3842] shadow-[0_20px_60px_rgba(0,56,68,0.08)] ${
                 index === 0 ? 'h-[26rem]' : 'h-[22rem]'
               }`}
             >
@@ -69,7 +69,7 @@ const ExperienceShowcase = () => {
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,17,31,0.05)_0%,rgba(7,17,31,0.7)_58%,rgba(7,17,31,0.92)_100%)]" />
 
               {/* Curated badge */}
-              <div className="absolute left-5 top-5 rounded-full border border-white/20 bg-white/15 px-3 py-1 text-[0.68rem] uppercase tracking-[0.22em] text-white/90 backdrop-blur-xl">
+              <div className="absolute left-5 top-5 rounded-full border border-white/20 bg-white/15 dark:bg-white/5 px-3 py-1 text-[0.68rem] uppercase tracking-[0.22em] text-white/90 backdrop-blur-xl">
                 Curated moment
               </div>
 

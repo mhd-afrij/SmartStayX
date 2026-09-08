@@ -39,19 +39,19 @@ const StepIndicator = ({ step }) => (
           <div className="flex flex-col items-center gap-1.5 flex-1">
             <div
               className={`flex h-9 w-9 items-center justify-center rounded-full border-2 transition-colors ${
-                isDone ? "bg-[#2563EB] border-[#2563EB] text-white"
-                : isActive ? "border-[#2563EB] text-[#2563EB] bg-[#2563EB]/10"
-                : "border-[#E2E8F0] text-[#94A3B8] bg-white"
+                isDone ? "bg-[#5077B3] border-[#5077B3] text-white"
+                : isActive ? "border-[#5077B3] text-[#5077B3] dark:text-[#93B3E0] bg-[#5077B3]/10"
+                : "border-[#E8E0D1] dark:border-[#1D3842] text-[#879497] dark:text-[#6B828A] bg-white dark:bg-[#122A32]"
               }`}
             >
               {isDone ? <CheckCircle2 className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
             </div>
-            <span className={`text-[10px] uppercase tracking-wide text-center ${isActive ? "text-[#0F172A] font-semibold" : "text-[#94A3B8]"}`}>
+            <span className={`text-[10px] uppercase tracking-wide text-center ${isActive ? "text-[#003844] dark:text-[#E9F1F2] font-semibold" : "text-[#879497] dark:text-[#6B828A]"}`}>
               {s.label}
             </span>
           </div>
           {i < STEPS.length - 1 && (
-            <div className={`h-0.5 flex-1 -mt-5 ${isDone ? "bg-[#2563EB]" : "bg-[#E2E8F0]"}`} />
+            <div className={`h-0.5 flex-1 -mt-5 ${isDone ? "bg-[#5077B3]" : "bg-[#E8E0D1] dark:bg-[#1D3842]"}`} />
           )}
         </div>
       );
@@ -207,7 +207,7 @@ const BookingWizard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white pt-28 pb-16 px-4">
+      <div className="min-h-screen bg-[#F3ECDE] dark:bg-[#122A32] pt-28 pb-16 px-4">
         <div className="mx-auto max-w-3xl space-y-4">
           <Skeleton className="h-10 w-64" />
           <Skeleton className="h-64 w-full" />
@@ -218,28 +218,28 @@ const BookingWizard = () => {
 
   if (loadError || !room) {
     return (
-      <div className="min-h-screen bg-white pt-28">
+      <div className="min-h-screen bg-[#F3ECDE] dark:bg-[#122A32] pt-28">
         <ErrorState title="Room not found" description="This room may no longer be available." />
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen bg-white pt-24 pb-20">
+    <div className="relative min-h-screen bg-[#F3ECDE] dark:bg-[#122A32] pt-24 pb-20">
       <div className="mx-auto max-w-3xl px-4 md:px-8">
         <StepIndicator step={step} />
 
-        <div className="rounded-2xl border border-[#E2E8F0] bg-white shadow-sm p-6 md:p-8">
+        <div className="rounded-2xl border border-[#E8E0D1] dark:border-[#1D3842] bg-white dark:bg-[#122A32] shadow-sm p-6 md:p-8">
           {step === 0 && (
             <div className="space-y-6">
               <div className="flex items-center gap-4">
                 <img src={room.images?.[0]} alt={room.roomType} className="h-20 w-28 rounded-xl object-cover" />
                 <div>
-                  <h2 className="text-lg font-semibold text-[#0F172A]">{room.roomType}</h2>
-                  <p className="flex items-center gap-1 text-sm text-[#64748B]">
+                  <h2 className="text-lg font-semibold text-[#003844] dark:text-[#E9F1F2]">{room.roomType}</h2>
+                  <p className="flex items-center gap-1 text-sm text-[#4D6166] dark:text-[#9FB2B8]">
                     <MapPin className="w-3.5 h-3.5" /> {room.hotel?.name}, {room.hotel?.city}
                   </p>
-                  <p className="text-sm text-[#2563EB] font-medium mt-1">{formatPrice(room.pricePerNight)} / night</p>
+                  <p className="text-sm text-[#5077B3] dark:text-[#93B3E0] font-medium mt-1">{formatPrice(room.pricePerNight)} / night</p>
                 </div>
               </div>
 
@@ -270,9 +270,9 @@ const BookingWizard = () => {
               </div>
 
               {pricing && nights > 0 && (
-                <div className="rounded-xl bg-[#F1F5F9] p-4 text-sm flex justify-between">
-                  <span className="text-[#64748B]">{nights} night{nights > 1 ? "s" : ""}</span>
-                  <span className="font-semibold text-[#0F172A]">{formatPrice(pricing.totalPrice)}</span>
+                <div className="rounded-xl bg-[#F3ECDE] dark:bg-[#16303A] p-4 text-sm flex justify-between">
+                  <span className="text-[#4D6166] dark:text-[#9FB2B8]">{nights} night{nights > 1 ? "s" : ""}</span>
+                  <span className="font-semibold text-[#003844] dark:text-[#E9F1F2]">{formatPrice(pricing.totalPrice)}</span>
                 </div>
               )}
             </div>
@@ -280,7 +280,7 @@ const BookingWizard = () => {
 
           {step === 1 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-[#0F172A]">Guest Details</h2>
+              <h2 className="text-lg font-semibold text-[#003844] dark:text-[#E9F1F2]">Guest Details</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input label="Full name" required value={guestInfo.name} onChange={(e) => setGuestInfo((p) => ({ ...p, name: e.target.value }))} />
                 <Input type="email" label="Email address" required value={guestInfo.email} onChange={(e) => setGuestInfo((p) => ({ ...p, email: e.target.value }))} />
@@ -292,22 +292,22 @@ const BookingWizard = () => {
 
           {step === 2 && (
             <div className="space-y-5">
-              <h2 className="text-lg font-semibold text-[#0F172A]">Review your booking</h2>
-              <div className="rounded-xl bg-[#F1F5F9] p-5 space-y-3 text-sm">
-                <div className="flex justify-between"><span className="text-[#64748B]">Hotel</span><span className="text-[#0F172A] font-medium">{room.hotel?.name}</span></div>
-                <div className="flex justify-between"><span className="text-[#64748B]">Room</span><span className="text-[#0F172A]">{room.roomType}</span></div>
-                <div className="flex justify-between"><span className="text-[#64748B]">Check-in</span><span className="text-[#0F172A]">{new Date(dates.checkInDate).toDateString()}</span></div>
-                <div className="flex justify-between"><span className="text-[#64748B]">Check-out</span><span className="text-[#0F172A]">{new Date(dates.checkOutDate).toDateString()}</span></div>
-                <div className="flex justify-between"><span className="text-[#64748B]">Guests</span><span className="text-[#0F172A]">{dates.guests}</span></div>
-                <div className="flex justify-between"><span className="text-[#64748B]">Guest name</span><span className="text-[#0F172A]">{guestInfo.name}</span></div>
+              <h2 className="text-lg font-semibold text-[#003844] dark:text-[#E9F1F2]">Review your booking</h2>
+              <div className="rounded-xl bg-[#F3ECDE] dark:bg-[#16303A] p-5 space-y-3 text-sm">
+                <div className="flex justify-between"><span className="text-[#4D6166] dark:text-[#9FB2B8]">Hotel</span><span className="text-[#003844] dark:text-[#E9F1F2] font-medium">{room.hotel?.name}</span></div>
+                <div className="flex justify-between"><span className="text-[#4D6166] dark:text-[#9FB2B8]">Room</span><span className="text-[#003844] dark:text-[#E9F1F2]">{room.roomType}</span></div>
+                <div className="flex justify-between"><span className="text-[#4D6166] dark:text-[#9FB2B8]">Check-in</span><span className="text-[#003844] dark:text-[#E9F1F2]">{new Date(dates.checkInDate).toDateString()}</span></div>
+                <div className="flex justify-between"><span className="text-[#4D6166] dark:text-[#9FB2B8]">Check-out</span><span className="text-[#003844] dark:text-[#E9F1F2]">{new Date(dates.checkOutDate).toDateString()}</span></div>
+                <div className="flex justify-between"><span className="text-[#4D6166] dark:text-[#9FB2B8]">Guests</span><span className="text-[#003844] dark:text-[#E9F1F2]">{dates.guests}</span></div>
+                <div className="flex justify-between"><span className="text-[#4D6166] dark:text-[#9FB2B8]">Guest name</span><span className="text-[#003844] dark:text-[#E9F1F2]">{guestInfo.name}</span></div>
                 {pricing && (
-                  <div className="flex justify-between pt-2 border-t border-[#E2E8F0] text-base font-semibold">
-                    <span className="text-[#0F172A]">Total ({nights} night{nights > 1 ? "s" : ""})</span>
-                    <span className="text-[#2563EB]">{formatPrice(pricing.totalPrice)}</span>
+                  <div className="flex justify-between pt-2 border-t border-[#E8E0D1] dark:border-[#1D3842] text-base font-semibold">
+                    <span className="text-[#003844] dark:text-[#E9F1F2]">Total ({nights} night{nights > 1 ? "s" : ""})</span>
+                    <span className="text-[#5077B3] dark:text-[#93B3E0]">{formatPrice(pricing.totalPrice)}</span>
                   </div>
                 )}
               </div>
-              <p className="text-xs text-[#94A3B8]">
+              <p className="text-xs text-[#879497] dark:text-[#6B828A]">
                 Free cancellation until 24 hours before check-in. Your room is held for a limited time — complete payment to confirm.
               </p>
             </div>
@@ -315,9 +315,9 @@ const BookingWizard = () => {
 
           {step === 3 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-[#0F172A]">Choose a payment method</h2>
+              <h2 className="text-lg font-semibold text-[#003844] dark:text-[#E9F1F2]">Choose a payment method</h2>
               {gateways.length === 0 ? (
-                <p className="text-sm text-[#94A3B8]">No payment methods available right now.</p>
+                <p className="text-sm text-[#879497] dark:text-[#6B828A]">No payment methods available right now.</p>
               ) : (
                 <div className="space-y-2.5">
                   {gateways.map((g) => {
@@ -329,11 +329,11 @@ const BookingWizard = () => {
                         type="button"
                         onClick={() => setSelectedGateway(g)}
                         className={`w-full flex items-center gap-3 rounded-xl border px-4 py-3.5 text-sm transition-colors ${
-                          active ? "border-[#2563EB] bg-[#2563EB]/5" : "border-[#E2E8F0] hover:border-[#2563EB]/40"
+                          active ? "border-[#5077B3] bg-[#5077B3]/5" : "border-[#E8E0D1] dark:border-[#1D3842] hover:border-[#5077B3]/40"
                         }`}
                       >
-                        <Icon className="w-4 h-4 text-[#2563EB]" />
-                        <span className="text-[#0F172A] font-medium">{GATEWAY_LABELS[g] || g}</span>
+                        <Icon className="w-4 h-4 text-[#5077B3] dark:text-[#93B3E0]" />
+                        <span className="text-[#003844] dark:text-[#E9F1F2] font-medium">{GATEWAY_LABELS[g] || g}</span>
                       </button>
                     );
                   })}
@@ -344,12 +344,12 @@ const BookingWizard = () => {
 
           {step === 4 && (
             <div className="space-y-5 text-center py-6">
-              <Loader2 className="w-10 h-10 text-[#2563EB] animate-spin mx-auto" />
+              <Loader2 className="w-10 h-10 text-[#5077B3] dark:text-[#93B3E0] animate-spin mx-auto" />
               <div>
-                <h2 className="text-lg font-semibold text-[#0F172A]">
+                <h2 className="text-lg font-semibold text-[#003844] dark:text-[#E9F1F2]">
                   {selectedGateway === "pay_at_hotel" ? "Confirming your booking..." : "Redirecting to secure payment..."}
                 </h2>
-                <p className="text-sm text-[#64748B] mt-1">Please don't close this window.</p>
+                <p className="text-sm text-[#4D6166] dark:text-[#9FB2B8] mt-1">Please don't close this window.</p>
               </div>
             </div>
           )}
@@ -357,11 +357,11 @@ const BookingWizard = () => {
           {step === 5 && (
             <div className="space-y-5 text-center py-6">
               <div className="mx-auto h-16 w-16 rounded-full bg-green-50 flex items-center justify-center">
-                <CheckCircle2 className="w-8 h-8 text-green-600" />
+                <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-300" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-[#0F172A]">Booking confirmed!</h2>
-                <p className="text-sm text-[#64748B] mt-1">
+                <h2 className="text-xl font-semibold text-[#003844] dark:text-[#E9F1F2]">Booking confirmed!</h2>
+                <p className="text-sm text-[#4D6166] dark:text-[#9FB2B8] mt-1">
                   {selectedGateway === "pay_at_hotel" ? "Pay at the hotel during check-in." : "Your payment was received."}
                 </p>
               </div>

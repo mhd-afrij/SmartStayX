@@ -74,12 +74,14 @@ async def list_conversations(user_id: Optional[str] = Header(None), limit: int =
 
 
 @router.get("/conversations/{conversation_id}", response_model=ConversationDetail)
-async def get_conversation(conversation_id: str):
+async def get_conversation(conversation_id: str, user_id: Optional[str] = Header(None)):
     if not is_db_available():
         raise HTTPException(status_code=503, detail="Conversation storage is unavailable")
     db = get_db()
     conv = await db.conversations.find_one({"_id": _parse_object_id(conversation_id)})
-    if not conv:
+    # Ownership check: a conversation is only readable by the user who created it.
+    # 404 (not 403) so conversation ids cannot be probed for existence.
+    if not conv or conv.get("userId") != (user_id or "anonymous"):
         raise HTTPException(status_code=404, detail="Conversation not found")
 
     messages = conv.get("messages", [])
@@ -93,13 +95,14 @@ async def get_conversation(conversation_id: str):
 
 
 @router.delete("/conversations/{conversation_id}")
-async def delete_conversation(conversation_id: str):
+async def delete_conversation(conversation_id: str, user_id: Optional[str] = Header(None)):
     if not is_db_available():
         raise HTTPException(status_code=503, detail="Conversation storage is unavailable")
     db = get_db()
-    result = await db.conversations.delete_one({"_id": _parse_object_id(conversation_id)})
-    if result.deleted_count == 0:
+    conv = await db.conversations.find_one({"_id": _parse_object_id(conversation_id)})
+    if not conv or conv.get("userId") != (user_id or "anonymous"):
         raise HTTPException(status_code=404, detail="Conversation not found")
+    await db.conversations.delete_one({"_id": conv["_id"]})
     return {"success": True}
 
 
@@ -115,7 +118,8 @@ async def send_message(
 
     if request.conversationId:
         conv = await db.conversations.find_one({"_id": _parse_object_id(request.conversationId)})
-        if not conv:
+        # Only the owner may continue a conversation (404 hides existence).
+        if not conv or conv.get("userId") != (user_id or "anonymous"):
             raise HTTPException(status_code=404, detail="Conversation not found")
     else:
         conv_data = {
@@ -171,7 +175,8 @@ async def send_message_stream(
 
     if request.conversationId:
         conv = await db.conversations.find_one({"_id": _parse_object_id(request.conversationId)})
-        if not conv:
+        # Only the owner may continue a conversation (404 hides existence).
+        if not conv or conv.get("userId") != (user_id or "anonymous"):
             raise HTTPException(status_code=404, detail="Conversation not found")
     else:
         conv_data = {

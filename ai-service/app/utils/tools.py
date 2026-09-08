@@ -58,6 +58,20 @@ TOOL_DEFINITIONS = [
     {
         "type": "function",
         "function": {
+            "name": "get_booking_status",
+            "description": "Look up the detailed status of one of the current user's bookings by its id",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "bookingId": {"type": "string", "description": "Booking MongoDB id"},
+                },
+                "required": ["bookingId"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "create_service_request",
             "description": "Create a new service request (housekeeping, maintenance, room service)",
             "parameters": {
@@ -65,8 +79,8 @@ TOOL_DEFINITIONS = [
                 "properties": {
                     "serviceType": {
                         "type": "string",
-                        "enum": ["Housekeeping", "Maintenance", "Room Service", "Front Desk"],
-                        "description": "Type of service requested",
+                        "enum": ["Housekeeping", "Maintenance", "Room Service", "Other"],
+                        "description": "Type of service requested (must match the backend ServiceRequest enum)",
                     },
                     "details": {"type": "string", "description": "Description of the request"},
                     "hotelId": {"type": "string", "description": "Hotel MongoDB ID"},

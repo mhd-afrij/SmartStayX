@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from app.config import settings
 from app.database import connect_db, close_db, is_db_available
+from app.middleware.auth import InternalAuthMiddleware
 from app.routers import chat, health
 
 
@@ -27,13 +27,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# The AI service is an internal component reached only by the Node backend,
+# which handles browser CORS. Requests must prove knowledge of AI_INTERNAL_TOKEN.
+app.add_middleware(InternalAuthMiddleware, settings=settings)
 
 app.include_router(chat.router)
 app.include_router(health.router)

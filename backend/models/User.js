@@ -10,8 +10,9 @@ const userSchema = new mongoose.Schema(
     // No longer set locally — auth is fully delegated to Clerk. Kept (optional)
     // instead of removed so any legacy documents/data paths that still read it don't break.
     passwordHash: { type: String, required: false, select: false },
-    role: { type: String, enum: ["guest", "staff", "owner", "admin"], default: "guest" },
+    role: { type: String, enum: ["guest", "receptionist", "hotel_manager", "super_admin"], default: "guest" },
     status: { type: String, enum: ["active", "suspended", "pending"], default: "active" },
+    assignedHotel: { type: mongoose.Schema.Types.ObjectId, ref: "Hotel", default: null },
     image: { type: String, default: "" },
     orgIds: [{ type: String, ref: "Organization" }],
     recentSearchedCities: [{ type: String }],

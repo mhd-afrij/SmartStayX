@@ -6,6 +6,7 @@ import Offer from "../models/Offer.js";
 import Booking from "../models/Booking.js";
 import ServiceRequest from "../models/ServiceRequest.js";
 import { v2 as cloudinary } from "cloudinary";
+import { clerkClient } from "@clerk/express";
 
 // Hotel CRUD, search, and owner operations — includes cascading delete.
 const escapeRegex = (value = "") =>
@@ -25,7 +26,7 @@ export const registerHotel = async (req, res) => {
       return res.json({ success: false, message: "All hotel fields are required" });
     }
 
-    await Hotel.create({
+    const hotel = await Hotel.create({
       name: String(name).trim(),
       address: String(address).trim(),
       contact: String(contact).trim(),
@@ -34,7 +35,21 @@ export const registerHotel = async (req, res) => {
       owner,
     });
 
-    await User.findByIdAndUpdate(owner, { role: "hotelOwner" });
+    // Promote the user to the "hotel_manager" role and scope them to the new
+    // hotel. The auth middleware re-syncs roles from Clerk public metadata on
+    // every request, so both must be persisted there too — otherwise the
+    // manager gets demoted back to guest and loses their assigned hotel.
+    await User.findByIdAndUpdate(owner, {
+      role: "hotel_manager",
+      assignedHotel: hotel._id,
+    });
+    try {
+      await clerkClient.users.updateUserMetadata(owner, {
+        publicMetadata: { role: "hotel_manager", hotelId: hotel._id.toString() },
+      });
+    } catch (clerkError) {
+      console.warn("Failed to sync hotel_manager role to Clerk metadata:", clerkError.message);
+    }
 
     res.json({ success: true, message: "Hotel Registered Successfully" });
   } catch (error) {
@@ -100,7 +115,7 @@ export const updateOwnerHotel = async (req, res) => {
     hotel.description = description ? String(description).trim() : "";
 
     if (req.file) {
-      const uploadRes = await cloudinary.uploader.upload(req.file.path);
+      const uploadRes = await cloudinary.uploader.upload(req.file.buffer, { resource_type: "auto" });
       hotel.image = uploadRes.secure_url;
     }
 

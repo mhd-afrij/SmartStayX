@@ -178,6 +178,28 @@ export const getCheapestDates = async ({ roomId, hotelId, monthsAhead = 2 }) => 
   const currentDate = new Date(now);
   currentDate.setHours(0, 0, 0, 0);
 
+  // Pre-compute per-day occupancy counts in ONE query instead of one
+  // countDocuments per day (previously up to ~365 queries for monthsAhead=12).
+  const occupancyByDay = new Map();
+  const overlappingBookings = await Booking.find({
+    hotel: hotelIdStr,
+    checkOutDate: { $gt: currentDate },
+    checkInDate: { $lt: endDate },
+    status: { $nin: [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED] },
+  })
+    .select('checkInDate checkOutDate')
+    .lean();
+  for (const b of overlappingBookings) {
+    const start = new Date(b.checkInDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(b.checkOutDate);
+    end.setHours(0, 0, 0, 0);
+    for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+      const key = d.toISOString().split('T')[0];
+      occupancyByDay.set(key, (occupancyByDay.get(key) || 0) + 1);
+    }
+  }
+
   while (currentDate < endDate) {
     const dayOfWeek = currentDate.getDay();
     let multiplier = 1;
@@ -194,12 +216,8 @@ export const getCheapestDates = async ({ roomId, hotelId, monthsAhead = 2 }) => 
       appliedRules.push({ rule: 'seasonal', label: 'Seasonal Rate', delta: seasonalMult, isMultiplicative: true });
     }
 
-    const activeBookings = await Booking.countDocuments({
-      hotel: hotelIdStr,
-      checkInDate: { $lte: currentDate },
-      checkOutDate: { $gte: currentDate },
-      status: { $nin: [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED] },
-    });
+    const dayKey = currentDate.toISOString().split('T')[0];
+    const activeBookings = occupancyByDay.get(dayKey) || 0;
     if (totalRooms > 0 && activeBookings / totalRooms > occThreshold) {
       multiplier += occSurcharge;
       appliedRules.push({ rule: 'occupancy', label: 'High Demand', delta: occSurcharge });

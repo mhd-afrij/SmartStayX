@@ -52,25 +52,25 @@ const Notifications = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white pt-32 flex items-start justify-center">
-        <Loader2 className="w-6 h-6 text-[#2563EB] animate-spin mt-20" />
+      <div className="min-h-screen bg-[#F3ECDE] dark:bg-[#122A32] pt-32 flex items-start justify-center">
+        <Loader2 className="w-6 h-6 text-[#5077B3] dark:text-[#93B3E0] animate-spin mt-20" />
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white pt-24 pb-16">
+    <div className="relative min-h-screen overflow-hidden bg-[#F3ECDE] dark:bg-[#122A32] pt-24 pb-16">
       <div className="absolute inset-0 mesh-glow opacity-60" />
       <div className="relative mx-auto max-w-2xl px-4 md:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-playfair text-slate-900">Notifications</h1>
-            <p className="text-sm text-slate-400 mt-1">Stay updated with your bookings and offers</p>
+            <h1 className="text-2xl font-playfair text-slate-900 dark:text-[#E9F1F2]">Notifications</h1>
+            <p className="text-sm text-slate-400 dark:text-[#6B828A] mt-1">Stay updated with your bookings and offers</p>
           </div>
           {notifications.some((n) => !n.read) && (
             <button
               onClick={markAllRead}
-              className="flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.15em] rounded-xl border border-black/[0.06] text-slate-600 hover:text-slate-900 hover:bg-[#f4f2ef] transition-all"
+              className="flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.15em] rounded-xl border border-black/[0.06] dark:border-[#1D3842] text-slate-600 dark:text-[#9FB2B8] hover:text-slate-900 dark:hover:text-[#E9F1F2] hover:bg-[#f4f2ef] dark:hover:bg-[#16303A] transition-all"
             >
               <CheckCheck className="w-3.5 h-3.5" />
               Mark All Read
@@ -80,9 +80,9 @@ const Notifications = () => {
 
         {notifications.length === 0 ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="luxury-card p-12 text-center">
-            <Bell className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-            <p className="text-slate-500 text-sm">No notifications yet</p>
-            <p className="text-slate-400 text-xs mt-1">You'll see booking updates and offers here</p>
+            <Bell className="w-12 h-12 mx-auto mb-3 text-slate-300 dark:text-[#4E646B]" />
+            <p className="text-slate-500 dark:text-[#8299A0] text-sm">No notifications yet</p>
+            <p className="text-slate-400 dark:text-[#6B828A] text-xs mt-1">You'll see booking updates and offers here</p>
           </motion.div>
         ) : (
           <div className="space-y-2">
@@ -94,19 +94,19 @@ const Notifications = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.03 }}
-                  className={`luxury-card p-4 flex items-start gap-4 ${!notif.read ? "border-l-2 border-l-[#2563EB]" : ""}`}
+                  className={`luxury-card p-4 flex items-start gap-4 ${!notif.read ? "border-l-2 border-l-[#5077B3]" : ""}`}
                 >
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${!notif.read ? "bg-[#2563EB]/10" : "bg-[#f4f2ef]"}`}>
-                    <Icon className={`w-4 h-4 ${!notif.read ? "text-[#2563EB]" : "text-slate-400"}`} />
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${!notif.read ? "bg-[#5077B3]/10" : "bg-[#f4f2ef] dark:bg-[#16303A]"}`}>
+                    <Icon className={`w-4 h-4 ${!notif.read ? "text-[#5077B3] dark:text-[#93B3E0]" : "text-slate-400 dark:text-[#6B828A]"}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${!notif.read ? "text-slate-900 font-medium" : "text-slate-600"}`}>{notif.message || notif.title}</p>
-                    {notif.description && <p className="text-xs text-slate-400 mt-0.5">{notif.description}</p>}
-                    <p className="text-[10px] text-slate-400 mt-1.5">
+                    <p className={`text-sm ${!notif.read ? "text-slate-900 dark:text-[#E9F1F2] font-medium" : "text-slate-600 dark:text-[#9FB2B8]"}`}>{notif.message || notif.title}</p>
+                    {notif.description && <p className="text-xs text-slate-400 dark:text-[#6B828A] mt-0.5">{notif.description}</p>}
+                    <p className="text-[10px] text-slate-400 dark:text-[#6B828A] mt-1.5">
                       {notif.createdAt ? new Date(notif.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : ""}
                     </p>
                   </div>
-                  {!notif.read && <span className="w-2 h-2 rounded-full bg-[#2563EB] shrink-0 mt-2" />}
+                  {!notif.read && <span className="w-2 h-2 rounded-full bg-[#5077B3] shrink-0 mt-2" />}
                 </motion.div>
               );
             })}

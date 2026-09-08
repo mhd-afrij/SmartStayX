@@ -35,12 +35,27 @@ export const createRoom = async (req, res) => {
       return res.json({ success: false, message: "Not authorized to add room to this hotel" });
     }
 
-    const uploadImages = req.files.map(async (file) => {
-      const response = await cloudinary.uploader.upload(file.path);
+    // `upload.array("images", 4)` is optional — no files means no images.
+    const uploadImages = (req.files || []).map(async (file) => {
+      const response = await cloudinary.uploader.upload(file.buffer, { resource_type: "auto" });
       return response.secure_url;
     });
 
     const images = await Promise.all(uploadImages);
+
+    // Amenities arrive as a JSON string (multipart form); be tolerant of
+    // already-parsed arrays and malformed payloads.
+    let amenitiesList = [];
+    if (Array.isArray(amenities)) {
+      amenitiesList = amenities;
+    } else if (typeof amenities === "string" && amenities.trim()) {
+      try {
+        const parsed = JSON.parse(amenities);
+        amenitiesList = Array.isArray(parsed) ? parsed : [];
+      } catch {
+        amenitiesList = amenities.split(",").map((a) => a.trim()).filter(Boolean);
+      }
+    }
 
     await Room.create({
       hotel: hotel._id,
@@ -50,7 +65,7 @@ export const createRoom = async (req, res) => {
       roomNumber,
       roomType,
       pricePerNight: +pricePerNight,
-      amenities: JSON.parse(amenities),
+      amenities: amenitiesList,
       images,
     });
 
@@ -58,6 +73,9 @@ export const createRoom = async (req, res) => {
 
     res.json({ success: true, message: "Room Created successfully" });
   } catch (error) {
+    if (error?.code === 11000) {
+      return res.json({ success: false, message: "A room with this room number already exists" });
+    }
     res.json({ success: false, message: error.message });
   }
 };
@@ -212,7 +230,8 @@ export const updateRoom = async (req, res) => {
     }
 
     if (isAvailable !== undefined) {
-      room.isAvailable = Boolean(isAvailable);
+      // Accept both JSON booleans and stringified "true"/"false" payloads.
+      room.isAvailable = isAvailable === true || isAvailable === "true";
     }
 
     await room.save();

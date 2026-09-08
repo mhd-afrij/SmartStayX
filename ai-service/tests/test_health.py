@@ -17,7 +17,23 @@ class AiServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(payload["service"], "SmartStayX AI Microservice")
 
     def test_routes_are_registered(self):
-        paths = {route.path for route in app.routes}
+        # Newer FastAPI versions expose included routers as `_IncludedRouter`
+        # wrappers whose sub-routes live under `original_router`, so unwrap
+        # defensively and compare full paths (prefix + route path).
+        paths = set()
+        for route in app.routes:
+            path = getattr(route, "path", None)
+            if path:
+                paths.add(path)
+                continue
+            original = getattr(route, "original_router", None)
+            if original is None:
+                continue
+            # APIRoute.path is already fully prefixed (e.g. /api/chat/message).
+            for sub in original.routes:
+                sub_path = getattr(sub, "path", None)
+                if sub_path:
+                    paths.add(sub_path)
         self.assertIn("/api/chat/message", paths)
         self.assertIn("/api/chat/message/stream", paths)
 

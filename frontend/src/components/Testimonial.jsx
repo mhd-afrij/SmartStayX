@@ -32,24 +32,24 @@ const Testimonial = () => {
               <TiltCard maxTilt={3} className="luxury-card relative p-6 group">
                 {/* Quote icon on hover */}
                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Quote className="w-6 h-6 text-[#2563EB]/25" />
+                  <Quote className="w-6 h-6 text-[#5077B3] dark:text-[#93B3E0]/25" />
                 </div>
 
                 {/* Avatar row */}
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#2563EB]/25 to-transparent blur-sm" />
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#5077B3]/25 to-transparent blur-sm" />
                     <img
-                      className="relative h-12 w-12 rounded-full border border-black/[0.08] object-cover"
+                      className="relative h-12 w-12 rounded-full border border-black/[0.08] dark:border-[#1D3842] object-cover"
                       src={testimonial.image}
                       alt={testimonial.name}
                     />
                   </div>
                   <div>
-                    <p className="font-playfair text-lg text-slate-900">
+                    <p className="font-playfair text-lg text-slate-900 dark:text-[#E9F1F2]">
                       {testimonial.name}
                     </p>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-400 dark:text-[#6B828A]">
                       {testimonial.address}
                     </p>
                   </div>
@@ -61,20 +61,20 @@ const Testimonial = () => {
                 </div>
 
                 {/* Review text */}
-                <p className="mt-4 text-sm leading-relaxed text-slate-600 italic">
+                <p className="mt-4 text-sm leading-relaxed text-slate-600 dark:text-[#9FB2B8] italic">
                   &ldquo;{testimonial.review}&rdquo;
                 </p>
 
                 {/* Visual rating bar */}
-                <div className="mt-5 pt-4 border-t border-black/[0.06]">
+                <div className="mt-5 pt-4 border-t border-black/[0.06] dark:border-[#1D3842]">
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, i) => (
                       <div
                         key={i}
                         className={`h-0.5 flex-1 rounded-full transition-colors duration-300 ${
                           i < testimonial.rating
-                            ? 'bg-[#2563EB]/50'
-                            : 'bg-black/[0.06]'
+                            ? 'bg-[#5077B3]/50'
+                            : 'bg-black/[0.06] dark:bg-white/5'
                         }`}
                       />
                     ))}

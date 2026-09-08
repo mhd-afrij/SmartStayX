@@ -26,7 +26,7 @@ export const predictPrice = async (req, res) => {
       return res.json({
         success: true,
         predictedPrice: mlResult.predictedPrice,
-        confidence: mlResult.mlConfidence,
+        mlAgreement: mlResult.mlAgreement,
         source: 'ml',
         features: mlResult.features,
       });
@@ -38,7 +38,7 @@ export const predictPrice = async (req, res) => {
     return res.json({
       success: true,
       predictedPrice: room.pricePerNight,
-      confidence: 0,
+      mlAgreement: 0,
       source: 'base',
       message: 'ML service unavailable, using base price',
     });

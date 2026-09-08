@@ -12,6 +12,13 @@ import { API } from '../configs/apiContracts.js';
 
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8001';
 const AI_TIMEOUT_MS = Number(process.env.AI_SERVICE_TIMEOUT_MS) || 30000;
+const AI_INTERNAL_TOKEN = process.env.AI_INTERNAL_TOKEN || '';
+
+if (!AI_INTERNAL_TOKEN) {
+  console.warn(
+    'AI_INTERNAL_TOKEN is not set — the AI service will reject requests; guest assistant will use the keyword fallback.'
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Fallback: static keyword matcher (used only when the AI service is down)
@@ -78,8 +85,12 @@ const createReply = async (message, { userId, conversationId, language, language
       },
       {
         timeout: AI_TIMEOUT_MS,
-        // The AI service reads the guest identity from the `user-id` header.
-        headers: userId ? { 'user-id': userId } : {},
+        // The AI service reads the guest identity from the `user-id` header,
+        // but only trusts it when the request carries the shared internal token.
+        headers: {
+          ...(userId ? { 'user-id': userId } : {}),
+          ...(AI_INTERNAL_TOKEN ? { 'x-internal-token': AI_INTERNAL_TOKEN } : {}),
+        },
       }
     );
 

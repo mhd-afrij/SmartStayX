@@ -43,7 +43,11 @@ SmartStayX/
 │       ├── services/            # LLM, context, recommendation services
 │       ├── models/              # Chat and trip MongoDB models
 │       └── utils/               # Tools and prompts
-├── ml-service/                  # Machine learning microservice
+├── ml-service/                  # Machine learning microservice (Flask)
+│   ├── routes/                  # /predict pricing endpoint
+│   ├── training/                # Training scripts + synthetic data generators
+│   ├── datasets/                # Training CSVs (synthetic unless marked real)
+│   └── saved_models/            # Trained model artifacts + metrics metadata
 └── .github/
     └── workflows/               # CI pipeline (test, build)
 ```
@@ -98,32 +102,61 @@ OPENAI_API_KEY=
 AI_MODEL=openai/gpt-4o-mini
 AI_HOST=127.0.0.1
 AI_PORT=8001
+AI_INTERNAL_TOKEN=<shared secret, must match backend/.env>
+```
+
+**ML Service** — copy `ml-service/.env.example` to `ml-service/.env`:
+
+```
+ML_SERVICE_HOST=127.0.0.1
+ML_SERVICE_PORT=5000
+ML_INTERNAL_TOKEN=<shared secret, must match backend/.env>
 ```
 
 ### Run Locally
 
+Each backend service can also run on its own — useful when developing the Python microservices separately:
+
 ```bash
-# Backend
-cd Server
+# Everything together (Express API + AI service + ML service)
+cd backend
 npm install
-npm run server
+npm run server        # or: server:api (API only), server:ai (AI service only), server:ml (ML service only)
 
 # Frontend
-cd client
+cd frontend
 npm install
 npm run dev
 
-# AI Service
+# AI Service standalone
 cd ai-service
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1        # Windows PowerShell (or: source .venv/bin/activate on Linux/macOS)
 pip install -r requirements.txt
-uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+npm run server:ai     # from backend/ — equivalent to:
+uvicorn app.main:app --host 127.0.0.1 --port 8000
 
-# ML Service
+# ML Service standalone
 cd ml-service
-python app.py
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1        # Windows PowerShell (or: source .venv/bin/activate on Linux/macOS)
+pip install -r requirements.txt
+python app.py         # or: npm run server:ml from backend/
 ```
 
-Note: Gunicorn is recommended on Linux/macOS. On Windows, use `python app.py` because Gunicorn depends on Unix-only modules.
+Note: the npm launchers (`server:ai`, `server:ml`, `server`) automatically pick up each service's `.venv` if present, then the repo-root `.venv`, then `PYTHON`/`python` on your PATH — so activating a venv manually is only needed when running `uvicorn` or `python app.py` directly.
+
+Retrain the pricing model after changing features or data:
+
+```bash
+cd ml-service
+python training/generate_synthetic_pricing_data.py   # labeled SYNTHETIC dev data (or drop a real CSV in datasets/)
+python training/train_pricing.py                     # writes saved_models/ + real MAE/RMSE/R² metrics
+```
+
+The same commands work from the repo root (`npm run server`, `server:ai`, `server:ml`) via the top-level `package.json`.
+
+Note: Gunicorn is recommended on Linux/macOS. On Windows, use `python app.py` because Gunicorn depends on Unix-only modules. The npm launchers already apply this automatically.
 
 ### Run Tests
 

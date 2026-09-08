@@ -21,12 +21,24 @@ export const createPayment = async (req, res) => {
     const booking = await Booking.findById(bookingId).populate("hotel");
     if (!booking) return res.json({ success: false, message: "Booking not found" });
 
+    // Ownership check — a guest may only pay for their own booking.
+    if (String(booking.user) !== String(req.user?._id)) {
+      return res.json({ success: false, message: "Not authorized for this payment" });
+    }
+
     const frontendUrl = process.env.FRONTEND_URL || req.headers.origin || "http://localhost:5173";
     const result = await paymentGatewayService.processPayment({ method, booking, frontendUrl });
 
     if (method === "pay_at_hotel") {
+      // Pay-at-hotel is a deferred payment: the booking is confirmed now and
+      // the guest settles the bill on arrival. Confirming also stops the
+      // booking cleaner from expiring the hold while the guest travels.
       booking.paymentMethod = "Pay At Hotel";
       booking.isPaid = false;
+      if (booking.status === "pending") {
+        booking.status = "confirmed";
+        booking.holdExpiresAt = null;
+      }
       await booking.save();
     }
 

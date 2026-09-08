@@ -4,8 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
   Users,
+  UserRound,
   ShieldCheck,
   Hotel,
+  DoorOpen,
+  CalendarCheck,
   UserCog,
   LineChart,
   CreditCard,
@@ -18,17 +21,20 @@ import {
 } from "lucide-react";
 
 const links = [
-  { name: "Overview", path: "/Admin", icon: LayoutDashboard },
-  { name: "User Management", path: "/Admin/users", icon: Users },
-  { name: "Role Management", path: "/Admin/roles", icon: ShieldCheck },
-  { name: "Hotels", path: "/Admin/hotels", icon: Hotel },
-  { name: "Hotel Managers", path: "/Admin/managers", icon: UserCog },
-  { name: "Platform Analytics", path: "/Admin/analytics", icon: LineChart },
-  { name: "Payments", path: "/Admin/payments", icon: CreditCard },
-  { name: "Reports", path: "/Admin/reports", icon: FileBarChart },
-  { name: "System Logs", path: "/Admin/logs", icon: FileClock },
-  { name: "Security", path: "/Admin/security", icon: Lock },
-  { name: "Settings", path: "/Admin/settings", icon: Settings },
+  { name: "Overview", path: "/super-admin", icon: LayoutDashboard },
+  { name: "User Management", path: "/super-admin/users", icon: Users },
+  { name: "Guests", path: "/super-admin/guests", icon: UserRound },
+  { name: "Role Management", path: "/super-admin/roles", icon: ShieldCheck },
+  { name: "Hotels", path: "/super-admin/hotels", icon: Hotel },
+  { name: "Rooms", path: "/super-admin/rooms", icon: DoorOpen },
+  { name: "Reservations", path: "/super-admin/reservations", icon: CalendarCheck },
+  { name: "Hotel Managers", path: "/super-admin/managers", icon: UserCog },
+  { name: "Platform Analytics", path: "/super-admin/analytics", icon: LineChart },
+  { name: "Payments", path: "/super-admin/payments", icon: CreditCard },
+  { name: "Reports", path: "/super-admin/reports", icon: FileBarChart },
+  { name: "Audit Logs", path: "/super-admin/audit-logs", icon: FileClock },
+  { name: "Security", path: "/super-admin/security", icon: Lock },
+  { name: "Settings", path: "/super-admin/settings", icon: Settings },
 ];
 
 const Sidebar = () => {
@@ -40,12 +46,12 @@ const Sidebar = () => {
       transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
       className="relative h-full flex-shrink-0"
     >
-      <div className="absolute inset-0 bg-[#0F172A]" />
+      <div className="absolute inset-0 bg-[#0A1628] dark:bg-[#060E18]" />
 
       <div className="relative z-10 flex flex-col h-full py-6">
-        <Link to="/Admin" className="flex items-center gap-3 px-6 mb-8">
-          <div className="w-9 h-9 rounded-lg bg-[#2563EB] flex items-center justify-center shadow-lg shadow-[#2563EB]/20">
-            <ShieldCheck className="w-5 h-5 text-white" />
+        <Link to="/super-admin" className="flex items-center gap-3 px-6 mb-8">
+          <div className="w-9 h-9 rounded-lg bg-[#D4A853] dark:bg-[#E6C075] flex items-center justify-center shadow-lg shadow-[#D4A853]/30">
+            <ShieldCheck className="w-5 h-5 text-[#2A230F]" />
           </div>
           <AnimatePresence>
             {!collapsed && (
@@ -63,21 +69,20 @@ const Sidebar = () => {
 
         <nav className="flex-1 overflow-y-auto space-y-1 px-3 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
           {links.map((item) => (
-            <NavLink key={item.path} to={item.path} end={item.path === "/Admin"} className="group relative block">
-              {({ isActive }) => (
-                <div
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
-                    isActive ? "bg-white/10 border border-white/10" : "hover:bg-white/5 border border-transparent"
-                  }`}
-                >
+            <NavLink key={item.path} to={item.path} end={item.path === "/super-admin"} className="group relative block">
+              {({ isActive }) => (                  <div
+                    className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+                      isActive ? "bg-[#D4A853]/10 border border-[#D4A853]/25 dark:bg-[#E6C075]/10 dark:border-[#E6C075]/25" : "hover:bg-white/5 dark:hover:bg-white/5 border border-transparent"
+                    }`}
+                  >
                   {isActive && (
                     <motion.div
-                      layoutId="admin-sidebar-active"
-                      className="absolute left-0 w-1 h-6 bg-[#2563EB] rounded-full"
+                      layoutId="super-admin-sidebar-active"
+                      className="absolute left-0 w-1 h-6 bg-[#D4A853] dark:bg-[#E6C075] rounded-full"
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                   )}
-                  <item.icon className={`w-5 h-5 shrink-0 transition-colors ${isActive ? "text-[#60A5FA]" : "text-white/50 group-hover:text-white/80"}`} />
+                  <item.icon className={`w-5 h-5 shrink-0 transition-colors ${isActive ? "text-[#E6C075]" : "text-white/50 group-hover:text-white/80"}`} />
                   <AnimatePresence>
                     {!collapsed && (
                       <motion.span
@@ -98,7 +103,7 @@ const Sidebar = () => {
 
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border border-white/10 bg-[#0F172A] flex items-center justify-center hover:bg-[#1E293B] transition-colors z-20 shadow-sm"
+          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border border-white/10 bg-[#0A1628] dark:bg-[#060E18] flex items-center justify-center hover:bg-[#0E1E38] dark:hover:bg-[#0D1624] transition-colors z-20 shadow-sm"
         >
           {collapsed ? <ChevronRight className="w-3 h-3 text-white/60" /> : <ChevronLeft className="w-3 h-3 text-white/60" />}
         </button>
