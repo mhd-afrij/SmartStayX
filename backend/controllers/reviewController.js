@@ -4,6 +4,8 @@ import Review from "../models/Review.js";
 import Room from "../models/Room.js";
 import Hotel from "../models/Hotel.js";
 import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
+import { awardReviewPoints } from "../services/loyaltyService.js";
+import logger from "../utils/logger.js";
 
 // Review CRUD, owner moderation, and satisfaction breakdown aggregation.
 const allowedSatisfaction = new Set([
@@ -105,6 +107,8 @@ export const createOrUpdateRoomReview = async (req, res) => {
       });
     }
 
+    const existing = await Review.exists({ user: userId, room: roomId });
+
     const review = await Review.findOneAndUpdate(
       { user: userId, room: roomId },
       {
@@ -118,6 +122,13 @@ export const createOrUpdateRoomReview = async (req, res) => {
       },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     ).populate("user", "name username image");
+
+    // Award loyalty points only when a new review is created, not on edits.
+    if (!existing && review?.hotel) {
+      awardReviewPoints({ userId, hotelId: String(review.hotel) }).catch((err) =>
+        logger.warn("Loyalty review award failed: %s", err.message)
+      );
+    }
 
     return res.json({ success: true, message: "Review saved successfully", review });
   } catch (error) {

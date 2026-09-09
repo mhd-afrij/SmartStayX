@@ -1,6 +1,9 @@
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import { requireRole } from "../middleware/authorization.js";
+import { getPlatformSettings, updatePlatformSettings, runAuditRetention } from "../controllers/platformSettingsController.js";
+import { getHotelApprovals, updateHotelApproval, getHotelDocuments } from "../controllers/adminApprovalController.js";
+import { getRevenueReport, getHotelPerformanceReport, getPaymentsReport } from "../controllers/adminReportsController.js";
 import User from "../models/User.js";
 import Hotel from "../models/Hotel.js";
 import Booking from "../models/Booking.js";
@@ -324,21 +327,24 @@ adminRouter.get("/audit-logs", async (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// System Settings placeholder
+// System Settings — platform configuration (retention, loyalty, inventory)
 // ---------------------------------------------------------------------------
-adminRouter.get("/settings", async (req, res) => {
-  try {
-    res.json({
-      success: true,
-      settings: {
-        platformName: "SmartStayX",
-        adminEmails: process.env.ADMIN_EMAILS || "",
-        maintenanceMode: false,
-      },
-    });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-});
+adminRouter.get("/settings", getPlatformSettings);
+adminRouter.put("/settings", updatePlatformSettings);
+adminRouter.post("/settings/run-audit-retention", runAuditRetention);
+
+// ---------------------------------------------------------------------------
+// Hotel approval workflow
+// ---------------------------------------------------------------------------
+adminRouter.get("/hotel-approvals", getHotelApprovals);
+adminRouter.patch("/hotels/:id/approval", updateHotelApproval);
+adminRouter.get("/hotels/:id/documents", getHotelDocuments);
+
+// ---------------------------------------------------------------------------
+// Reports (revenue, hotel performance, payments)
+// ---------------------------------------------------------------------------
+adminRouter.get("/reports/revenue", getRevenueReport);
+adminRouter.get("/reports/hotels", getHotelPerformanceReport);
+adminRouter.get("/payments", getPaymentsReport);
 
 export default adminRouter;

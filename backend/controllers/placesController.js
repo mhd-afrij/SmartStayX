@@ -1,26 +1,21 @@
-// placesController.js — Nearby places search via external APIs
-import crypto from "crypto";
-import axios from "axios";
-import TripItinerary from "../models/TripItinerary.js";
-import { API } from "../configs/apiContracts.js";
-
-// Google Places API integration: attractions, restaurants, routes, and trip itineraries.
+// placesController.js — Google Places proxy: nearby places, search, geocoding, and directions.
+// Powers the Trip Planner (nearby discovery, destination search, road routes + ETAs).
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
-const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://127.0.0.1:8001";
-const AI_TIMEOUT_MS = Number(process.env.AI_SERVICE_TIMEOUT_MS) || 45000;
-// Shared secret the AI service requires on every request (see app/middleware/auth.py).
-const AI_INTERNAL_TOKEN = process.env.AI_INTERNAL_TOKEN || "";
 
-const readQueryLocation = (query) => {
+const PLACES_BASE = "https://maps.googleapis.com/maps/api/place";
+const DIRECTIONS_BASE = "https://maps.googleapis.com/maps/api/directions/json";
+const GEOCODE_BASE = "https://maps.googleapis.com/maps/api/geocode/json";
+
+const MISSING_KEY = "GOOGLE_API_KEY is not configured";
+
+// Reads and validates lat/lng query params. Returns { ok, lat, lng }.
+const readCoordinates = (query) => {
   const lat = Number(query.lat);
   const lng = Number(query.lng);
-  const hasCoordinates = Number.isFinite(lat) && Number.isFinite(lng);
-  return {
-    hasCoordinates,
-    lat,
-    lng,
-    destination: String(query.destination || query.query || query.place || "").trim(),
-  };
+  const ok =
+    Number.isFinite(lat) && Number.isFinite(lng) &&
+    Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
+  return { ok, lat, lng };
 };
 
 const extractPhotoUrl = (place) => {
@@ -44,12 +39,12 @@ const normalizePlace = (place) => ({
 
 const fetchPlaces = async ({ type, radius, queryValue, lat, lng }) => {
   if (!GOOGLE_API_KEY) {
-    return { source: "missing_key", results: [], message: "GOOGLE_API_KEY is not configured" };
+    return { source: "missing_key", results: [], message: MISSING_KEY };
   }
 
   const endpoint = queryValue
-    ? "https://maps.googleapis.com/maps/api/place/textsearch/json"
-    : "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
+    ? `${PLACES_BASE}/textsearch/json`
+    : `${PLACES_BASE}/nearbysearch/json`;
 
   const params = queryValue
     ? { query: queryValue, key: GOOGLE_API_KEY }
@@ -69,12 +64,12 @@ const fetchPlaces = async ({ type, radius, queryValue, lat, lng }) => {
 
 export const getAttractions = async (req, res) => {
   try {
-    const location = readQueryLocation(req.query);
-    const queryValue = location.hasCoordinates
+    const location = readCoordinates(req.query);
+    const queryValue = location.ok
       ? null
-      : location.destination
-        ? `tourist attractions in ${location.destination}`
-        : null;
+      : String(req.query.destination || req.query.query || req.query.place || "")
+          ? `tourist attractions in ${String(req.query.destination || req.query.query || req.query.place).trim()}`
+          : null;
 
     const payload = await fetchPlaces({
       type: "tourist_attraction",
@@ -97,12 +92,9 @@ export const getAttractions = async (req, res) => {
 
 export const getRestaurants = async (req, res) => {
   try {
-    const location = readQueryLocation(req.query);
-    const queryValue = location.hasCoordinates
-      ? null
-      : location.destination
-        ? `restaurants in ${location.destination}`
-        : null;
+    const location = readCoordinates(req.query);
+    const destination = String(req.query.destination || req.query.query || req.query.place || "").trim();
+    const queryValue = location.ok ? null : destination ? `restaurants in ${destination}` : null;
 
     const payload = await fetchPlaces({
       type: "restaurant",
@@ -123,6 +115,241 @@ export const getRestaurants = async (req, res) => {
   }
 };
 
+// ---------------------------------------------------------------------------
+// Trip Planner endpoints
+// ---------------------------------------------------------------------------
+
+// GET /api/places/nearby?lat=&lng=&category=
+// Category-driven discovery around the hotel location. Empty category returns
+// a curated mix (tourist_attraction + restaurant + park) via text search.
+const CATEGORY_TYPES = {
+  attractions: ["tourist_attraction"],
+  restaurants: ["restaurant"],
+  shopping: ["shopping_mall", "store"],
+  airports: ["airport"],
+  hospitals: ["hospital"],
+  parks: ["park"],
+  beaches: undefined, // keyword based
+  museums: ["museum"],
+  entertainment: ["night_club", "movie_theater", "casino"],
+  transport: ["transit_station", "bus_station", "train_station", "taxi_stand"],
+};
+
+const CATEGORY_KEYWORDS = {
+  beaches: "beach",
+};
+
+export const getNearbyPlaces = async (req, res) => {
+  try {
+    const location = readCoordinates(req.query);
+    if (!location.ok) {
+      return res.json({ success: false, message: "Valid lat and lng query params are required", places: [] });
+    }
+
+    const category = String(req.query.category || "").trim().toLowerCase();
+    const types = CATEGORY_TYPES[category];
+    const keyword = CATEGORY_KEYWORDS[category] || undefined;
+    const radius = Math.min(Math.max(Number(req.query.radius) || 15000, 500), 50000);
+
+    if (!GOOGLE_API_KEY) {
+      return res.json({ success: false, source: "missing_key", message: MISSING_KEY, places: [] });
+    }
+
+    let places = [];
+    if (types) {
+      // Split into multiple Google types when a category maps to more than one.
+      const chunks = await Promise.all(
+        types.slice(0, 2).map(async (type) => {
+          const payload = await fetchPlaces({ type, radius, lat: location.lat, lng: location.lng });
+          return payload.results;
+        })
+      );
+      const seen = new Set();
+      places = chunks.flat().filter((p) => {
+        if (!p.placeId || seen.has(p.placeId)) return false;
+        seen.add(p.placeId);
+        return true;
+      });
+    } else {
+      // Keyword search around the hotel (e.g. beaches) via text search with
+      // a location bias — the Places text search API honors "in <area>" only,
+      // so we fall back to a text query anchored to the hotel's city context.
+      const payload = await fetchPlaces({
+        type: undefined,
+        radius,
+        queryValue: `${keyword || "tourist attractions"} near ${location.lat},${location.lng}`,
+        lat: location.lat,
+        lng: location.lng,
+      });
+      places = payload.results.filter(
+        (p) => Number.isFinite(p.lat) && Number.isFinite(p.lng)
+      );
+    }
+
+    res.json({ success: true, source: "google", category: category || "all", places });
+  } catch (error) {
+    res.json({ success: false, message: error.message, places: [] });
+  }
+};
+
+// GET /api/places/search?query=&lat=&lng=
+// Free-text destination search with optional location bias (hotel area first).
+export const searchPlaces = async (req, res) => {
+  try {
+    const query = String(req.query.query || req.query.q || "").trim();
+    if (!query) {
+      return res.json({ success: false, message: "query is required", places: [] });
+    }
+    if (!GOOGLE_API_KEY) {
+      return res.json({ success: false, source: "missing_key", message: MISSING_KEY, places: [] });
+    }
+
+    const url = new URL(`${PLACES_BASE}/textsearch/json`);
+    url.searchParams.set("query", query);
+    url.searchParams.set("key", GOOGLE_API_KEY);
+
+    const response = await fetch(url.toString());
+    const data = await response.json();
+
+    const places = Array.isArray(data.results) ? data.results.map(normalizePlace) : [];
+    res.json({
+      success: Boolean(data.status === "OK" || data.status === "ZERO_RESULTS"),
+      source: "google",
+      places,
+    });
+  } catch (error) {
+    res.json({ success: false, message: error.message, places: [] });
+  }
+};
+
+// GET /api/places/reverse-geocode?lat=&lng=
+// Resolves clicked map coordinates to an address.
+export const reverseGeocode = async (req, res) => {
+  try {
+    const location = readCoordinates(req.query);
+    if (!location.ok) {
+      return res.json({ success: false, message: "Valid lat and lng query params are required" });
+    }
+    if (!GOOGLE_API_KEY) {
+      return res.json({ success: false, message: MISSING_KEY });
+    }
+
+    const url = new URL(GEOCODE_BASE);
+    url.searchParams.set("latlng", `${location.lat},${location.lng}`);
+    url.searchParams.set("key", GOOGLE_API_KEY);
+
+    const response = await fetch(url.toString());
+    const data = await response.json();
+    const first = data?.results?.[0] || null;
+
+    res.json({
+      success: Boolean(first),
+      address: first?.formatted_address || "",
+      location: first ? { lat: location.lat, lng: location.lng } : null,
+    });
+  } catch (error) {
+    res.json({ success: false, message: error.message, address: "" });
+  }
+};
+
+// GET /api/places/directions?origin=lat,lng&destination=lat,lng[&waypoint=lat,lng...]
+// Road-based directions supporting up to N waypoints (Google's limit is 23).
+// Returns a normalized route: legs with distance/duration text + values and
+// the overview polyline for rendering.
+export const getDirections = async (req, res) => {
+  try {
+    const origin = String(req.query.origin || "").trim();
+    const destination = String(req.query.destination || "").trim();
+    const waypoints = Array.isArray(req.query.waypoint)
+      ? req.query.waypoint
+      : req.query.waypoint
+        ? [req.query.waypoint]
+        : [];
+
+    if (!origin || !destination) {
+      return res.json({ success: false, message: "origin and destination are required", route: null });
+    }
+    if (!GOOGLE_API_KEY) {
+      return res.json({ success: false, message: MISSING_KEY, route: null });
+    }
+
+    const url = new URL(DIRECTIONS_BASE);
+    url.searchParams.set("origin", origin);
+    url.searchParams.set("destination", destination);
+    if (waypoints.length > 0) {
+      if (waypoints.length > 23) {
+        return res.json({ success: false, message: "Too many stops for a single route", route: null });
+      }
+      url.searchParams.set("waypoints", `optimize:false|${waypoints.join("|")}`);
+    }
+    url.searchParams.set("key", GOOGLE_API_KEY);
+
+    const response = await fetch(url.toString());
+    const data = await response.json();
+    const route = data?.routes?.[0] || null;
+
+    if (!route) {
+      const status = data?.status || "NO_ROUTE";
+      const friendly =
+        status === "ZERO_RESULTS"
+          ? "No route is available between these locations."
+          : "Unable to calculate this route.";
+      return res.json({ success: false, message: friendly, status, route: null });
+    }
+
+    const legs = (route.legs || []).map((leg) => ({
+      distance: { text: leg.distance?.text || "", value: leg.distance?.value || 0 },
+      duration: { text: leg.duration?.text || "", value: leg.duration?.value || 0 },
+      startAddress: leg.start_address || "",
+      endAddress: leg.end_address || "",
+      startLocation: leg.start_location || null,
+      endLocation: leg.end_location || null,
+    }));
+
+    res.json({
+      success: true,
+      message: "Route loaded",
+      route: {
+        summary: route.summary || "",
+        legs,
+        overviewPolyline: route.overview_polyline?.points || "",
+        bounds: route.bounds || null,
+      },
+    });
+  } catch (error) {
+    res.json({ success: false, message: "Unable to calculate this route.", route: null });
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Legacy single-endpoint geocode + raw route (kept for existing consumers)
+// ---------------------------------------------------------------------------
+
+export const geocode = async (req, res) => {
+  try {
+    const place = req.query.place;
+    if (!place) {
+      return res.json({ success: false, message: "place query param is required" });
+    }
+    if (!GOOGLE_API_KEY) {
+      return res.json({ success: false, message: MISSING_KEY });
+    }
+    const url = new URL(GEOCODE_BASE);
+    url.searchParams.set("address", place);
+    url.searchParams.set("key", GOOGLE_API_KEY);
+    const response = await fetch(url.toString());
+    const data = await response.json();
+    const location = data?.results?.[0]?.geometry?.location || null;
+    res.json({
+      success: Boolean(location),
+      location,
+      place: data?.results?.[0]?.formatted_address || place,
+    });
+  } catch (error) {
+    res.json({ success: false, message: error.message, location: null });
+  }
+};
+
 export const getRoute = async (req, res) => {
   try {
     const origin = String(req.query.origin || "").trim();
@@ -133,10 +360,10 @@ export const getRoute = async (req, res) => {
     }
 
     if (!GOOGLE_API_KEY) {
-      return res.json({ success: false, message: "GOOGLE_API_KEY is not configured", route: null });
+      return res.json({ success: false, message: MISSING_KEY, route: null });
     }
 
-    const url = new URL("https://maps.googleapis.com/maps/api/directions/json");
+    const url = new URL(DIRECTIONS_BASE);
     url.searchParams.set("origin", origin);
     url.searchParams.set("destination", destination);
     url.searchParams.set("key", GOOGLE_API_KEY);
@@ -155,320 +382,3 @@ export const getRoute = async (req, res) => {
     res.json({ success: false, message: error.message, route: null });
   }
 };
-
-export const geocode = async (req, res) => {
-  try {
-    const { place } = req.query;
-    if (!place) {
-      return res.json({ success: false, message: "place query param is required" });
-    }
-    if (!GOOGLE_API_KEY) {
-      return res.json({ success: false, message: "GOOGLE_API_KEY is not configured" });
-    }
-    const url = new URL("https://maps.googleapis.com/maps/api/geocode/json");
-    url.searchParams.set("address", place);
-    url.searchParams.set("key", GOOGLE_API_KEY);
-    const response = await fetch(url.toString());
-    const data = await response.json();
-    const location = data?.results?.[0]?.geometry?.location || null;
-    res.json({ success: Boolean(location), location, place: data?.results?.[0]?.formatted_address || place });
-  } catch (error) {
-    res.json({ success: false, message: error.message, location: null });
-  }
-};
-
-// ---------------------------------------------------------------------------
-// Trip itinerary CRUD + AI generation
-// ---------------------------------------------------------------------------
-
-export const getItinerary = async (req, res) => {
-  try {
-    const { tripId } = req.query;
-    if (tripId) {
-      const itinerary = await TripItinerary.findOne({ user: req.user._id, tripId: String(tripId) });
-      return res.json({ success: true, itinerary: itinerary || null });
-    }
-    const itineraries = await TripItinerary.find({ user: req.user._id }).sort({ updatedAt: -1 });
-    res.json({ success: true, itineraries });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-};
-
-export const upsertItineraryItem = async (req, res) => {
-  try {
-    const {
-      tripId, title, type, day = 1, address = "", notes = "",
-      placeId = "", rating = 0, photoUrl = "", lat, lng,
-    } = req.body;
-
-    if (!tripId || !title || !type) {
-      return res.json({ success: false, message: "tripId, title and type are required" });
-    }
-
-    const itinerary = await TripItinerary.findOneAndUpdate(
-      { user: req.user._id, tripId: String(tripId) },
-      {
-        $setOnInsert: {
-          user: req.user._id,
-          tripId,
-          title: `Trip ${tripId}`,
-        },
-        $push: {
-          items: {
-            type,
-            title,
-            address,
-            day: Number(day) || 1,
-            notes,
-            placeId,
-            rating: Number(rating) || 0,
-            photoUrl,
-            lat: Number.isFinite(Number(lat)) ? Number(lat) : undefined,
-            lng: Number.isFinite(Number(lng)) ? Number(lng) : undefined,
-          },
-        },
-      },
-      { new: true, upsert: true }
-    );
-
-    res.json({ success: true, message: "Itinerary item added", itinerary });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-};
-
-export const deleteItineraryItem = async (req, res) => {
-  try {
-    const { tripId, itemId } = req.params;
-    if (!tripId || !itemId) {
-      return res.json({ success: false, message: "tripId and itemId are required" });
-    }
-    const itinerary = await TripItinerary.findOneAndUpdate(
-      { user: req.user._id, tripId: String(tripId) },
-      { $pull: { items: { _id: itemId } } },
-      { new: true }
-    );
-    if (!itinerary) {
-      return res.json({ success: false, message: "Itinerary not found" });
-    }
-    res.json({ success: true, message: "Itinerary item removed", itinerary });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-};
-
-export const clearItinerary = async (req, res) => {
-  try {
-    const { tripId } = req.params;
-    if (!tripId) {
-      return res.json({ success: false, message: "tripId is required" });
-    }
-    const deleted = await TripItinerary.findOneAndDelete({ user: req.user._id, tripId: String(tripId) });
-    res.json({ success: true, message: "Trip deleted", deleted: Boolean(deleted) });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-};
-
-export const renameTrip = async (req, res) => {
-  try {
-    const { tripId } = req.params;
-    const { title } = req.body;
-    if (!tripId || !title) {
-      return res.json({ success: false, message: "tripId and title are required" });
-    }
-    const itinerary = await TripItinerary.findOneAndUpdate(
-      { user: req.user._id, tripId: String(tripId) },
-      { $set: { title } },
-      { new: true }
-    );
-    if (!itinerary) {
-      return res.json({ success: false, message: "Itinerary not found" });
-    }
-    res.json({ success: true, itinerary });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-};
-
-export const duplicateTrip = async (req, res) => {
-  try {
-    const { tripId } = req.params;
-    const source = await TripItinerary.findOne({ user: req.user._id, tripId: String(tripId) });
-    if (!source) {
-      return res.json({ success: false, message: "Itinerary not found" });
-    }
-    const newTripId = crypto.randomUUID();
-    const copy = await TripItinerary.create({
-      user: req.user._id,
-      tripId: newTripId,
-      title: `${source.title} (Copy)`,
-      destination: source.destination,
-      origin: source.origin,
-      items: source.items.map((item) => item.toObject({ getters: false })),
-    });
-    res.json({ success: true, itinerary: copy });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-};
-
-const ACTIVITY_TYPE_BY_INTEREST = {
-  beaches: "activity",
-  nature: "activity",
-  adventure: "activity",
-  culture: "attraction",
-  history: "attraction",
-  food: "restaurant",
-  shopping: "activity",
-  nightlife: "activity",
-  relaxation: "activity",
-  family: "activity",
-};
-
-const dayCount = (startDate, endDate) => {
-  if (!startDate || !endDate) return 3;
-  const ms = new Date(endDate) - new Date(startDate);
-  return Math.max(1, Math.min(21, Math.ceil(ms / (1000 * 60 * 60 * 24)) + 1));
-};
-
-// Extracts the first well-formed JSON object/array embedded in a free-form LLM reply.
-const extractJson = (text) => {
-  if (!text || typeof text !== "string") return null;
-  const fencedMatch = text.match(/```json\s*([\s\S]*?)```/i) || text.match(/```\s*([\s\S]*?)```/);
-  const candidate = fencedMatch ? fencedMatch[1] : text;
-  const start = candidate.search(/[[{]/);
-  if (start === -1) return null;
-  const openChar = candidate[start];
-  const closeChar = openChar === "{" ? "}" : "]";
-  let depth = 0;
-  for (let i = start; i < candidate.length; i++) {
-    if (candidate[i] === openChar) depth++;
-    else if (candidate[i] === closeChar) {
-      depth--;
-      if (depth === 0) {
-        try {
-          return JSON.parse(candidate.slice(start, i + 1));
-        } catch {
-          return null;
-        }
-      }
-    }
-  }
-  return null;
-};
-
-const buildItineraryPrompt = (params) => {
-  const {
-    destination, startDate, endDate, travelers, budget, interests,
-    activityPreferences, transportPreference, foodPreference, travelPace, accessibilityRequirements,
-  } = params;
-  const nights = dayCount(startDate, endDate);
-
-  return `You are a luxury travel planner. Generate a ${nights}-day trip itinerary for ${destination}.
-Trip dates: ${startDate || "flexible"} to ${endDate || "flexible"}.
-Travelers: ${travelers || 1}. Budget: ${budget || "not specified"}.
-Interests: ${(interests || []).join(", ") || "general sightseeing"}.
-Activity preferences: ${activityPreferences || "none specified"}.
-Transport preference: ${transportPreference || "any"}.
-Food preference: ${foodPreference || "any"}.
-Travel pace: ${travelPace || "moderate"}.
-Accessibility requirements: ${accessibilityRequirements || "none"}.
-
-Respond with ONLY valid JSON (no prose, no markdown fences) in this exact shape:
-{
-  "title": "short trip title",
-  "items": [
-    {
-      "day": 1,
-      "type": "attraction | restaurant | activity | hotel",
-      "title": "place name",
-      "address": "approximate address or area",
-      "notes": "1-2 sentence description including any estimated cost or duration",
-      "rating": 4.5
-    }
-  ]
-}
-Include 3-4 items per day covering morning, afternoon, and evening. Keep it realistic for ${destination}.`;
-};
-
-export const generateItinerary = async (req, res) => {
-  try {
-    const {
-      destination, startDate, endDate, travelers, budget, interests,
-      activityPreferences, transportPreference, foodPreference, travelPace,
-      accessibilityRequirements, tripId,
-    } = req.body || {};
-
-    if (!destination) {
-      return res.status(400).json({ success: false, message: "destination is required" });
-    }
-
-    const prompt = buildItineraryPrompt({
-      destination, startDate, endDate, travelers, budget, interests,
-      activityPreferences, transportPreference, foodPreference, travelPace, accessibilityRequirements,
-    });
-
-    let parsed = null;
-    try {
-      const { data } = await axios.post(
-        `${AI_SERVICE_URL}${API.ai.chat}`,
-        { message: prompt, conversationId: null, language: null, languageName: null },
-        {
-          timeout: AI_TIMEOUT_MS,
-          headers: {
-            ...(req.user?._id ? { "user-id": req.user._id } : {}),
-            ...(AI_INTERNAL_TOKEN ? { "x-internal-token": AI_INTERNAL_TOKEN } : {}),
-          },
-        }
-      );
-      parsed = extractJson(data?.message || "");
-    } catch (aiError) {
-      return res.status(502).json({
-        success: false,
-        message: `AI service unavailable: ${aiError.message}`,
-      });
-    }
-
-    if (!parsed || !Array.isArray(parsed.items)) {
-      return res.status(502).json({
-        success: false,
-        message: "AI service returned an unparseable itinerary. Please try again.",
-      });
-    }
-
-    const items = parsed.items.map((item) => ({
-      type: String(item.type || ACTIVITY_TYPE_BY_INTEREST[(interests || [])[0]?.toLowerCase()] || "activity").toLowerCase(),
-      title: String(item.title || "Untitled"),
-      address: String(item.address || ""),
-      day: Number(item.day) || 1,
-      notes: String(item.notes || ""),
-      placeId: "",
-      rating: Number(item.rating) || 0,
-      photoUrl: "",
-      lat: undefined,
-      lng: undefined,
-    }));
-
-    const finalTripId = tripId || crypto.randomUUID();
-    const itinerary = await TripItinerary.findOneAndUpdate(
-      { user: req.user._id, tripId: String(finalTripId) },
-      {
-        $set: {
-          user: req.user._id,
-          tripId: String(finalTripId),
-          title: parsed.title || `Trip to ${destination}`,
-          destination,
-          items,
-        },
-      },
-      { new: true, upsert: true }
-    );
-
-    res.json({ success: true, message: "Itinerary generated", itinerary });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-

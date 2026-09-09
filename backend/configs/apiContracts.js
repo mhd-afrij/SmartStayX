@@ -45,7 +45,10 @@ export const API = {
     suggest: '/api/pricing/suggest',
     occupancy: '/api/pricing/occupancy',
     update: '/api/pricing/update',
-    enhanced: '/api/pricing/enhanced',
+    forecast: '/api/pricing/forecast',
+    suggestions: '/api/pricing/suggestions',
+    enhanced: '/api/pricing/ml/enhanced',
+    predict: '/api/pricing/ml/predict',
   },
   guestAssistant: {
     chat: '/api/guest-assistant/chat',

@@ -14,6 +14,8 @@ import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 import { BOOKING_ERRORS, BOOKING_SUCCESS } from "../constants/messages.js";
 import bookingConfig from "../configs/bookingConfig.js";
 import { notifyNewBooking, notifyPaymentReceived, notifyCancellation } from "../utils/notificationHelper.js";
+import { awardBookingPoints } from "../services/loyaltyService.js";
+import logger from "../utils/logger.js";
 import { ok, badRequest, unauthorized, notFound, serverError } from "../utils/apiResponse.js";
 
 // ---------------------------------------------------------------------------
@@ -261,8 +263,10 @@ export const payBooking = async (req, res, next) => {
 
     booking.isPaid = true;
     booking.status = BOOKING_STATUS.CONFIRMED;
+    booking.paymentReceivedAt = booking.paymentReceivedAt || new Date();
     await booking.save();
     notifyPaymentReceived(booking);
+    awardBookingPoints({ booking }).catch((err) => logger.warn("Loyalty award failed: %s", err.message));
 
     ok(res, { booking });
   } catch (error) {
@@ -397,10 +401,12 @@ export const confirmCheckoutSession = async (req, res, next) => {
         booking.isPaid = true;
         booking.status = BOOKING_STATUS.CONFIRMED;
         booking.paymentMethod = "Stripe";
+        booking.paymentReceivedAt = booking.paymentReceivedAt || new Date();
         booking.stripeSessionId = session.id;
         booking.stripePaymentIntentId = session.payment_intent || null;
         await booking.save();
         notifyPaymentReceived(booking);
+        awardBookingPoints({ booking }).catch((err) => logger.warn("Loyalty award failed: %s", err.message));
       }
       return ok(res, { paid: true, booking });
     }

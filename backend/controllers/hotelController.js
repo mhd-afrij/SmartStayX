@@ -12,10 +12,20 @@ import { clerkClient } from "@clerk/express";
 const escapeRegex = (value = "") =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+// Parses optional latitude/longitude input (string or number) into a Hotel
+// location point. Returns undefined when no valid coordinates were provided.
+const parseLocationInput = (latitude, longitude) => {
+  const lat = Number(latitude);
+  const lng = Number(longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return undefined;
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return undefined;
+  return { type: "Point", coordinates: [lng, lat] };
+};
+
 // Register a new hotel and promote user to hotelOwner role.
 export const registerHotel = async (req, res) => {
   try {
-    const { name, address, contact, city, description } = req.body;
+    const { name, address, contact, city, description, latitude, longitude, country } = req.body;
     const owner = req.user?._id;
 
     if (!owner) {
@@ -31,7 +41,9 @@ export const registerHotel = async (req, res) => {
       address: String(address).trim(),
       contact: String(contact).trim(),
       city: String(city).trim(),
+      country: country ? String(country).trim() : "",
       description: description ? String(description).trim() : "",
+      location: parseLocationInput(latitude, longitude),
       owner,
     });
 
@@ -93,7 +105,7 @@ export const updateOwnerHotel = async (req, res) => {
   try {
     const ownerId = String(req.user?._id || "");
     const { id } = req.params;
-    const { name, address, contact, city, description } = req.body;
+    const { name, address, contact, city, description, latitude, longitude, country, clearLocation } = req.body;
 
     if (!ownerId) {
       return res.json({ success: false, message: "Not authenticated" });
@@ -112,7 +124,18 @@ export const updateOwnerHotel = async (req, res) => {
     if (address) hotel.address = String(address).trim();
     if (contact) hotel.contact = String(contact).trim();
     if (city) hotel.city = String(city).trim();
+    if (country !== undefined) hotel.country = String(country || "").trim();
     hotel.description = description ? String(description).trim() : "";
+
+    // Coordinates: set when valid latitude+longitude arrive; removed when the
+    // client explicitly sends clearLocation (e.g. "true"). FormData sends
+    // strings, so empty strings are treated as "not provided".
+    const parsedLocation = parseLocationInput(latitude, longitude);
+    if (parsedLocation) {
+      hotel.location = parsedLocation;
+    } else if (String(clearLocation || "").toLowerCase() === "true") {
+      hotel.location = undefined;
+    }
 
     if (req.file) {
       const uploadRes = await cloudinary.uploader.upload(req.file.buffer, { resource_type: "auto" });

@@ -6,6 +6,8 @@ import Hotel from '../models/Hotel.js';
 import Offer from '../models/Offer.js';
 import { BOOKING_STATUS } from '../constants/bookingStatuses.js';
 import bookingConfig from '../configs/bookingConfig.js';
+import { awardBookingPoints } from './loyaltyService.js';
+import logger from '../utils/logger.js';
 
 // -----------------------------------------------------------------------
 // Helpers — date normalization, availability check, pricing rules
@@ -325,6 +327,7 @@ const createBooking = async ({ userId, room, checkInDate, checkOutDate, guests, 
       holdExpiresAt,
       idempotencyKey,
       status: BOOKING_STATUS.PENDING,
+      paymentPendingAt: now,
       offer: pricing.offerDiscountPercent > 0 ? offerId : undefined,
       offerDiscountPercent: pricing.offerDiscountPercent > 0 ? pricing.offerDiscountPercent : undefined,
       originalPricePerNight: pricing.originalPricePerNight,
@@ -345,11 +348,20 @@ const confirmPayment = async ({ bookingId, stripeSessionId, stripePaymentIntentI
   const booking = await Booking.findById(bookingId);
   if (!booking) throw Object.assign(new Error('Booking not found'), { status: 404 });
 
+  const wasPaid = booking.isPaid;
   booking.isPaid = true;
   booking.status = BOOKING_STATUS.CONFIRMED;
+  booking.paymentReceivedAt = booking.paymentReceivedAt || new Date();
   if (stripeSessionId) booking.stripeSessionId = stripeSessionId;
   if (stripePaymentIntentId) booking.stripePaymentIntentId = stripePaymentIntentId;
   await booking.save();
+
+  // Award loyalty points once, on first captured payment.
+  if (!wasPaid) {
+    awardBookingPoints({ booking }).catch((err) =>
+      logger.warn('Loyalty award failed for booking %s: %s', bookingId, err.message)
+    );
+  }
 
   return booking;
 };

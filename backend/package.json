@@ -11,7 +11,7 @@
     "server:ml": "node scripts/start-ml.js",
     "start": "node server.js",
     "seed": "node utils/seedData.js",
-    "test": "node --test tests/smoke.test.js tests/roles.test.js",
+    "test": "node --test tests/smoke.test.js tests/roles.test.js tests/tripPlanner.test.js",
     "test:smoke": "node tests/smoke.test.js"
   },
   "keywords": [],

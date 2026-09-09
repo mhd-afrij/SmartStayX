@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useAppContext } from '../../context/AppContext';
+import Sidebar from '../components/Sidebar';
 import ReceptionistNavbar from '../components/Navbar';
+import { useAppContext } from '../../context/AppContext';
 
 const Layout = () => {
   // Super admins and hotel managers may view the receptionist dashboard
@@ -30,6 +31,7 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-[#F7F5F0] dark:bg-[#111412]">
+      <Sidebar />
       <div className="flex flex-col">
         <ReceptionistNavbar />
         <main className="flex-1 overflow-y-auto scrollbar-hide">

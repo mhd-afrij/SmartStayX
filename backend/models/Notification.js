@@ -6,7 +6,11 @@ const notificationSchema = new mongoose.Schema(
     hotel: { type: mongoose.Schema.Types.ObjectId, ref: "Hotel", required: true }, // Hotel this notification belongs to
     type: {
       type: String,
-      enum: ["new_booking", "payment_received", "check_in", "check_out", "maintenance", "cancellation", "review", "room_assigned"],
+      enum: [
+        "new_booking", "payment_received", "check_in", "check_out",
+        "maintenance", "cancellation", "review", "room_assigned",
+        "low_stock", "housekeeping", "attendance", "leave", "inventory", "loyalty",
+      ],
       required: true,
     }, // Category of notification event
     title: { type: String, required: true }, // Short notification title

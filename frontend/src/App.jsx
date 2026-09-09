@@ -27,7 +27,11 @@ import PaymentManagement from './hotelOwner/pages/PaymentManagement';
 import ServiceManagement from './hotelOwner/pages/ServiceManagement';
 import ReviewsManagement from './hotelOwner/pages/ReviewsManagement';
 import TestimonialsManagement from './hotelOwner/pages/TestimonialsManagement';
-import DynamicPricing from './hotelOwner/pages/DynamicPricing';
+ import Housekeeping from './hotelOwner/pages/Housekeeping';
+ import Inventory from './hotelOwner/pages/Inventory';
+ import Attendance from './hotelOwner/pages/Attendance';
+ import LoyaltyManagement from './hotelOwner/pages/LoyaltyManagement';
+ import DynamicPricing from './hotelOwner/pages/DynamicPricing';
 import AnalyticsDashboard from './hotelOwner/pages/AnalyticsDashboard';
 import StaffManagement from './hotelOwner/pages/StaffManagement';
 import AddRoom from './hotelOwner/pages/rooms/AddRoom';
@@ -37,8 +41,6 @@ import DestinationManagement from './hotelOwner/pages/DestinationManagement';
 import OwnerProfile from './hotelOwner/pages/OwnerProfile';
 
 // ── Receptionist ───────────────────────────────────────────────────────
-import ReceptionistLayout from './receptionist/pages/Layout';
-import ReceptionistReservations from './receptionist/pages/Reservations';
 import ReceptionistRooms from './receptionist/pages/Rooms';
 import ReceptionistRoomStatusBoard from './receptionist/pages/RoomStatusBoard';
 import ReceptionistAssignedTasks from './receptionist/pages/AssignedTasks';
@@ -46,9 +48,11 @@ import ReceptionistPayments from './receptionist/pages/Payments';
 import ReceptionistServices from './receptionist/pages/Services';
 import ReceptionistOffers from './receptionist/pages/Offers';
 import ReceptionistReviews from './receptionist/pages/Reviews';
+import ReceptionistFrontDesk from './receptionist/pages/FrontDesk';
 
 // ── Super Admin ────────────────────────────────────────────────────────
 import AdminLayout from './admin/pages/Layout';
+import ReceptionistLayout from './receptionist/pages/Layout.jsx';
 import AdminDashboard from './admin/pages/Dashboard';
 import AdminComingSoon from './admin/pages/ComingSoon';
 import AdminUserManagement from './admin/pages/UserManagement';
@@ -58,6 +62,11 @@ import AdminGuests from './admin/pages/Guests';
 import AdminRooms from './admin/pages/Rooms';
 import AdminReservations from './admin/pages/Reservations';
 import AdminAnalytics from './admin/pages/Analytics';
+import AdminSecurityCenter from './admin/pages/SecurityCenter';
+import AdminAuditLogs from './admin/pages/AuditLogs';
+import AdminPlatformSettings from './admin/pages/PlatformSettings';
+import AdminHotelApprovals from './admin/pages/HotelApprovals';
+import AdminReports from './admin/pages/Reports';
 
 // ── Lazy-loaded public pages ───────────────────────────────────────────
 const Blog = lazy(() => import('./pages/Blog'));
@@ -157,6 +166,7 @@ const App = () => {
           <Route path="/signup/*" element={<SuspenseWrap><SignUp /></SuspenseWrap>} />
           <Route path="/blog" element={<SuspenseWrap><Blog /></SuspenseWrap>} />
           <Route path="/trip-planner" element={<SuspenseWrap><TripPlanner /></SuspenseWrap>} />
+          <Route path="/dashboard/trip-planner" element={<Navigate to="/trip-planner" replace />} />
           <Route path="/payment/:bookingId" element={<PaymentPage />} />
           <Route path="/booking/:roomId" element={<BookingWizard />} />
           <Route path="/profile" element={<SuspenseWrap><Profile /></SuspenseWrap>} />
@@ -181,10 +191,11 @@ const App = () => {
             <Route path='analytics' element={<AdminAnalytics />} />
             <Route path='managers' element={<AdminComingSoon title="Hotel Managers" />} />
             <Route path='payments' element={<AdminComingSoon title="Payments" />} />
-            <Route path='reports' element={<AdminComingSoon title="Reports" />} />
-            <Route path='audit-logs' element={<AdminComingSoon title="Audit Logs" />} />
-            <Route path='security' element={<AdminComingSoon title="Security" />} />
-            <Route path='settings' element={<AdminComingSoon title="Settings" />} />
+            <Route path='reports' element={<AdminReports />} />
+            <Route path='audit-logs' element={<AdminAuditLogs />} />
+            <Route path='security' element={<AdminSecurityCenter />} />
+            <Route path='settings' element={<AdminPlatformSettings />} />
+            <Route path='hotel-approvals' element={<AdminHotelApprovals />} />
           </Route>
 
           {/* ── Hotel Manager dashboard ───────────────────────────── */}
@@ -204,12 +215,16 @@ const App = () => {
             <Route path='staff-management' element={<StaffManagement />} />
             <Route path='role-management' element={<RoleManagement />} />
             <Route path='destinations' element={<DestinationManagement />} />
+            <Route path='housekeeping' element={<Housekeeping />} />
+            <Route path='inventory' element={<Inventory />} />
+            <Route path='attendance' element={<Attendance />} />
+            <Route path='loyalty' element={<LoyaltyManagement />} />
             <Route path='profile' element={<OwnerProfile />} />
           </Route>
 
           {/* ── Receptionist dashboard ────────────────────────────── */}
           <Route path='/receptionist' element={<ProtectedRoute allowedRoles={["receptionist", "hotel_manager", "super_admin"]}><ReceptionistLayout /></ProtectedRoute>}>
-            <Route index element={<ReceptionistReservations />} />
+            <Route index element={<ReceptionistFrontDesk />} />
             <Route path='rooms' element={<ReceptionistRooms />} />
             <Route path='room-status' element={<ReceptionistRoomStatusBoard />} />
             <Route path='tasks' element={<ReceptionistAssignedTasks />} />

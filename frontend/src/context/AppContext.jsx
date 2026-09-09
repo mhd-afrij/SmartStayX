@@ -130,9 +130,19 @@ export const AppProvider = ({ children }) => {
   }, [theme]);
   const toggleTheme = useCallback(() => setTheme((t) => (t === "dark" ? "light" : "dark")), []);
 
-  const isSuperAdmin = dashboardAccess === "super_admin";
-  const isHotelManager = dashboardAccess === "hotel_manager";
-  const isReceptionist = dashboardAccess === "receptionist";
+  // The default Clerk session token has no role claim, so the backend may
+  // briefly report a stale/guest access before /api/user settles. Fall back to
+  // Clerk's public metadata (source of truth) so staff dashboards always show.
+  const clerkRoleFallback =
+    clerkUser?.publicMetadata?.role || clerkUser?.public_metadata?.role || null;
+  const effectiveAccess =
+    dashboardAccess && dashboardAccess !== "none"
+      ? dashboardAccess
+      : deriveDashboardAccess(clerkRoleFallback);
+
+  const isSuperAdmin = effectiveAccess === "super_admin";
+  const isHotelManager = effectiveAccess === "hotel_manager";
+  const isReceptionist = effectiveAccess === "receptionist";
   // Legacy alias — backward compatible during migration
   const isOwner = isHotelManager;
 

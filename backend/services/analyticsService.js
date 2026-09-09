@@ -53,9 +53,11 @@ export const getBookingTrends = async ({ hotelId, range = '30d', granularity = '
   };
 };
 
-export const getPopularDestinations = async ({ limit = 10 } = {}) => {
+export const getPopularDestinations = async ({ hotelId, limit = 10 } = {}) => {
+  const matchTimeUnity = { status: { $ne: BOOKING_STATUS.CANCELLED } };
+  if (hotelId) matchTimeUnity.hotel = hotelId;
   const pipeline = [
-    { $match: { status: { $ne: BOOKING_STATUS.CANCELLED } } },
+    { $match: matchTimeUnity },
     { $group: { _id: '$hotel', bookings: { $sum: 1 }, revenue: { $sum: '$totalPrice' } } },
     { $sort: { bookings: -1 } },
     { $limit: limit },
@@ -124,9 +126,10 @@ export const getRevenueAnalytics = async ({ hotelId, range = '30d' } = {}) => {
   };
 };
 
-export const getGuestDemographics = async ({ range = '30d' } = {}) => {
+export const getGuestDemographics = async ({ hotelId, range = '30d' } = {}) => {
   const from = startDate(range);
   const match = { createdAt: { $gte: from }, status: { $ne: BOOKING_STATUS.CANCELLED } };
+  if (hotelId) match.hotel = hotelId;
 
   const bookings = await Booking.find(match)
     .populate('hotel', 'name city')
