@@ -30,11 +30,11 @@ const Layout = () => {
   if (!user || !canAccess) return null;
 
   return (
-    <div className="min-h-screen bg-[#F7F5F0] dark:bg-[#111412]">
+    <div className="flex min-h-screen bg-[#F7F5F0] dark:bg-[#111412]">
       <Sidebar />
-      <div className="flex flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <ReceptionistNavbar />
-        <main className="flex-1 overflow-y-auto scrollbar-hide">
+        <main className="min-w-0 flex-1 overflow-y-auto scrollbar-hide">
           <div className="p-6 lg:p-8">
             <Outlet />
           </div>
