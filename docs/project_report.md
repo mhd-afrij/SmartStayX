@@ -140,7 +140,6 @@ Key public routes include:
 - `/login/*`
 - `/signup/*`
 - `/blog`
-- `/trip-planner`
 - `/payment/:bookingId`
 - `/booking/:roomId`
 - `/profile`
@@ -408,7 +407,6 @@ Major backend API areas:
 | `/api/reviews` | Room and owner reviews |
 | `/api/notifications` | Notification listing and read state |
 | `/api/places` | Places, geocoding, directions, nearby search |
-| `/api/trips` | Trip planner hotel location and saved trips |
 | `/api/transport` | Transport-related functionality |
 | `/api/destinations` | Destination management |
 | `/api/pricing` | Pricing suggestions and ML-enhanced pricing |

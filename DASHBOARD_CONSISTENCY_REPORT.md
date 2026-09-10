@@ -2,77 +2,51 @@
 
 ## Executive Summary
 
-This report identifies data inconsistencies across three dashboards (Manager, Super Admin, Receptionist) and provides fixes to ensure cross-dashboard consistency using the Manager Dashboard as the source of truth for business calculations.
+This report identified data inconsistencies across three dashboards (Manager, Super Admin, Receptionist) and documents the fixes applied to ensure cross-dashboard consistency. Canonical definitions are now: **revenue = paid bookings only** (`isPaid: true`, excluding cancelled/expired) and **booking counts = valid bookings** (excluding cancelled/expired). These standards are enforced across the Manager Dashboard, Receptionist Dashboard, Super Admin Reports, and `analyticsService.js`.
 
 ---
 
-## Mismatch Table
+## Mismatch Table (post-fix status)
 
-| Metric | Manager Dashboard | Super Admin Dashboard | Receptionist Dashboard | Issue |
-|--------|------------------|----------------------|------------------------|-------|
-| **Revenue Definition** | Sums ALL bookings (including cancelled) | Filters by `isPaid: true` | Separates paid vs unpaid | **CRITICAL**: Manager includes cancelled bookings in revenue |
-| **Booking Count** | Counts ALL bookings (including cancelled) | Counts ALL bookings globally | Uses status-based filtering | **HIGH**: Manager overcounts bookings |
-| **Occupancy Formula** | `occupiedRooms / totalRooms * 100` (booking-based) | N/A (platform-level) | Uses `Room.status` field | **MEDIUM**: Different methodologies |
-| **Revenue Time Period** | Based on `createdAt` | Based on `createdAt` with `isPaid` filter | Based on `paymentReceivedAt` | **LOW**: Acceptable variation |
-| **Active Bookings** | Includes all non-cancelled | N/A | Uses `checked_in` status only | **LOW**: Different scopes |
+| Metric | Manager Dashboard | Super Admin Dashboard | Receptionist Dashboard | Issue | Status |
+|--------|------------------|----------------------|------------------------|-------|--------|
+| **Revenue Definition** | ❌ Summed ALL bookings incl. cancelled | ✅ Filtered by `isPaid: true` | ⚠️ Separated paid vs unpaid | **CRITICAL**: Manager included cancelled/expired and did not require payment | ✅ **FIXED** — all three now: paid-only, excludes cancelled/expired |
+| **Booking Count** | ❌ Counted ALL bookings | ❌ Counted ALL bookings | ⚠️ Status-based filtering | **HIGH**: Overcounting cancelled/expired | ✅ **FIXED** — all three count valid bookings (non-cancelled/expired) |
+| **Occupancy Formula** | `occupiedRooms / totalRooms * 100` (booking-based) | N/A (platform-level) | `Room.status` field | **MEDIUM**: Different methodologies | ⚠️ **Documented** — methodology intentionally different (booking vs room-status); `isAvailable`/`status` drift resolved via Room model hooks |
+| **Revenue Time Period** | Based on `createdAt` | Based on `createdAt` with `isPaid` filter | Based on `paymentReceivedAt` | **LOW**: Acceptable variation | ⚠️ **Documented** — intentional per-dashboard semantics |
+| **Active Bookings** | Non-cancelled active window | N/A | `checked_in` status only | **LOW**: Different scopes | ⚠️ **Documented** — intentional |
 
 ---
 
 ## Critical Issues Found
 
-### 1. **Manager Dashboard Revenue Includes Cancelled Bookings** (CRITICAL)
+> **Resolution status:** All CRITICAL/HIGH issues below are **FIXED** as of the production-readiness pass. The fix descriptions are retained for the record.
 
-**Location:** `backend/controllers/bookingController.js:634-703`
+### 1. **Manager Dashboard Revenue Included Cancelled/Unpaid Bookings** (CRITICAL — FIXED)
 
-**Problem:** The aggregation pipeline sums `totalPrice` for ALL bookings, including cancelled ones:
+**Location:** `backend/controllers/bookingController.js` (`getHotelBookings` aggregation)
 
-```javascript
-// Line 643
-totalRevenue: { $sum: "$totalPrice" },
-```
+**Problem (before fix):** `totalRevenue` summed `totalPrice` for ALL bookings (cancelled included), and `revenueToday/Week/Month` did not require payment.
 
-This means cancelled bookings still contribute to revenue metrics, which is incorrect.
+**Fix applied:** Every revenue accumulator now requires `isPaid: true` **and** `status: { $nin: [cancelled, expired] }`. `totalBookings`, `activeStays`, `upcomingBookings`, and `lastMinuteBookings` also exclude cancelled/expired.
 
-**Impact:**
-- `totalRevenue` KPI shows inflated numbers
-- `revenueToday`, `revenueWeek`, `revenueMonth` all include cancelled amounts
-- Revenue trends are inaccurate
-
-**Fix:** Add status filter to exclude cancelled bookings from revenue calculations.
-
-### 2. **Manager Dashboard Booking Count Includes Cancelled** (HIGH)
+### 2. **Manager Dashboard Booking Count Included Cancelled/Expired** (HIGH — FIXED)
 
 **Location:** `backend/controllers/bookingController.js:642`
 
-**Problem:** Counts all bookings regardless of status:
+**Fix applied:** `totalBookings` counts only valid bookings (`status: { $nin: [cancelled, expired] }`).
 
-```javascript
-// Line 642
-totalBookings: { $sum: 1 },
-```
+### 3. **Raw status string literals** (HIGH — FIXED)
 
-**Impact:**
-- Total bookings KPI is inflated
-- Trends show cancelled bookings as regular activity
+**Location:** `receptionistController.js`, `adminReportsController.js`, `bookingCleaner.js`, `paymentGatewayController.js`, `checkinController.js`
 
-**Fix:** Add status filter to exclude cancelled bookings.
+**Fix applied:** All 25 raw booking status literals replaced with `BOOKING_STATUS` constants from `backend/constants/bookingStatuses.js`.
 
-### 3. **Occupancy Calculation Methodology Differs** (MEDIUM)
+### 4. **Occupancy / Room availability drift** (MEDIUM — FIXED)
 
-**Manager Dashboard** (`bookingController.js:726-738`):
-- Counts rooms with active bookings spanning today
-- Excludes: cancelled, checked_out, expired
+**Manager Dashboard**: booking-derived occupancy. **Receptionist Dashboard**: `Room.status`-based.
 
-**Receptionist Dashboard** (`receptionistController.js:488-494`):
-- Uses `Room.status` field directly
-- Different status values: available, occupied, reserved, cleaning, maintenance, out_of_service
-
-**Impact:**
-- Occupancy percentages may differ between dashboards
-- Manager shows "booking-derived" occupancy
-- Receptionist shows "room status" occupancy
-
-**Recommendation:** Use consistent formula: `(occupied / total) * 100` where occupied = rooms with `status: "occupied"` OR rooms with active bookings.
+**Fix applied:** `isAvailable` is now **derived from `status`** (canonical rule: `isAvailable === (status === "available")`) via Mongoose hooks on the `Room` model (pre-`save`/`findOneAndUpdate`/`updateOne`/`updateMany`). Availability toggles (manager, receptionist, `roomService.toggleAvailability`, `updateRoom`) now translate to `status` changes, so the two fields can never drift. Methodology difference between booking-occupancy and room-status-occupancy is intentional and documented.
 
 ---
 
@@ -168,21 +142,29 @@ revenueToday: {
 
 ## Verification Checklist
 
-After applying fixes, verify:
+The following desktop checks pass via code review; a live data comparison is recommended:
 
-- [ ] Manager Dashboard `totalRevenue` matches sum of non-cancelled booking `totalPrice` values
-- [ ] Manager Dashboard `totalBookings` counts only non-cancelled bookings
-- [ ] Revenue trends exclude cancelled bookings
-- [ ] Occupancy calculation is consistent (or documented difference)
-- [ ] Super Admin analytics remain accurate (already correct)
-- [ ] Receptionist payments section remains accurate (already correct)
+- [x] Manager Dashboard `totalRevenue` = sum of `totalPrice` for `isPaid: true` non-cancelled/non-expired bookings
+- [x] Manager Dashboard `totalBookings` counts only non-cancelled/non-expired bookings
+- [x] Revenue trends exclude cancelled/expired and count paid bookings only
+- [x] Super Admin revenue reports (`adminReportsController.js`) use the same paid-only definition
+- [x] Receptionist `collectedRevenue` uses the same paid-only definition
+- [x] Room `isAvailable` is always derived from `status` on every write path
+- [x] All booking status literals use `BOOKING_STATUS` constants
+- [x] Missing MongoDB indexes added to Booking, Room, and Hotel models
+- [ ] Live: compare Manager, Receptionist, and Super Admin-selected-hotel revenue for the same hotel/date range (requires running application)
 
 ---
 
-## Files to Modify
+## Files to Modify (completed)
 
-1. `backend/controllers/bookingController.js` - Fix revenue and booking count calculations
-2. (Optional) `backend/controllers/receptionistController.js` - Align occupancy methodology
+1. `backend/controllers/bookingController.js` — paid-only revenue + valid-booking counts + trends exclusion
+2. `backend/controllers/receptionistController.js` — revenue alignment, guest-detail scope, room availability toggles, status constants
+3. `backend/controllers/adminReportsController.js` — paid-only revenue reports + status constants
+4. `backend/services/analyticsService.js` — paid-only revenue in trends/destinations, status exclusion
+5. `backend/models/Room.js` — `isAvailable`/`status` sync hooks + indexes
+6. `backend/models/Booking.js` — indexes
+7. `backend/models/Hotel.js` — indexes
 
 ---
 
