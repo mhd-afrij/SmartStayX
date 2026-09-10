@@ -1,8 +1,15 @@
 import { Navigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 
+const roleMatchesAccess = ({ role, isSuperAdmin, isHotelManager, isReceptionist }) => {
+  if (role === "super_admin") return isSuperAdmin;
+  if (role === "hotel_manager") return isHotelManager;
+  if (role === "receptionist") return isReceptionist;
+  return false;
+};
+
 const ProtectedRoute = ({ allowedRoles = [], children }) => {
-  const { user, userLoaded } = useAppContext();
+  const { user, userLoaded, isSuperAdmin, isHotelManager, isReceptionist } = useAppContext();
 
   if (!userLoaded) {
     return (
@@ -15,9 +22,12 @@ const ProtectedRoute = ({ allowedRoles = [], children }) => {
     );
   }
   if (!user) return <Navigate to="/" replace />;
-  if (allowedRoles.length && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
-  }
+
+  const canAccess = allowedRoles.length === 0 || allowedRoles.some((role) =>
+    roleMatchesAccess({ role, isSuperAdmin, isHotelManager, isReceptionist }) || user.role === role
+  );
+
+  if (!canAccess) return <Navigate to="/" replace />;
 
   return children;
 };

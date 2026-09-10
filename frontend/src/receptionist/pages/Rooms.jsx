@@ -30,8 +30,8 @@ const Rooms = () => {
         setRooms(data.rooms);
         setHotels(data.hotels || []);
       }
-    } catch {
-      toast.error("Failed to load rooms");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to load rooms");
     } finally {
       setLoading(false);
     }
@@ -66,8 +66,8 @@ const Rooms = () => {
       } else {
         toast.error(data.message);
       }
-    } catch {
-      toast.error("Failed to create room");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to create room");
     }
   };
 
@@ -105,8 +105,8 @@ const Rooms = () => {
       } else {
         toast.error(data.message);
       }
-    } catch {
-      toast.error("Failed to update room");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update room");
     }
   };
 
@@ -119,8 +119,8 @@ const Rooms = () => {
         toast.success(data.message);
         await loadRooms(selectedHotelId);
       }
-    } catch {
-      toast.error("Failed to toggle");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to toggle");
     }
   };
 
@@ -134,8 +134,8 @@ const Rooms = () => {
         toast.success("Room deleted");
         await loadRooms(selectedHotelId);
       }
-    } catch {
-      toast.error("Failed to delete");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete");
     }
   };
 

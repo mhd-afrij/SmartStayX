@@ -28,8 +28,8 @@ const Services = () => {
         headers: { Authorization: `Bearer ${await getToken()}` },
       });
       if (data.success) setServices(data.services);
-    } catch {
-      toast.error("Failed to load services");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to load services");
     } finally {
       setLoading(false);
     }
@@ -50,8 +50,8 @@ const Services = () => {
       } else {
         toast.error(data.message);
       }
-    } catch {
-      toast.error("Failed to update status");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update status");
     } finally {
       setUpdatingId(null);
     }

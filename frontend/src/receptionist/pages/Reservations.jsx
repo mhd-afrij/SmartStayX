@@ -35,11 +35,13 @@ const Reservations = () => {
         headers: { Authorization: `Bearer ${await getToken()}` },
       });
       if (data.success) {
-        setReservations(data.reservations);
+        setReservations(data.reservations || []);
         setHotels(data.hotels || []);
+      } else {
+        toast.error(data.message || "Failed to load reservations");
       }
-    } catch {
-      toast.error("Failed to load reservations");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to load reservations");
     } finally {
       setLoading(false);
     }
