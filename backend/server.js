@@ -58,7 +58,7 @@ import inventoryRouter from './routes/inventoryRoutes.js'
 import housekeepingRouter from './routes/housekeepingRoutes.js'
 import loyaltyRouter from './routes/loyaltyRoutes.js'
 import securityRouter from './routes/securityRoutes.js'
-import tripRouter from './routes/tripRoutes.js'
+import tripPlannerRouter from './routes/tripPlannerRoutes.js'
 
 const app = express()
 
@@ -66,7 +66,22 @@ const app = express()
 // Global middleware
 // ---------------------------------------------------------------------------
 
-app.use(cors())
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(",").map((o) => o.trim()).filter(Boolean)
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true)
+      if (allowedOrigins.length === 0) {
+        // No explicit allowlist: default open in dev, locked down in production.
+        if (process.env.NODE_ENV === "production") return callback(new Error("Not allowed by CORS"))
+        return callback(null, true)
+      }
+      if (allowedOrigins.includes(origin)) return callback(null, true)
+      return callback(new Error("Not allowed by CORS"))
+    },
+    credentials: process.env.CORS_CREDENTIALS === "true",
+  })
+)
 app.use(helmet())
 app.use(rateLimit({ windowMs: 60 * 1000, max: 200 }))
 
@@ -129,7 +144,6 @@ app.use('/api/testimonials', testimonialRouter)
 app.use('/api/reviews', reviewRouter)
 app.use('/api/notifications', notificationRouter)
 app.use('/api/places', placesRouter)
-app.use('/api/trips', tripRouter)
 app.use(['/api/routes', '/api/transport'], transportRouter)
 app.use('/api/destinations', destinationRouter)
 app.use('/api/pricing', pricingRouter)
@@ -156,6 +170,7 @@ app.use('/api/inventory', inventoryRouter)
 app.use('/api/housekeeping', housekeepingRouter)
 app.use('/api/loyalty', loyaltyRouter)
 app.use('/api/security', securityRouter)
+app.use('/api/trip-planner', tripPlannerRouter)
 
 // ---------------------------------------------------------------------------
 // Error handler (must be last)

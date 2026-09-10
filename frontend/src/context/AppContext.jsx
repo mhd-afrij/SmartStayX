@@ -17,7 +17,7 @@ const CURRENCY_OPTIONS = [
 const normalizeCurrencyCode = (value) => {
   if (!value) return "USD";
   const upper = String(value).toUpperCase();
-  if (upper === "AED" || upper === "SGD" || upper === "GBP" || upper === "USD" || upper === "LKR") return upper;
+  if (upper === "AED" || upper === "EUR" || upper === "SGD" || upper === "GBP" || upper === "USD" || upper === "LKR") return upper;
   if (value === "$") return "USD";
   return "USD";
 };

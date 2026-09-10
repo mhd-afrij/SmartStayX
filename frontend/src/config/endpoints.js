@@ -52,23 +52,6 @@ const API_ENDPOINTS = {
     base: "/api/reviews",
     byRoom: (roomId) => `/api/reviews/room/${roomId}`,
   },
-  places: {
-    attractions: "/api/places/attractions",
-    restaurants: "/api/places/restaurants",
-    // Trip Planner discovery + routing
-    nearby: "/api/places/nearby",
-    search: "/api/places/search",
-    reverseGeocode: "/api/places/reverse-geocode",
-    directions: "/api/places/directions",
-  },
-  trips: {
-    base: "/api/trips",
-    hotelLocation: "/api/trips/hotel-location",
-    trip: (id) => `/api/trips/${id}`,
-    stops: (id) => `/api/trips/${id}/stops`,
-    stop: (id, stopId) => `/api/trips/${id}/stops/${stopId}`,
-    reorder: (id) => `/api/trips/${id}/stops-reorder`,
-  },
   analytics: {
     bookingTrends: "/api/analytics/booking-trends",
     popularDestinations: "/api/analytics/popular-destinations",
@@ -126,6 +109,12 @@ const API_ENDPOINTS = {
   guestAssistant: {
     chat: "/api/guest-assistant/chat",
     chatStream: "/api/guest-assistant/chat/stream",
+  },
+  tripPlanner: {
+    context: "/api/trip-planner/context",
+    nearby: "/api/trip-planner/nearby",
+    search: "/api/trip-planner/search",
+    route: "/api/trip-planner/route",
   },
   pricing: {
     suggest: "/api/pricing/suggest",

@@ -1,96 +1,64 @@
-// tripPlanner.test.js — Trip Planner backend tests (no live server required).
+// tripPlanner.test.js — Pure unit tests for the security-critical Trip Planner
+// helpers. No database or live Google calls: hotelLocationPoint validates the
+// GeoJSON [lng, lat] ↔ {lat, lng} contract that anchors every route origin,
+// and resolveAccess enforces staff hotel-scope isolation.
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { hotelLocationPoint, resolveAccess } from '../controllers/tripPlannerController.js'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const serverRoot = path.resolve(__dirname, '..')
+const scopeHotels = {
+  alice: 'hotel-123',
+  none: null,
+}
 
-const read = (relativePath) => fs.readFileSync(path.join(serverRoot, relativePath), 'utf8')
+const fakeScopeResolver = (user) => Promise.resolve(scopeHotels[user?.scopeKey] ?? null)
 
-test('trip routes expose the expected contract paths', () => {
-  const tripRoutes = read('routes/tripRoutes.js')
-  assert.match(tripRoutes, /hotel-location/)
-  assert.match(tripRoutes, /tripRouter\.post\("\/"/)
-  assert.match(tripRoutes, /tripRouter\.get\("\/:id"/)
-  assert.match(tripRoutes, /tripRouter\.put\("\/:id"/)
-  assert.match(tripRoutes, /tripRouter\.delete\("\/:id"/)
-  assert.match(tripRoutes, /tripRouter\.post\("\/:id\/stops"/)
-  assert.match(tripRoutes, /tripRouter\.put\("\/:id\/stops-reorder"/)
-  assert.match(tripRoutes, /protect/)
+// ── hotelLocationPoint ────────────────────────────────────────────────────
+test('hotelLocationPoint extracts { lat, lng } from GeoJSON [lng, lat]', () => {
+  const point = hotelLocationPoint({ location: { coordinates: [79.8431, 6.9271] } })
+  assert.deepEqual(point, { lat: 6.9271, lng: 79.8431 })
 })
 
-test('places routes expose the trip planner endpoints', () => {
-  const placesRoutes = read('routes/placesRoutes.js')
-  assert.match(placesRoutes, /nearby/)
-  assert.match(placesRoutes, /search/)
-  assert.match(placesRoutes, /reverse-geocode/)
-  assert.match(placesRoutes, /directions/)
-  // Legacy endpoints kept for existing consumers
-  assert.match(placesRoutes, /attractions/)
-  assert.match(placesRoutes, /restaurants/)
-  assert.match(placesRoutes, /geocode/)
+test('hotelLocationPoint rejects coordinates outside valid ranges', () => {
+  assert.equal(hotelLocationPoint({ location: { coordinates: [200, 10] } }), null)
+  assert.equal(hotelLocationPoint({ location: { coordinates: [80, 95] } }), null)
+  assert.equal(hotelLocationPoint({ location: { coordinates: ['80', '10'] } }), null)
+  assert.equal(hotelLocationPoint({ location: { coordinates: [NaN, 10] } }), null)
 })
 
-test('server mounts trip routes and no longer mounts the removed itinerary module', () => {
-  const server = read('server.js')
-  assert.match(server, /app\.use\('\/api\/trips', tripRouter\)/)
-  assert.doesNotMatch(server, /itinerary/)
+test('hotelLocationPoint rejects missing or malformed locations', () => {
+  assert.equal(hotelLocationPoint({}), null)
+  assert.equal(hotelLocationPoint({ location: {} }), null)
+  assert.equal(hotelLocationPoint({ location: { coordinates: [1] } }), null)
+  assert.equal(hotelLocationPoint({ location: { coordinates: [1, 2, 3] } }), null)
+  assert.equal(hotelLocationPoint(null), null)
 })
 
-test('trip controller enforces hotel scoping on stop and trip mutations', () => {
-  const controller = read('controllers/tripController.js')
-  // Every trip-scoped handler goes through loadAuthorizedTrip (scope check).
-  const scopedHandlers = [
-    'getTrip',
-    'updateTrip',
-    'deleteTrip',
-    'addStop',
-    'updateStop',
-    'deleteStop',
-    'reorderStops',
-  ]
-  for (const handler of scopedHandlers) {
-    const start = controller.indexOf(`export const ${handler} = async`)
-    assert.ok(start !== -1, `${handler} exists in the controller`)
-    const next = controller.indexOf('export const', start + 1)
-    const section = next === -1 ? controller.slice(start) : controller.slice(start, next)
-    assert.match(section, /loadAuthorizedTrip/, `${handler} must verify trip ownership`)
-  }
+// ── resolveAccess ─────────────────────────────────────────────────────────
+test('super_admin can access any hotel', async () => {
+  const req = { user: { role: 'super_admin' } }
+  assert.deepEqual(await resolveAccess(req, 'any-hotel'), { allowed: true, scope: null })
+  assert.deepEqual(await resolveAccess(req, null), { allowed: true, scope: null })
 })
 
-test('hotel model defines the trip planner location fields', () => {
-  const hotel = read('models/Hotel.js')
-  assert.match(hotel, /location/)
-  assert.match(hotel, /coordinates/)
-  assert.match(hotel, /country/)
+test('manager/receptionist allowed only on their assigned hotel', async () => {
+  const req = { user: { role: 'hotel_manager', scopeKey: 'alice' } }
+  assert.equal((await resolveAccess(req, 'hotel-123', fakeScopeResolver)).allowed, true)
+  assert.equal((await resolveAccess(req, 'hotel-999', fakeScopeResolver)).allowed, false)
+  // Without a hotelId the assigned scope itself is permitted.
+  const scoped = await resolveAccess(req, null, fakeScopeResolver)
+  assert.equal(scoped.allowed, true)
+  assert.equal(scoped.scope, 'hotel-123')
 })
 
-test('trip model requires hotel reference and ordered stops', () => {
-  const trip = read('models/Trip.js')
-  assert.match(trip, /hotel:\s*\{ type: mongoose\.Schema\.Types\.ObjectId, ref: "Hotel", required: true/)
-  assert.match(trip, /startLocation/)
-  assert.match(trip, /stopDuration/)
-  assert.match(trip, /timestamps: true/)
+test('receptionist without a hotel scope is denied', async () => {
+  const req = { user: { role: 'receptionist', scopeKey: 'none' } }
+  assert.equal((await resolveAccess(req, 'hotel-123', fakeScopeResolver)).allowed, false)
+  assert.equal((await resolveAccess(req, null, fakeScopeResolver)).allowed, false)
 })
 
-test('geoUtils resolves the canonical hotel without hardcoding ids', () => {
-  const geo = read('utils/geoUtils.js')
-  assert.match(geo, /resolveUserHotel/)
-  assert.match(geo, /assignedHotel/)
-  assert.match(geo, /owner: user\._id/)
-  assert.match(geo, /haversineKm/)
-})
-
-test('places controller normalizes multi-waypoint directions with road routing', () => {
-  const places = read('controllers/placesController.js')
-  assert.match(places, /waypoints/)
-  assert.match(places, /optimize:false/)
-  assert.match(places, /overview_polyline/)
-  // Friendly errors, never raw API messages
-  assert.match(places, /No route is available between these locations\./)
-  assert.match(places, /Unable to calculate this route\./)
+test('guests may use any (approved) hotel', async () => {
+  const req = { user: { role: 'guest' } }
+  assert.deepEqual(await resolveAccess(req, 'hotel-1'), { allowed: true, scope: null })
+  assert.deepEqual(await resolveAccess(req, null), { allowed: true, scope: null })
 })
