@@ -75,7 +75,7 @@ export const AppProvider = ({ children }) => {
     try {
       const { data } = await axios.get("/api/user");
       if (data.success) {
-        setUser({ ...data.user, role: data.role, status: data.status });
+        setUser({ ...data.user, role: data.role, status: data.status, assignedHotel: data.assignedHotel || null });
         setDashboardAccess(data.dashboardAccess || deriveDashboardAccess(data.role));
       } else {
         setUser(null);

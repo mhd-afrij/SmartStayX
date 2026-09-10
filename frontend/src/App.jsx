@@ -46,8 +46,11 @@ import ReceptionistRoomStatusBoard from './receptionist/pages/RoomStatusBoard';
 import ReceptionistAssignedTasks from './receptionist/pages/AssignedTasks';
 import ReceptionistPayments from './receptionist/pages/Payments';
 import ReceptionistServices from './receptionist/pages/Services';
-import ReceptionistOffers from './receptionist/pages/Offers';
-import ReceptionistReviews from './receptionist/pages/Reviews';
+import ReceptionistReservations from './receptionist/pages/Reservations';
+import ReceptionistGuests from './receptionist/pages/Guests';
+import ReceptionistCheckin from './receptionist/pages/Checkin';
+import ReceptionistCheckout from './receptionist/pages/Checkout';
+import ReceptionistNotifications from './receptionist/pages/Notifications';
 import ReceptionistFrontDesk from './receptionist/pages/FrontDesk';
 
 // ── Super Admin ────────────────────────────────────────────────────────
@@ -225,13 +228,16 @@ const App = () => {
           {/* ── Receptionist dashboard ────────────────────────────── */}
           <Route path='/receptionist' element={<ProtectedRoute allowedRoles={["receptionist", "hotel_manager", "super_admin"]}><ReceptionistLayout /></ProtectedRoute>}>
             <Route index element={<ReceptionistFrontDesk />} />
+            <Route path='reservations' element={<ReceptionistReservations />} />
+            <Route path='guests' element={<ReceptionistGuests />} />
+            <Route path='checkin' element={<ReceptionistCheckin />} />
+            <Route path='checkout' element={<ReceptionistCheckout />} />
             <Route path='rooms' element={<ReceptionistRooms />} />
             <Route path='room-status' element={<ReceptionistRoomStatusBoard />} />
             <Route path='tasks' element={<ReceptionistAssignedTasks />} />
             <Route path='payments' element={<ReceptionistPayments />} />
             <Route path='services' element={<ReceptionistServices />} />
-            <Route path='offers' element={<ReceptionistOffers />} />
-            <Route path='reviews' element={<ReceptionistReviews />} />
+            <Route path='notifications' element={<ReceptionistNotifications />} />
           </Route>
         </Routes>
         </ErrorBoundary>

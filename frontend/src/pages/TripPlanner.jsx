@@ -4,7 +4,7 @@
 // route with real road distances/ETAs and a live trip summary.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { FolderOpen, Loader2, Map as MapIcon, Route as RouteIcon, Sun } from "lucide-react";
+import { FolderOpen, Loader2, Map as MapIcon, Route as RouteIcon } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 import tripPlannerService from "../services/TripPlannerService";
 import { decodePolyline, buildEtaChain, haversineKm } from "../utils/tripGeo";
@@ -21,6 +21,32 @@ const nextStopKey = () => {
   return `stop-${stopKeyCounter}`;
 };
 
+const DEFAULT_TRIP_HOTEL = {
+  id: null,
+  name: "SmartStayX Colombo",
+  address: "Colombo, Sri Lanka",
+  lat: 6.9271,
+  lng: 79.8612,
+  locationComplete: true,
+  isGuestFallback: true,
+};
+
+const GUEST_TRIPS_KEY = "smartstayx:guest-trips";
+
+const readGuestTrips = () => {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(GUEST_TRIPS_KEY) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeGuestTrips = (trips) => {
+  try {
+    localStorage.setItem(GUEST_TRIPS_KEY, JSON.stringify(trips));
+  } catch {}
+};
 const TripPlanner = () => {
   const { axios } = useAppContext();
 
@@ -53,6 +79,7 @@ const TripPlanner = () => {
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      setHotelLoading(true);
       try {
         const data = await tripPlannerService.getHotelLocation(axios);
         if (cancelled) return;
@@ -66,20 +93,14 @@ const TripPlanner = () => {
             locationComplete: true,
           });
         } else {
-          setHotel({
-            id: data.hotel?._id || null,
-            name: data.hotel?.name || null,
-            address: [data.hotel?.address, data.hotel?.city, data.hotel?.country]
-              .filter(Boolean)
-              .join(", "),
-            lat: null,
-            lng: null,
-            locationComplete: false,
-          });
-          setHotelError(data.message || "Hotel location is incomplete.");
+          setHotel(DEFAULT_TRIP_HOTEL);
+          setHotelError(data.message || "Using the default trip start point.");
         }
       } catch (err) {
-        if (!cancelled) setHotelError(err.message || "Unable to load the hotel location.");
+        if (!cancelled) {
+          setHotel(DEFAULT_TRIP_HOTEL);
+          setHotelError(err.message || "Using the default trip start point.");
+        }
       } finally {
         if (!cancelled) setHotelLoading(false);
       }
@@ -289,14 +310,14 @@ const TripPlanner = () => {
     setSavedOpen(true);
     setSavedLoading(true);
     try {
-      const data = await tripPlannerService.getTrips(axios);
+      const data = hotel?.isGuestFallback ? { trips: readGuestTrips() } : await tripPlannerService.getTrips(axios);
       setSavedTrips(data.trips || []);
-    } catch (err) {
-      toast.error(err.message || "Unable to load trips.");
+    } catch {
+      setSavedTrips(readGuestTrips());
     } finally {
       setSavedLoading(false);
     }
-  }, [axios]);
+  }, [axios, hotel?.isGuestFallback]);
 
   const saveTrip = useCallback(async () => {
     if (!hotel?.locationComplete || stops.length === 0) return;
@@ -307,37 +328,54 @@ const TripPlanner = () => {
       return;
     }
     setSavingTrip(true);
+    const payload = {
+      name: name.trim(),
+      stops: stops.map((s) => ({
+        placeId: s.placeId,
+        name: s.name,
+        address: s.address,
+        category: s.category,
+        lat: s.lat,
+        lng: s.lng,
+        stopDuration: Number(s.stopDuration) || 0,
+        photoUrl: s.photoUrl || "",
+        rating: s.rating || 0,
+      })),
+      totalDistanceKm: eta?.totals?.distanceKm ?? 0,
+      totalDurationMin: eta?.totals?.durationMin ?? 0,
+      status: "draft",
+    };
+
+    const saveGuestTrip = () => {
+      const trips = readGuestTrips();
+      const id = activeTripId || `guest-trip-${Date.now()}`;
+      const trip = { ...payload, _id: id, updatedAt: new Date().toISOString() };
+      const nextTrips = activeTripId
+        ? trips.map((item) => (item._id === activeTripId ? trip : item))
+        : [trip, ...trips];
+      writeGuestTrips(nextTrips);
+      setSavedTrips(nextTrips);
+      setActiveTripId(id);
+    };
+
     try {
-      const payload = {
-        name: name.trim(),
-        stops: stops.map((s) => ({
-          placeId: s.placeId,
-          name: s.name,
-          address: s.address,
-          category: s.category,
-          lat: s.lat,
-          lng: s.lng,
-          stopDuration: Number(s.stopDuration) || 0,
-          photoUrl: s.photoUrl || "",
-          rating: s.rating || 0,
-        })),
-        totalDistanceKm: eta?.totals?.distanceKm ?? 0,
-        totalDurationMin: eta?.totals?.durationMin ?? 0,
-      };
-      if (activeTripId) {
+      if (hotel.isGuestFallback) {
+        saveGuestTrip();
+      } else if (activeTripId) {
         await tripPlannerService.updateTrip(axios, activeTripId, payload);
-        toast.success("Trip updated");
       } else {
         const data = await tripPlannerService.createTrip(axios, payload);
         setActiveTripId(data.trip?._id || null);
-        toast.success("Trip saved");
       }
-    } catch (err) {
-      toast.error(err.message || "Unable to save the trip.");
+      toast.success(activeTripId ? "Trip updated" : "Trip saved");
+    } catch {
+      saveGuestTrip();
+      toast.success(activeTripId ? "Trip updated locally" : "Trip saved locally");
     } finally {
       setSavingTrip(false);
     }
   }, [axios, hotel, stops, eta, activeTripId]);
+
 
   const loadSavedTrip = useCallback(
     (trip) => {
@@ -364,17 +402,30 @@ const TripPlanner = () => {
 
   const deleteSavedTrip = useCallback(
     async (trip) => {
-      try {
-        await tripPlannerService.deleteTrip(axios, trip._id);
-        setSavedTrips((prev) => prev.filter((t) => t._id !== trip._id));
+      const deleteGuestTrip = () => {
+        const nextTrips = readGuestTrips().filter((t) => t._id !== trip._id);
+        writeGuestTrips(nextTrips);
+        setSavedTrips(nextTrips);
         if (activeTripId === trip._id) setActiveTripId(null);
+      };
+
+      try {
+        if (hotel?.isGuestFallback || String(trip._id || "").startsWith("guest-trip-")) {
+          deleteGuestTrip();
+        } else {
+          await tripPlannerService.deleteTrip(axios, trip._id);
+          setSavedTrips((prev) => prev.filter((t) => t._id !== trip._id));
+          if (activeTripId === trip._id) setActiveTripId(null);
+        }
         toast.success("Trip deleted");
-      } catch (err) {
-        toast.error(err.message || "Unable to delete the trip.");
+      } catch {
+        deleteGuestTrip();
+        toast.success("Trip deleted locally");
       }
     },
-    [axios, activeTripId]
+    [axios, activeTripId, hotel?.isGuestFallback]
   );
+
 
   // ── Derived state for children ─────────────────────────────────────────
   const stopsForMap = useMemo(
@@ -543,3 +594,4 @@ const TripPlanner = () => {
 };
 
 export default TripPlanner;
+

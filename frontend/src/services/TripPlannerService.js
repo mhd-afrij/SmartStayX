@@ -82,7 +82,9 @@ class TripPlannerService {
   }
 
   searchPlaces(axios, query, lat = null, lng = null) {
-    return this.searchDebounced(axios, query, lat, lng);
+    return this.searchDebounced(axios, query, lat, lng).then(({ data }) =>
+      unwrap(data, "Unable to find this location.")
+    );
   }
 
   async reverseGeocode(axios, lat, lng) {
@@ -168,3 +170,4 @@ class TripPlannerService {
 const tripPlannerService = new TripPlannerService();
 export default tripPlannerService;
 export { CANCEL_MESSAGE };
+
