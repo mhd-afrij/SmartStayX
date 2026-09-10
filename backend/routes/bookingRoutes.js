@@ -1,6 +1,7 @@
 // bookingRoutes.js — Booking CRUD, availability, checkout, and payment routes
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
+import { requireRole } from "../middleware/authorization.js";
 import validateRequest from "../middleware/validateRequest.js";
 import bookingValidators from "../validators/bookingValidators.js";
 import { checkAvailabilityAPI, createBooking, createCheckoutSession, confirmCheckoutSession, cancelBooking, modifyBooking, payBooking, setPaymentMethod, getUserBookings, getHotelBookings, deleteOwnerBooking, updateOwnerBookingPayment, updateOwnerBookingStatus, calculatePrice, extendBookingHold } from "../controllers/bookingController.js";
@@ -19,7 +20,7 @@ bookingRouter.post("/pay", protect, validateRequest({ body: bookingValidators.bo
 bookingRouter.post("/payment-method", protect, validateRequest({ body: bookingValidators.paymentMethodBody }), setPaymentMethod);
 bookingRouter.post("/extend-hold", protect, validateRequest({ body: bookingValidators.extendHoldBody }), extendBookingHold);
 bookingRouter.get("/user", protect, getUserBookings);
-bookingRouter.get("/hotel", protect, getHotelBookings);
+bookingRouter.get("/hotel", protect, requireRole("hotel_manager", "super_admin"), getHotelBookings);
 bookingRouter.delete("/owner/:bookingId", protect, deleteOwnerBooking);
 bookingRouter.post("/owner/update-payment", protect, updateOwnerBookingPayment);
 bookingRouter.patch("/owner/:bookingId/status", protect, updateOwnerBookingStatus);

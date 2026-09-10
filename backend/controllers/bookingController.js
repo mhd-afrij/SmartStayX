@@ -579,7 +579,8 @@ export const getHotelBookings = async (req, res) => {
     const userId = req.user?._id || req.user?.id;
     const { hotelId } = req.query;
 
-    const allUserHotels = await Hotel.find({ owner: userId });
+    const isSuperAdmin = req.user?.role === "super_admin";
+    const allUserHotels = isSuperAdmin ? await Hotel.find({}) : await Hotel.find({ owner: userId });
 
     if (!allUserHotels || allUserHotels.length === 0) {
       return ok(res, {
@@ -630,6 +631,7 @@ export const getHotelBookings = async (req, res) => {
 
     // Single-pass MongoDB aggregation: total bookings, revenue, active stays,
     // revenue by period, upcoming/cancelled/last-minute counts.
+    // Excludes cancelled bookings from revenue and active metrics.
     const [aggResult] = await Booking.aggregate([
       { $match: hotelMatch },
       {
@@ -638,8 +640,20 @@ export const getHotelBookings = async (req, res) => {
             {
               $group: {
                 _id: null,
-                totalBookings: { $sum: 1 },
-                totalRevenue: { $sum: "$totalPrice" },
+                totalBookings: {
+                  $sum: {
+                    $cond: [{ $ne: ["$status", BOOKING_STATUS.CANCELLED] }, 1, 0],
+                  },
+                },
+                totalRevenue: {
+                  $sum: {
+                    $cond: [
+                      { $ne: ["$status", BOOKING_STATUS.CANCELLED] },
+                      "$totalPrice",
+                      0,
+                    ],
+                  },
+                },
                 activeStays: {
                   $sum: {
                     $cond: [
@@ -656,13 +670,31 @@ export const getHotelBookings = async (req, res) => {
                   },
                 },
                 revenueToday: {
-                  $sum: { $cond: [{ $gte: ["$createdAt", today] }, "$totalPrice", 0] },
+                  $sum: {
+                    $cond: [
+                      { $and: [{ $gte: ["$createdAt", today] }, { $ne: ["$status", BOOKING_STATUS.CANCELLED] }] },
+                      "$totalPrice",
+                      0,
+                    ],
+                  },
                 },
                 revenueWeek: {
-                  $sum: { $cond: [{ $gte: ["$createdAt", weekAgo] }, "$totalPrice", 0] },
+                  $sum: {
+                    $cond: [
+                      { $and: [{ $gte: ["$createdAt", weekAgo] }, { $ne: ["$status", BOOKING_STATUS.CANCELLED] }] },
+                      "$totalPrice",
+                      0,
+                    ],
+                  },
                 },
                 revenueMonth: {
-                  $sum: { $cond: [{ $gte: ["$createdAt", monthAgo] }, "$totalPrice", 0] },
+                  $sum: {
+                    $cond: [
+                      { $and: [{ $gte: ["$createdAt", monthAgo] }, { $ne: ["$status", BOOKING_STATUS.CANCELLED] }] },
+                      "$totalPrice",
+                      0,
+                    ],
+                  },
                 },
                 upcomingBookings: {
                   $sum: {

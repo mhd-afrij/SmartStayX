@@ -2,7 +2,11 @@ import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import { requireRole, requireHotelScope } from "../middleware/authorization.js";
 import {
+  getDashboardSummary,
   getReservations,
+  getReservationDetail,
+  createReservation,
+  updateReservation,
   updateReservationStatus,
   markPaymentReceived,
   getAllRooms,
@@ -20,6 +24,10 @@ import {
   deleteOffer,
   getAllReviews,
   toggleReviewVisibility,
+  getGuests,
+  getGuestDetail,
+  frontDeskCheckin,
+  frontDeskCheckout,
 } from "../controllers/receptionistController.js";
 
 const receptionistRouter = express.Router();
@@ -30,10 +38,24 @@ const receptionistRouter = express.Router();
 // bookings/rooms/services of hotel B.
 receptionistRouter.use(protect, requireRole("receptionist", "hotel_manager", "super_admin"), requireHotelScope);
 
+// Front Desk dashboard
+receptionistRouter.get("/dashboard", getDashboardSummary);
+
 // Reservations
 receptionistRouter.get("/reservations", getReservations);
+receptionistRouter.get("/reservations/:id", getReservationDetail);
+receptionistRouter.post("/reservations", createReservation);
+receptionistRouter.put("/reservations/:id", updateReservation);
 receptionistRouter.patch("/reservations/:id/status", updateReservationStatus);
 receptionistRouter.post("/reservations/:id/payment", markPaymentReceived);
+
+// Guest management
+receptionistRouter.get("/guests", getGuests);
+receptionistRouter.get("/guests/:id", getGuestDetail);
+
+// Front desk check-in / check-out
+receptionistRouter.post("/checkin", frontDeskCheckin);
+receptionistRouter.post("/checkout", frontDeskCheckout);
 
 // Rooms
 receptionistRouter.get("/rooms", getAllRooms);

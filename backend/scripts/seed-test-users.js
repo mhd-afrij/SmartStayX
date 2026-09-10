@@ -7,6 +7,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import User from "../models/User.js";
+import Hotel from "../models/Hotel.js";
 
 dotenv.config();
 
@@ -86,9 +87,18 @@ const seed = async () => {
   await mongoose.connect(uri, { dbName: "SmartStayX" });
   console.log("Connected to MongoDB\n");
 
+  const defaultHotel = await Hotel.findOne().sort({ createdAt: 1 }).select("_id name").lean();
+  if (!defaultHotel) {
+    console.warn("No hotel found. Receptionist test users will be created without an assigned hotel.");
+  }
+
   for (const u of TEST_USERS) {
     try {
       let clerkUser = null;
+      const assignedHotel = u.role === "receptionist" ? defaultHotel?._id?.toString() : null;
+      const publicMetadata = assignedHotel
+        ? { role: u.role, hotelId: assignedHotel }
+        : { role: u.role };
 
       // 1. Find or create Clerk user
       try {
@@ -103,14 +113,14 @@ const seed = async () => {
           first_name: u.firstName,
           last_name: u.lastName,
           username: u.username,
-          public_metadata: { role: u.role },
+          public_metadata: publicMetadata,
         });
         console.log(`  Created Clerk user: ${u.email}`);
       } else {
         await clerkPatch(`/users/${clerkUser.id}`, {
-          public_metadata: { role: u.role },
+          public_metadata: publicMetadata,
         });
-        console.log(`  Updated Clerk role: ${u.email} → ${u.role}`);
+        console.log(`  Updated Clerk role: ${u.email} -> ${u.role}`);
       }
 
       // 2. Upsert MongoDB user
@@ -123,12 +133,14 @@ const seed = async () => {
             username: u.username,
             role: u.role,
             status: "active",
+            assignedHotel: assignedHotel || null,
           },
         },
         { upsert: true, new: true }
       );
 
-      console.log(`✓ ${u.email} (${u.role})`);
+      const hotelLabel = assignedHotel ? `, hotel: ${defaultHotel.name}` : "";
+      console.log(`✓ ${u.email} (${u.role}${hotelLabel})`);
     } catch (err) {
       console.error(`✗ ${u.email} — ${err.message}`);
     }

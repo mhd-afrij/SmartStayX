@@ -11,7 +11,12 @@ export const getNotifications = async (req, res) => {
     }
 
     const hotels = await Hotel.find({ owner: userId });
-    const hotelIds = hotels.map((h) => h._id);
+    let hotelIds = hotels.map((h) => h._id);
+    // Receptionists and managers assigned to a hotel see that hotel's
+    // notifications too (guest self-service check-in, new bookings, etc).
+    if (req.user?.assignedHotel && !hotelIds.some((id) => String(id) === String(req.user.assignedHotel))) {
+      hotelIds.push(req.user.assignedHotel);
+    }
 
     const { page = 1, limit = 20, unread } = req.query;
     const filter = { hotel: { $in: hotelIds } };
@@ -69,7 +74,12 @@ export const markAllAsRead = async (req, res) => {
     }
 
     const hotels = await Hotel.find({ owner: userId });
-    const hotelIds = hotels.map((h) => h._id);
+    let hotelIds = hotels.map((h) => h._id);
+    // Receptionists and managers assigned to a hotel see that hotel's
+    // notifications too (guests self-service check-in, new bookings, etc).
+    if (req.user?.assignedHotel && !hotelIds.some((id) => String(id) === String(req.user.assignedHotel))) {
+      hotelIds.push(req.user.assignedHotel);
+    }
 
     await Notification.updateMany(
       { hotel: { $in: hotelIds }, isRead: false },
