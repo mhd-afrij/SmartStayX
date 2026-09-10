@@ -230,8 +230,15 @@ export const updateRoom = async (req, res) => {
     }
 
     if (isAvailable !== undefined) {
-      // Accept both JSON booleans and stringified "true"/"false" payloads.
-      room.isAvailable = isAvailable === true || isAvailable === "true";
+      // Availability is derived from `status` (canonical rule), so the manager's
+      // availability toggle translates into a status change: unavailable rooms
+      // are set to maintenance until explicitly released.
+      const wantsAvailable = isAvailable === true || isAvailable === "true";
+      if (wantsAvailable) {
+        room.status = "available";
+      } else if (room.status === "available" || room.status === "cleaning") {
+        room.status = "maintenance";
+      }
     }
 
     await room.save();

@@ -54,6 +54,15 @@ const bookingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Query performance indexes for dashboard/report aggregations and room
+// overlap checks (receptionist + booking creation flows).
+bookingSchema.index({ hotel: 1, status: 1 });
+bookingSchema.index({ hotel: 1, checkInDate: 1, checkOutDate: 1 });
+bookingSchema.index({ hotel: 1, createdAt: -1, isPaid: 1 });
+bookingSchema.index({ status: 1, holdExpiresAt: 1 });
+bookingSchema.index({ user: 1, createdAt: -1 });
+bookingSchema.index({ room: 1, checkInDate: 1, checkOutDate: 1 });
+
 const Booking = mongoose.model("Booking", bookingSchema);
 
 export default Booking;

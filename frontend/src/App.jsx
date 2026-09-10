@@ -74,12 +74,12 @@ import AdminReports from './admin/pages/Reports';
 // ── Lazy-loaded public pages ───────────────────────────────────────────
 const Blog = lazy(() => import('./pages/Blog'));
 const Profile = lazy(() => import('./pages/Profile'));
-const TripPlanner = lazy(() => import('./pages/TripPlanner'));
 const Login = lazy(() => import('./pages/StaffLogin'));
 const SignUp = lazy(() => import('./pages/SignUp'));
 const Notifications = lazy(() => import('./pages/Notifications'));
 const SupportTickets = lazy(() => import('./pages/SupportTickets'));
 const Invoice = lazy(() => import('./pages/Invoice'));
+const TripPlanner = lazy(() => import('./pages/TripPlanner'));
 
 import PaymentPage from './pages/PaymentPage';
 import BookingWizard from './pages/BookingWizard';
@@ -163,18 +163,17 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/rooms" element={<AllRooms />} />
           <Route path='/rooms/:id' element={<RoomDetails />} />
-          <Route path="/my-bookings" element={<MyBookings />} />
+          <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
           <Route path="/about" element={<About />} />
           <Route path="/login/*" element={<SuspenseWrap><Login /></SuspenseWrap>} />
           <Route path="/signup/*" element={<SuspenseWrap><SignUp /></SuspenseWrap>} />
           <Route path="/blog" element={<SuspenseWrap><Blog /></SuspenseWrap>} />
-          <Route path="/trip-planner" element={<SuspenseWrap><TripPlanner /></SuspenseWrap>} />
-          <Route path="/dashboard/trip-planner" element={<Navigate to="/trip-planner" replace />} />
-          <Route path="/payment/:bookingId" element={<PaymentPage />} />
-          <Route path="/booking/:roomId" element={<BookingWizard />} />
-          <Route path="/profile" element={<SuspenseWrap><Profile /></SuspenseWrap>} />
-          <Route path="/notifications" element={<SuspenseWrap><Notifications /></SuspenseWrap>} />
+          <Route path="/payment/:bookingId" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
+          <Route path="/booking/:roomId" element={<ProtectedRoute><BookingWizard /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><SuspenseWrap><Profile /></SuspenseWrap></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute><SuspenseWrap><Notifications /></SuspenseWrap></ProtectedRoute>} />
           <Route path="/support" element={<SuspenseWrap><SupportTickets /></SuspenseWrap>} />
+          <Route path="/trip-planner" element={<ProtectedRoute><SuspenseWrap><TripPlanner /></SuspenseWrap></ProtectedRoute>} />
           <Route path="/invoice/:bookingId" element={<SuspenseWrap><Invoice /></SuspenseWrap>} />
 
           {/* ── Legacy path redirects (backward compatibility) ─────── */}

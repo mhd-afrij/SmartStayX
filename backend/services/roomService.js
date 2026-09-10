@@ -84,7 +84,8 @@ const getOwnerRooms = async ({ userId }) => {
   });
 };
 
-// Toggles a room's isAvailable flag; only the owning Admin can perform this
+// Toggles a room's availability via its operational status (`status` is the
+// single source of truth; `isAvailable` is always derived from it).
 const toggleAvailability = async ({ roomId, userId }) => {
   if (typeof roomId !== 'string') throw Object.assign(new Error('Invalid room ID'), { status: 400 });
   const room = await Room.findById(roomId).populate('hotel');
@@ -93,8 +94,8 @@ const toggleAvailability = async ({ roomId, userId }) => {
     throw Object.assign(new Error('Not authorized'), { status: 403 });
   }
 
-  // Toggle the flag and persist
-  room.isAvailable = !room.isAvailable;
+  const willBeAvailable = room.status !== 'available';
+  room.status = willBeAvailable ? 'available' : 'maintenance';
   await room.save();
 
   const redis = getRedis();

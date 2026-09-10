@@ -10,6 +10,7 @@ import Booking from "../models/Booking.js";
 import Role from "../models/Role.js";
 import Room from "../models/Room.js";
 import AuditLog from "../models/AuditLog.js";
+import escapeRegex from "../utils/escapeRegex.js";
 
 const adminRouter = express.Router();
 
@@ -47,9 +48,10 @@ adminRouter.get("/users", async (req, res) => {
     const query = {};
     if (role) query.role = role;
     if (search) {
+      const safeSearch = escapeRegex(String(search));
       query.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
+        { name: { $regex: safeSearch, $options: "i" } },
+        { email: { $regex: safeSearch, $options: "i" } },
       ];
     }
     const users = await User.find(query)
@@ -117,9 +119,10 @@ adminRouter.get("/bookings", async (req, res) => {
     if (status) query.status = status;
     if (hotel) query.hotel = hotel;
     if (search) {
+      const safeSearch = escapeRegex(String(search));
       query.$or = [
-        { guestDisplayName: { $regex: search, $options: "i" } },
-        { guestEmail: { $regex: search, $options: "i" } },
+        { guestDisplayName: { $regex: safeSearch, $options: "i" } },
+        { guestEmail: { $regex: safeSearch, $options: "i" } },
       ];
     }
     const bookings = await Booking.find(query)
@@ -194,9 +197,10 @@ adminRouter.get("/guests", async (req, res) => {
     const { page = 1, limit = 20, search } = req.query;
     const query = { role: "guest" };
     if (search) {
+      const safeSearch = escapeRegex(String(search));
       query.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
+        { name: { $regex: safeSearch, $options: "i" } },
+        { email: { $regex: safeSearch, $options: "i" } },
       ];
     }
     const users = await User.find(query)
@@ -253,9 +257,10 @@ adminRouter.get("/managers", async (req, res) => {
     const { page = 1, limit = 20, search } = req.query;
     const query = { role: "hotel_manager" };
     if (search) {
+      const safeSearch = escapeRegex(String(search));
       query.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
+        { name: { $regex: safeSearch, $options: "i" } },
+        { email: { $regex: safeSearch, $options: "i" } },
       ];
     }
     const managers = await User.find(query)

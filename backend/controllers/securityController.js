@@ -11,6 +11,8 @@ const paginate = (page = 1, limit = 20) => ({
   page: Math.max(1, Number(page)),
 });
 
+import escapeRegex from "../utils/escapeRegex.js";
+
 export const getSecurityOverview = async (req, res) => {
   try {
     const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -38,7 +40,10 @@ export const getLoginHistory = async (req, res) => {
   try {
     const { page = 1, limit = 20, search, from, to, ip } = req.query;
     const query = { type: "login" };
-    if (search) query.$or = [{ email: { $regex: search, $options: "i" } }, { ip: { $regex: search, $options: "i" } }];
+    if (search) {
+      const safeSearch = escapeRegex(String(search));
+      query.$or = [{ email: { $regex: safeSearch, $options: "i" } }, { ip: { $regex: safeSearch, $options: "i" } }];
+    }
     if (ip) query.ip = ip;
     if (from || to) {
       query.createdAt = {};

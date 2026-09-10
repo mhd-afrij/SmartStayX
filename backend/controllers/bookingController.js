@@ -642,13 +642,18 @@ export const getHotelBookings = async (req, res) => {
                 _id: null,
                 totalBookings: {
                   $sum: {
-                    $cond: [{ $ne: ["$status", BOOKING_STATUS.CANCELLED] }, 1, 0],
+                    $cond: [{ $nin: ["$status", [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED]] }, 1, 0],
                   },
                 },
                 totalRevenue: {
                   $sum: {
                     $cond: [
-                      { $ne: ["$status", BOOKING_STATUS.CANCELLED] },
+                      {
+                        $and: [
+                          { $eq: ["$isPaid", true] },
+                          { $nin: ["$status", [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED]] },
+                        ],
+                      },
                       "$totalPrice",
                       0,
                     ],
@@ -661,7 +666,7 @@ export const getHotelBookings = async (req, res) => {
                         $and: [
                           { $lte: ["$checkInDate", now] },
                           { $gte: ["$checkOutDate", now] },
-                          { $ne: ["$status", BOOKING_STATUS.CANCELLED] },
+                          { $nin: ["$status", [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED]] },
                         ],
                       },
                       1,
@@ -672,7 +677,13 @@ export const getHotelBookings = async (req, res) => {
                 revenueToday: {
                   $sum: {
                     $cond: [
-                      { $and: [{ $gte: ["$createdAt", today] }, { $ne: ["$status", BOOKING_STATUS.CANCELLED] }] },
+                      {
+                        $and: [
+                          { $gte: ["$createdAt", today] },
+                          { $eq: ["$isPaid", true] },
+                          { $nin: ["$status", [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED]] },
+                        ],
+                      },
                       "$totalPrice",
                       0,
                     ],
@@ -681,7 +692,13 @@ export const getHotelBookings = async (req, res) => {
                 revenueWeek: {
                   $sum: {
                     $cond: [
-                      { $and: [{ $gte: ["$createdAt", weekAgo] }, { $ne: ["$status", BOOKING_STATUS.CANCELLED] }] },
+                      {
+                        $and: [
+                          { $gte: ["$createdAt", weekAgo] },
+                          { $eq: ["$isPaid", true] },
+                          { $nin: ["$status", [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED]] },
+                        ],
+                      },
                       "$totalPrice",
                       0,
                     ],
@@ -690,7 +707,13 @@ export const getHotelBookings = async (req, res) => {
                 revenueMonth: {
                   $sum: {
                     $cond: [
-                      { $and: [{ $gte: ["$createdAt", monthAgo] }, { $ne: ["$status", BOOKING_STATUS.CANCELLED] }] },
+                      {
+                        $and: [
+                          { $gte: ["$createdAt", monthAgo] },
+                          { $eq: ["$isPaid", true] },
+                          { $nin: ["$status", [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED]] },
+                        ],
+                      },
                       "$totalPrice",
                       0,
                     ],
@@ -699,7 +722,12 @@ export const getHotelBookings = async (req, res) => {
                 upcomingBookings: {
                   $sum: {
                     $cond: [
-                      { $and: [{ $gt: ["$checkInDate", now] }, { $ne: ["$status", BOOKING_STATUS.CANCELLED] }] },
+                      {
+                        $and: [
+                          { $gt: ["$checkInDate", now] },
+                          { $nin: ["$status", [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED]] },
+                        ],
+                      },
                       1,
                       0,
                     ],
@@ -718,7 +746,13 @@ export const getHotelBookings = async (req, res) => {
                               $divide: [{ $subtract: ["$checkInDate", "$createdAt"] }, 1000 * 60 * 60],
                             },
                           },
-                          in: { $and: [{ $gt: ["$$hoursDiff", 0] }, { $lte: ["$$hoursDiff", bookingConfig.lastMinuteWindowHours] }] },
+                          in: {
+                            $and: [
+                              { $gt: ["$$hoursDiff", 0] },
+                              { $lte: ["$$hoursDiff", bookingConfig.lastMinuteWindowHours] },
+                              { $nin: ["$status", [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED]] },
+                            ],
+                          },
                         },
                       },
                       1,
@@ -832,7 +866,11 @@ export const getHotelBookings = async (req, res) => {
 
     const filteredBookings = bookings.filter(Boolean);
 
-    // Trend
+    // Trend — valid bookings only (excludes cancelled/expired); revenue counts
+    // paid bookings only, matching the canonical definition.
+    const validBookings = filteredBookings.filter(
+      (b) => ![BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED].includes(b.status),
+    );
     const trends = Array.from({ length: trendDays }).map((_, idx) => {
       const day = new Date();
       day.setDate(now.getDate() - (6 - idx));
@@ -840,10 +878,12 @@ export const getHotelBookings = async (req, res) => {
       const label = `${day.getMonth() + 1}/${day.getDate()}`;
       const dayStart = new Date(day.toDateString());
       const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
-      const dayBookings = filteredBookings.filter(
+      const dayBookings = validBookings.filter(
         (b) => new Date(b.createdAt) >= dayStart && new Date(b.createdAt) < dayEnd,
       );
-      const revenue = dayBookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+      const revenue = dayBookings
+        .filter((b) => b.isPaid)
+        .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
       return { date: dateStr, label, bookings: dayBookings.length, revenue };
     });
 

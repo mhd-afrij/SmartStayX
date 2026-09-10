@@ -5,14 +5,9 @@ import Hotel from "../models/Hotel.js";
 import Refund from "../models/Refund.js";
 import PlatformSettings from "../models/PlatformSettings.js";
 import { ok } from "../utils/apiResponse.js";
+import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 
-const { CHECKED_OUT, CONFIRMED, CHECKED_IN, CANCELLED, EXPIRED } = {
-  CHECKED_OUT: "checked_out",
-  CONFIRMED: "confirmed",
-  CHECKED_IN: "checked_in",
-  CANCELLED: "cancelled",
-  EXPIRED: "expired",
-};
+const { CHECKED_OUT, CANCELLED, EXPIRED } = BOOKING_STATUS;
 
 export const getRevenueReport = async (req, res) => {
   try {
@@ -20,17 +15,22 @@ export const getRevenueReport = async (req, res) => {
     const days = range === "7d" ? 7 : range === "90d" ? 90 : range === "year" ? 365 : 30;
     const start = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
-    const bookings = await Booking.find({ createdAt: { $gte: start }, status: { $nin: [CANCELLED, EXPIRED] } })
-      .select("createdAt totalPrice hotel status")
+    const bookings = await Booking.find({
+      createdAt: { $gte: start },
+      status: { $nin: [CANCELLED, EXPIRED] },
+    })
+      .select("createdAt totalPrice hotel status isPaid")
       .lean();
 
-    const totalRevenue = bookings.reduce((s, b) => s + (Number(b.totalPrice) || 0), 0);
+    // Revenue counts paid bookings only (canonical); bookingCount counts every
+    // valid booking regardless of payment status.
+    const totalRevenue = bookings.reduce((s, b) => s + (b.isPaid ? Number(b.totalPrice) || 0 : 0), 0);
     const byDay = {};
     const gran = granularity || (days <= 31 ? "day" : "month");
     bookings.forEach((b) => {
       const d = new Date(b.createdAt);
       const key = gran === "month" ? d.toISOString().slice(0, 7) : d.toISOString().split("T")[0];
-      byDay[key] = (byDay[key] || 0) + (Number(b.totalPrice) || 0);
+      byDay[key] = (byDay[key] || 0) + (b.isPaid ? Number(b.totalPrice) || 0 : 0);
     });
 
     const platform = await PlatformSettings.getSettings();
@@ -55,7 +55,7 @@ export const getHotelPerformanceReport = async (req, res) => {
   try {
     const hotels = await Hotel.find().select("_id name city approvalStatus").lean();
     const bookings = await Booking.find({ status: { $nin: [CANCELLED, EXPIRED] } })
-      .select("hotel totalPrice status")
+      .select("hotel totalPrice status isPaid")
       .lean();
 
     const byHotel = {};
@@ -63,7 +63,7 @@ export const getHotelPerformanceReport = async (req, res) => {
       const k = String(b.hotel);
       byHotel[k] = byHotel[k] || { bookings: 0, revenue: 0, completed: 0 };
       byHotel[k].bookings += 1;
-      byHotel[k].revenue += Number(b.totalPrice) || 0;
+      if (b.isPaid) byHotel[k].revenue += Number(b.totalPrice) || 0;
       if (b.status === CHECKED_OUT) byHotel[k].completed += 1;
     });
 

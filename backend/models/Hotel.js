@@ -27,6 +27,7 @@ const hotelSchema = new mongoose.Schema(
     image: { type: String, default: "" },
     description: { type: String, default: "" },
     currency: { type: String, default: "USD" },
+    timezone: { type: String, default: "", trim: true },
     // ── Super Admin approval workflow ───────────────────────────────────
     approvalStatus: {
       type: String,
@@ -64,6 +65,11 @@ const hotelSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Scope/ownership lookups (resolveManagerScope, manager dashboards).
+hotelSchema.index({ owner: 1 });
+hotelSchema.index({ city: 1 });
+hotelSchema.index({ approvalStatus: 1 });
 
 const Hotel = mongoose.model("Hotel", hotelSchema);
 

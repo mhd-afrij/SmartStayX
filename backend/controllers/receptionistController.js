@@ -114,7 +114,7 @@ export const updateReservationStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    const allowed = ["confirmed", "checked_in", "checked_out", "cancelled"];
+    const allowed = [BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.CHECKED_IN, BOOKING_STATUS.CHECKED_OUT, BOOKING_STATUS.CANCELLED];
 
     if (!allowed.includes(status)) {
       return res.json({ success: false, message: `Invalid status. Allowed: ${allowed.join(", ")}` });
@@ -239,7 +239,16 @@ export const updateRoom = async (req, res) => {
     if (roomType !== undefined) room.roomType = roomType;
     if (pricePerNight !== undefined) room.pricePerNight = Number(pricePerNight);
     if (amenities !== undefined) room.amenities = amenities;
-    if (isAvailable !== undefined) room.isAvailable = isAvailable === true || isAvailable === "true";
+    if (isAvailable !== undefined) {
+      // Availability is derived from `status` (canonical rule), so the toggle
+      // translates into a status change; unavailable rooms go to maintenance.
+      const wantsAvailable = isAvailable === true || isAvailable === "true";
+      if (wantsAvailable) {
+        room.status = "available";
+      } else if (room.status === "available" || room.status === "cleaning") {
+        room.status = "maintenance";
+      }
+    }
     await room.save();
     res.json({ success: true, message: "Room updated", room });
   } catch (error) {
@@ -253,9 +262,12 @@ export const toggleRoomAvailability = async (req, res) => {
     const room = await Room.findById(id);
     if (!room) return res.json({ success: false, message: "Room not found" });
     if (!assertHotelScope(req, res, room.hotel)) return;
-    room.isAvailable = !room.isAvailable;
+    // Availability is derived from `status` (canonical rule), so toggling
+    // moves the room between available and maintenance.
+    const willBeAvailable = room.status !== "available";
+    room.status = willBeAvailable ? "available" : "maintenance";
     await room.save();
-    res.json({ success: true, message: `Room ${room.isAvailable ? "available" : "unavailable"}`, room });
+    res.json({ success: true, message: `Room ${willBeAvailable ? "available" : "unavailable"}`, room });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
@@ -495,27 +507,29 @@ export const getDashboardSummary = async (req, res) => {
 
     // ── Bookings / guest metrics ─────────────────────────────────────
     const bookings = await Booking.find(hotelFilter).lean();
-    const activeBooking = (b) => !["cancelled", "expired"].includes(b.status);
+    const activeBooking = (b) => ![BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED].includes(b.status);
 
     const arrivalsToday = bookings.filter(
-      (b) => b.checkInDate >= startOfToday && b.checkInDate < endOfToday && ["confirmed", "checked_in"].includes(b.status)
+      (b) => b.checkInDate >= startOfToday && b.checkInDate < endOfToday && [BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.CHECKED_IN].includes(b.status)
     ).length;
     const departuresToday = bookings.filter(
-      (b) => b.checkOutDate >= startOfToday && b.checkOutDate < endOfToday && ["checked_in", "checked_out"].includes(b.status)
+      (b) => b.checkOutDate >= startOfToday && b.checkOutDate < endOfToday && [BOOKING_STATUS.CHECKED_IN, BOOKING_STATUS.CHECKED_OUT].includes(b.status)
     ).length;
-    const inHouse = bookings.filter((b) => b.status === "checked_in").length;
-    const pendingCheckins = bookings.filter((b) => b.status === "confirmed" && new Date(b.checkInDate) <= now).length;
-    const pendingCheckouts = bookings.filter((b) => b.status === "checked_in" && new Date(b.checkOutDate) <= now).length;
+    const inHouse = bookings.filter((b) => b.status === BOOKING_STATUS.CHECKED_IN).length;
+    const pendingCheckins = bookings.filter((b) => b.status === BOOKING_STATUS.CONFIRMED && new Date(b.checkInDate) <= now).length;
+    const pendingCheckouts = bookings.filter((b) => b.status === BOOKING_STATUS.CHECKED_IN && new Date(b.checkOutDate) <= now).length;
 
     // ── Payments ─────────────────────────────────────────────────────
-    const unpaidBookings = bookings.filter((b) => !b.isPaid && ["confirmed", "checked_in", "checked_out"].includes(b.status));
-    const paidBookings = bookings.filter((b) => b.isPaid);
+    const unpaidBookings = bookings.filter((b) => !b.isPaid && [BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.CHECKED_IN, BOOKING_STATUS.CHECKED_OUT].includes(b.status));
+    // Revenue counts paid bookings only (canonical), excluding cancelled/expired
+    // regardless of payment status so it matches the manager dashboard.
+    const paidBookings = bookings.filter((b) => b.isPaid && activeBooking(b));
     const pendingRevenue = unpaidBookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
     const collectedRevenue = paidBookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
     const collectedToday = paidBookings
       .filter((b) =>
         (b.paymentReceivedAt && b.paymentReceivedAt >= startOfToday && b.paymentReceivedAt < endOfToday) ||
-        (b.updatedAt && b.updatedAt >= startOfToday && b.updatedAt < endOfToday && (activeBooking(b) || b.status === "checked_out"))
+        (b.updatedAt && b.updatedAt >= startOfToday && b.updatedAt < endOfToday && (activeBooking(b) || b.status === BOOKING_STATUS.CHECKED_OUT))
       )
       .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
 
@@ -589,7 +603,7 @@ export const createReservation = async (req, res) => {
 
     const overlap = await Booking.findOne({
       room: roomId,
-      status: { $nin: ["cancelled", "expired"] },
+      status: { $nin: [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED] },
       checkInDate: { $lt: checkOut },
       checkOutDate: { $gt: checkIn },
     });
@@ -678,7 +692,7 @@ export const updateReservation = async (req, res) => {
     if (!hotelInScope(req, booking.hotel)) {
       return res.json({ success: false, message: "Access denied: hotel scope violation" });
     }
-    if (!["pending", "confirmed", "reservation"].includes(booking.status)) {
+    if (![BOOKING_STATUS.PENDING, BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.RESERVATION].includes(booking.status)) {
       return res.json({ success: false, message: "Only pending or confirmed reservations can be edited" });
     }
 
@@ -700,7 +714,7 @@ export const updateReservation = async (req, res) => {
       const overlap = await Booking.findOne({
         _id: { $ne: booking._id },
         room: roomId,
-        status: { $nin: ["cancelled", "expired"] },
+        status: { $nin: [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED] },
         checkInDate: { $lt: checkOut },
         checkOutDate: { $gt: checkIn },
       });
@@ -780,13 +794,13 @@ export const getGuests = async (req, res) => {
       entry.totalSpent += b.totalPrice || 0;
       if (b.roomNumber) entry.roomNumbers.add(b.roomNumber);
 
-      if (b.status === "checked_out" || b.status === "checked_in") {
+      if (b.status === BOOKING_STATUS.CHECKED_OUT || b.status === BOOKING_STATUS.CHECKED_IN) {
         const ts = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
         if (!entry.lastStay || ts > new Date(entry.lastStay).getTime()) {
           entry.lastStay = b.updatedAt || b.checkOutDate;
         }
       }
-      if (["confirmed", "reservation"].includes(b.status)) {
+      if ([BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.RESERVATION].includes(b.status)) {
         if (!entry.upcomingStay || new Date(b.checkInDate) < new Date(entry.upcomingStay)) {
           entry.upcomingStay = b.checkInDate;
         }
@@ -837,6 +851,11 @@ export const getGuestDetail = async (req, res) => {
           .lean()
       : [];
 
+    // Only expose guest details when the user has a real relationship with
+    // this hotel (booking or service request). Otherwise a receptionist could
+    // inspect any platform user's profile across hotel boundaries.
+    const hasHotelRelation = bookings.length > 0 || serviceRequests.length > 0;
+
     const payments = bookings.map((b) => ({
       bookingId: b._id,
       hotel: b.hotel?.name || "Hotel",
@@ -850,13 +869,15 @@ export const getGuestDetail = async (req, res) => {
 
     res.json({
       success: true,
-      guest: {
-        name: user?.name || bookings[0]?.guestDisplayName || "Guest",
-        email: user?.email || bookings[0]?.guestEmail || "",
-        phone: user?.profile?.phone || "",
-        image: user?.image || "",
-        userId: user?._id || guestId,
-      },
+      guest: hasHotelRelation
+        ? {
+            name: user?.name || bookings[0]?.guestDisplayName || "Guest",
+            email: user?.email || bookings[0]?.guestEmail || "",
+            phone: user?.profile?.phone || "",
+            image: user?.image || "",
+            userId: user?._id || guestId,
+          }
+        : null,
       bookings,
       serviceRequests,
       payments,
@@ -875,7 +896,7 @@ export const frontDeskCheckin = async (req, res) => {
     if (!hotelInScope(req, booking.hotel)) {
       return res.json({ success: false, message: "Access denied: hotel scope violation" });
     }
-    if (!["confirmed", "reservation"].includes(booking.status)) {
+    if (![BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.RESERVATION].includes(booking.status)) {
       return res.json({ success: false, message: `Cannot check in a ${booking.status} reservation` });
     }
 
@@ -916,7 +937,7 @@ export const frontDeskCheckin = async (req, res) => {
         $set: {
           user: String(booking.user),
           hotel: booking.hotel,
-          status: "checked_in",
+          status: BOOKING_STATUS.CHECKED_IN,
           checkedInAt: new Date(),
           documents,
         },
@@ -966,7 +987,7 @@ export const frontDeskCheckout = async (req, res) => {
     if (!hotelInScope(req, booking.hotel)) {
       return res.json({ success: false, message: "Access denied: hotel scope violation" });
     }
-    if (booking.status !== "checked_in") {
+    if (booking.status !== BOOKING_STATUS.CHECKED_IN) {
       return res.json({ success: false, message: "Only checked-in guests can check out" });
     }
 
@@ -998,7 +1019,7 @@ export const frontDeskCheckout = async (req, res) => {
 
     await Checkin.findOneAndUpdate(
       { booking: booking._id },
-      { $set: { status: "checked_out", checkedOutAt: new Date() } }
+      { $set: { status: BOOKING_STATUS.CHECKED_OUT, checkedOutAt: new Date() } }
     );
 
     await Notification.create({

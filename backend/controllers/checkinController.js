@@ -123,7 +123,7 @@ export const completeCheckout = async (req, res) => {
 
     await Checkin.findOneAndUpdate(
       { booking: bookingId },
-      { status: "checked_out", checkedOutAt: new Date() },
+      { status: BOOKING_STATUS.CHECKED_OUT, checkedOutAt: new Date() },
     );
 
     res.json({ success: true, message: "Checkout completed" });

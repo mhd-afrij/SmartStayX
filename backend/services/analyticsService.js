@@ -32,7 +32,9 @@ export const getBookingTrends = async ({ hotelId, range = '30d', granularity = '
       $group: {
         _id: { $dateToString: { format: dateFormat, date: '$createdAt' } },
         bookings: { $sum: 1 },
-        revenue: { $sum: '$totalPrice' },
+        // Revenue counts paid bookings only (canonical definition); the
+        // bookings metric counts every valid (non-cancelled/expired) booking.
+        revenue: { $sum: { $cond: [{ $eq: ['$isPaid', true] }, '$totalPrice', 0] } },
       },
     },
     { $sort: { '_id': 1 } },
@@ -54,11 +56,18 @@ export const getBookingTrends = async ({ hotelId, range = '30d', granularity = '
 };
 
 export const getPopularDestinations = async ({ hotelId, limit = 10 } = {}) => {
-  const matchTimeUnity = { status: { $ne: BOOKING_STATUS.CANCELLED } };
+  const matchTimeUnity = { status: { $nin: [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED] } };
   if (hotelId) matchTimeUnity.hotel = hotelId;
   const pipeline = [
     { $match: matchTimeUnity },
-    { $group: { _id: '$hotel', bookings: { $sum: 1 }, revenue: { $sum: '$totalPrice' } } },
+    {
+      $group: {
+        _id: '$hotel',
+        bookings: { $sum: 1 },
+        // Revenue counts paid bookings only (canonical definition).
+        revenue: { $sum: { $cond: [{ $eq: ['$isPaid', true] }, '$totalPrice', 0] } },
+      },
+    },
     { $sort: { bookings: -1 } },
     { $limit: limit },
     {
@@ -86,7 +95,7 @@ export const getPopularDestinations = async ({ hotelId, limit = 10 } = {}) => {
 
 export const getRevenueAnalytics = async ({ hotelId, range = '30d' } = {}) => {
   const from = startDate(range);
-  const match = { createdAt: { $gte: from }, isPaid: true };
+  const match = { createdAt: { $gte: from }, isPaid: true, status: { $nin: [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED] } };
   if (hotelId) match.hotel = hotelId;
 
   const bookings = await Booking.find(match)
@@ -128,7 +137,7 @@ export const getRevenueAnalytics = async ({ hotelId, range = '30d' } = {}) => {
 
 export const getGuestDemographics = async ({ hotelId, range = '30d' } = {}) => {
   const from = startDate(range);
-  const match = { createdAt: { $gte: from }, status: { $ne: BOOKING_STATUS.CANCELLED } };
+  const match = { createdAt: { $gte: from }, status: { $nin: [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED] } };
   if (hotelId) match.hotel = hotelId;
 
   const bookings = await Booking.find(match)

@@ -1,6 +1,7 @@
 // roomRoutes.js — Room CRUD, availability toggle, and search routes
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
+import { requireHotelScope } from "../middleware/authorization.js";
 import upload from "../middleware/uploadMiddleware.js";
 import validateRequest from "../middleware/validateRequest.js";
 import roomValidators from "../validators/roomValidators.js";
@@ -21,7 +22,7 @@ roomRouter.get("/trending/list", getTrendingRooms);
 // POST /toggle-availability — Toggle room availability on/off (auth required)
 roomRouter.post("/toggle-availability", protect, validateRequest({ body: roomValidators.toggleAvailabilityBody }), toggleRoomAvailability);
 // GET /next-number/:hotelId — Suggest next room number for a hotel (based on city prefix)
-roomRouter.get("/next-number/:hotelId", protect, suggestRoomNumber);
+roomRouter.get("/next-number/:hotelId", protect, requireHotelScope, suggestRoomNumber);
 // PUT /:id — Update a room by ID (auth required)
 roomRouter.put("/:id", protect, validateRequest({ body: roomValidators.updateRoomBody }), updateRoom);
 // GET /:id — Get a single room by ID (public)

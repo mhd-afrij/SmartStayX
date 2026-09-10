@@ -50,14 +50,25 @@ export const getNotifications = async (req, res) => {
 // Mark a single notification as read
 export const markAsRead = async (req, res) => {
   try {
+    const userId = req.user?._id || req.user?.id;
     const { notificationId } = req.params;
-    const notification = await Notification.findByIdAndUpdate(
-      notificationId,
+    if (!userId) {
+      return res.json({ success: false, message: "Not authenticated" });
+    }
+
+    const hotels = await Hotel.find({ owner: userId });
+    let hotelIds = hotels.map((h) => h._id);
+    if (req.user?.assignedHotel && !hotelIds.some((id) => String(id) === String(req.user.assignedHotel))) {
+      hotelIds.push(req.user.assignedHotel);
+    }
+
+    const notification = await Notification.findOneAndUpdate(
+      { _id: notificationId, hotel: { $in: hotelIds } },
       { isRead: true },
       { new: true }
     );
     if (!notification) {
-      return res.json({ success: false, message: "Notification not found" });
+      return res.json({ success: false, message: "Notification not found or not in your scope" });
     }
     res.json({ success: true, notification });
   } catch (error) {

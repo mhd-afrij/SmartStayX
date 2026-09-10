@@ -1,6 +1,22 @@
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import { requireRole, requireHotelScope } from "../middleware/authorization.js";
+import validateRequest from "../middleware/validateRequest.js";
+import {
+  createReservationBody,
+  updateReservationBody,
+  updateReservationStatusBody,
+  markPaymentReceivedBody,
+  frontDeskCheckinBody,
+  frontDeskCheckoutBody,
+  createRoomBody,
+  updateRoomBody,
+  updateRoomStatusBody,
+  updateServiceStatusBody,
+  assignServiceBody,
+  createOfferBody,
+  updateOfferBody,
+} from "../validators/receptionistValidators.js";
 import {
   getDashboardSummary,
   getReservations,
@@ -44,36 +60,36 @@ receptionistRouter.get("/dashboard", getDashboardSummary);
 // Reservations
 receptionistRouter.get("/reservations", getReservations);
 receptionistRouter.get("/reservations/:id", getReservationDetail);
-receptionistRouter.post("/reservations", createReservation);
-receptionistRouter.put("/reservations/:id", updateReservation);
-receptionistRouter.patch("/reservations/:id/status", updateReservationStatus);
-receptionistRouter.post("/reservations/:id/payment", markPaymentReceived);
+receptionistRouter.post("/reservations", validateRequest({ body: createReservationBody }), createReservation);
+receptionistRouter.put("/reservations/:id", validateRequest({ body: updateReservationBody }), updateReservation);
+receptionistRouter.patch("/reservations/:id/status", validateRequest({ body: updateReservationStatusBody }), updateReservationStatus);
+receptionistRouter.post("/reservations/:id/payment", validateRequest({ body: markPaymentReceivedBody }), markPaymentReceived);
 
 // Guest management
 receptionistRouter.get("/guests", getGuests);
 receptionistRouter.get("/guests/:id", getGuestDetail);
 
 // Front desk check-in / check-out
-receptionistRouter.post("/checkin", frontDeskCheckin);
-receptionistRouter.post("/checkout", frontDeskCheckout);
+receptionistRouter.post("/checkin", validateRequest({ body: frontDeskCheckinBody }), frontDeskCheckin);
+receptionistRouter.post("/checkout", validateRequest({ body: frontDeskCheckoutBody }), frontDeskCheckout);
 
 // Rooms
 receptionistRouter.get("/rooms", getAllRooms);
-receptionistRouter.post("/rooms", createRoom);
-receptionistRouter.put("/rooms/:id", updateRoom);
+receptionistRouter.post("/rooms", validateRequest({ body: createRoomBody }), createRoom);
+receptionistRouter.put("/rooms/:id", validateRequest({ body: updateRoomBody }), updateRoom);
 receptionistRouter.patch("/rooms/:id/toggle", toggleRoomAvailability);
-receptionistRouter.patch("/rooms/:id/status", updateRoomStatus);
+receptionistRouter.patch("/rooms/:id/status", validateRequest({ body: updateRoomStatusBody }), updateRoomStatus);
 receptionistRouter.delete("/rooms/:id", deleteRoom);
 
 // Services
 receptionistRouter.get("/services", getAllServices);
-receptionistRouter.patch("/services/:id/status", updateServiceStatus);
-receptionistRouter.patch("/services/:id/assign", assignService);
+receptionistRouter.patch("/services/:id/status", validateRequest({ body: updateServiceStatusBody }), updateServiceStatus);
+receptionistRouter.patch("/services/:id/assign", validateRequest({ body: assignServiceBody }), assignService);
 
 // Offers
 receptionistRouter.get("/offers", getAllOffers);
-receptionistRouter.post("/offers", createOffer);
-receptionistRouter.put("/offers/:id", updateOffer);
+receptionistRouter.post("/offers", validateRequest({ body: createOfferBody }), createOffer);
+receptionistRouter.put("/offers/:id", validateRequest({ body: updateOfferBody }), updateOffer);
 receptionistRouter.delete("/offers/:id", deleteOffer);
 
 // Reviews

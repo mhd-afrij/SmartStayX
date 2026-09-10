@@ -1,6 +1,7 @@
 // paymentGatewayController.js — Multi-gateway payment processing and gateway listing
 import paymentGatewayService from "../services/paymentGatewayService.js";
 import Booking from "../models/Booking.js";
+import { BOOKING_STATUS } from "../constants/bookingStatuses.js";
 
 export const getAvailableGateways = async (req, res) => {
   try {
@@ -35,8 +36,8 @@ export const createPayment = async (req, res) => {
       // booking cleaner from expiring the hold while the guest travels.
       booking.paymentMethod = "Pay At Hotel";
       booking.isPaid = false;
-      if (booking.status === "pending") {
-        booking.status = "confirmed";
+      if (booking.status === BOOKING_STATUS.PENDING) {
+        booking.status = BOOKING_STATUS.CONFIRMED;
         booking.holdExpiresAt = null;
       }
       await booking.save();
