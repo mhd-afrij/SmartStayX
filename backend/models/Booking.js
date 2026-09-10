@@ -40,9 +40,28 @@ const bookingSchema = new mongoose.Schema(
     offer: { type: mongoose.Schema.Types.ObjectId, ref: "Offer" },
     offerDiscountPercent: { type: Number, min: 0, max: 100 },
     originalPricePerNight: { type: Number, min: 0 },
+    // ── Workflow tracking (NOT status values) ───────────────────────────
+    // The core `status` enum above remains the single authoritative state;
+    // these fields + statusHistory capture the surrounding workflow events.
+    paymentPendingAt: { type: Date, default: null },   // booking awaiting payment
+    paymentReceivedAt: { type: Date, default: null },  // payment captured
+    roomAssignedAt: { type: Date, default: null },     // room assigned to booking
+    invoiceGeneratedAt: { type: Date, default: null }, // invoice physically generated
+    reviewRequestedAt: { type: Date, default: null },  // post-stay review invited
+    checkedInAt: { type: Date, default: null },        // guest checked in
+    checkedOutAt: { type: Date, default: null },       // guest checked out
   },
   { timestamps: true }
 );
+
+// Query performance indexes for dashboard/report aggregations and room
+// overlap checks (receptionist + booking creation flows).
+bookingSchema.index({ hotel: 1, status: 1 });
+bookingSchema.index({ hotel: 1, checkInDate: 1, checkOutDate: 1 });
+bookingSchema.index({ hotel: 1, createdAt: -1, isPaid: 1 });
+bookingSchema.index({ status: 1, holdExpiresAt: 1 });
+bookingSchema.index({ user: 1, createdAt: -1 });
+bookingSchema.index({ room: 1, checkInDate: 1, checkOutDate: 1 });
 
 const Booking = mongoose.model("Booking", bookingSchema);
 

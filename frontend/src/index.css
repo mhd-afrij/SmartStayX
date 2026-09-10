@@ -639,6 +639,78 @@ body {
   color: #f2efe8 !important;
 }
 
+/* ============================================================
+   Trip Planner — Leaflet theming (light + dark)
+   ============================================================ */
+.trip-map {
+  background: #e8e5de;
+  z-index: 0;
+}
+
+.dark .trip-map {
+  background: #1a1e1b;
+  filter: brightness(0.85) contrast(1.05) saturate(0.85);
+}
+
+.trip-map .leaflet-container {
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+}
+
+.trip-map .leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.8);
+  color: #5c6b64;
+  font-size: 10px;
+}
+
+.dark .trip-map .leaflet-control-attribution {
+  background: rgba(17, 20, 18, 0.85);
+  color: #a9aea7;
+}
+
+.trip-map .leaflet-control-attribution a {
+  color: #183b35;
+}
+
+.dark .trip-map .leaflet-control-attribution a {
+  color: #8fb8a8;
+}
+
+.trip-map .leaflet-bar a {
+  background: #ffffff;
+  color: #183b35;
+  border-color: #e3e0d8;
+}
+
+.dark .trip-map .leaflet-bar a {
+  background: #1a1e1b;
+  color: #f2efe8;
+  border-color: #303631;
+}
+
+.trip-marker {
+  background: transparent;
+  border: 0;
+}
+
+/* Leaflet popups follow the design tokens in both themes */
+.trip-map .leaflet-popup-content-wrapper {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+
+.trip-map .leaflet-popup-tip {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.trip-map .leaflet-popup-content {
+  margin: 12px 14px;
+}
+
 /* ---------------------------------------------------------------------------
    Owner dashboard shell — dark charcoal background with champagne accents.
    Scoped to .owner-shell (added on the owner layout root) so the public site

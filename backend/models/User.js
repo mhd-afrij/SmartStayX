@@ -30,6 +30,17 @@ const userSchema = new mongoose.Schema(
         specialRequests: { type: String, default: "" },
       },
     },
+    // ── Loyalty aggregate (platform-wide) ───────────────────────────────
+    loyalty: {
+      totalStays: { type: Number, default: 0 },
+      lifetimeSpend: { type: Number, default: 0 },
+      referralsCount: { type: Number, default: 0 },
+    },
+    // ── Security / login tracking for the admin Security Center ─────────
+    lastLoginAt: { type: Date, default: null },
+    lastLoginIp: { type: String, default: null },
+    lastLoginUserAgent: { type: String, default: null },
+    loginCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

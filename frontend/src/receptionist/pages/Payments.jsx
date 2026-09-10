@@ -22,8 +22,8 @@ const Payments = () => {
         headers: { Authorization: `Bearer ${await getToken()}` },
       });
       if (data.success) setReservations(data.reservations);
-    } catch {
-      toast.error("Failed to load");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to load");
     } finally {
       setLoading(false);
     }
@@ -45,8 +45,8 @@ const Payments = () => {
       } else {
         toast.error(data.message || "Failed");
       }
-    } catch {
-      toast.error("Failed to mark payment");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to mark payment");
     } finally {
       setUpdatingId(null);
     }

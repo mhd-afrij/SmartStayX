@@ -1,9 +1,9 @@
 // bookingCleaner.js — Periodic cleanup job for expired booking holds
-// bookingCleaner.js — Periodic cleanup job for expired booking holds
 import Booking from '../models/Booking.js'
 import mongoose from 'mongoose'
 import logger from './logger.js'
 import bookingConfig from '../configs/bookingConfig.js'
+import { BOOKING_STATUS } from '../constants/bookingStatuses.js'
 
 // Periodic background job that expires pending bookings past their hold window.
 
@@ -24,8 +24,8 @@ export const startBookingCleaner = (options = {}) => {
       // Mark all pending bookings whose hold has expired
       const now = new Date()
       const res = await Booking.updateMany(
-        { status: 'pending', holdExpiresAt: { $lte: now } },
-        { $set: { status: 'expired' } }
+        { status: BOOKING_STATUS.PENDING, holdExpiresAt: { $lte: now } },
+        { $set: { status: BOOKING_STATUS.EXPIRED } }
       )
       // Log count of expired holds if any were released
       if (res.modifiedCount && res.modifiedCount > 0 && logger?.info) {

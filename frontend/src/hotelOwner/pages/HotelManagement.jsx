@@ -30,6 +30,9 @@ const emptyForm = {
   contact: "",
   city: "",
   description: "",
+  country: "",
+  latitude: "",
+  longitude: "",
   image: null,
 };
 
@@ -61,6 +64,35 @@ const HotelManagement = () => {
   const [amenityOptions, setAmenityOptions] = useState([]);
   const [newFeature, setNewFeature] = useState({ icon: "homeIcon", title: "", description: "" });
   const [newAmenity, setNewAmenity] = useState("");
+  const [geocoding, setGeocoding] = useState(false);
+
+  // handleGeocodeAddress — Resolves the hotel address to coordinates via the
+  // existing Google geocode endpoint so the trip planner has a start point.
+  const handleGeocodeAddress = async () => {
+    const query = [form.address, form.city, form.country].filter(Boolean).join(", ");
+    if (!query.trim()) {
+      toast.error("Enter the hotel address first");
+      return;
+    }
+    try {
+      setGeocoding(true);
+      const { data } = await axios.get("/api/places/geocode", { params: { place: query } });
+      if (data.success && data.location) {
+        setForm((prev) => ({
+          ...prev,
+          latitude: String(data.location.lat),
+          longitude: String(data.location.lng),
+        }));
+        toast.success("Coordinates found");
+      } else {
+        toast.error(data.message || "Could not find coordinates for this address");
+      }
+    } catch {
+      toast.error("Could not find coordinates for this address");
+    } finally {
+      setGeocoding(false);
+    }
+  };
 
   // loadHotels — Fetches the owner's hotels and selects the first one for editing
   const loadHotels = async () => {
@@ -82,6 +114,13 @@ const HotelManagement = () => {
             contact: first.contact || "",
             city: first.city || "",
             description: first.description || "",
+            country: first.country || "",
+            latitude: Array.isArray(first.location?.coordinates) && first.location.coordinates.length === 2
+              ? String(first.location.coordinates[1])
+              : "",
+            longitude: Array.isArray(first.location?.coordinates) && first.location.coordinates.length === 2
+              ? String(first.location.coordinates[0])
+              : "",
             image: null,
           });
           setPreview(safeUrl(first.image) || "");
@@ -114,6 +153,13 @@ const HotelManagement = () => {
       contact: selected.contact || "",
       city: selected.city || "",
       description: selected.description || "",
+      country: selected.country || "",
+      latitude: Array.isArray(selected.location?.coordinates) && selected.location.coordinates.length === 2
+        ? String(selected.location.coordinates[1])
+        : "",
+      longitude: Array.isArray(selected.location?.coordinates) && selected.location.coordinates.length === 2
+        ? String(selected.location.coordinates[0])
+        : "",
       image: null,
     });
     setPreview(safeUrl(selected.image) || "");
@@ -142,6 +188,14 @@ const HotelManagement = () => {
     payload.append("contact", form.contact);
     payload.append("city", form.city);
     payload.append("description", form.description);
+    payload.append("country", form.country || "");
+    if (String(form.latitude).trim() && String(form.longitude).trim()) {
+      payload.append("latitude", String(form.latitude).trim());
+      payload.append("longitude", String(form.longitude).trim());
+    } else {
+      // Coordinates intentionally blanked by the owner — remove the point.
+      payload.append("clearLocation", "true");
+    }
     payload.append("features", JSON.stringify(features));
     payload.append("amenityOptions", JSON.stringify(amenityOptions));
     if (form.image) payload.append("image", form.image);
@@ -269,6 +323,62 @@ const HotelManagement = () => {
                 className="luxury-input"
                 required
               />
+            </div>
+
+            {/* Trip Planner start location — coordinates + geocode helper */}
+            <div className="rounded-xl border border-black/[0.06] dark:border-[#303631] bg-[#EFEEE8]/60 dark:bg-[#111412] p-3 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-medium text-slate-600 dark:text-[#A9AEA7]">Map Location (optional)</p>
+                <button
+                  type="button"
+                  disabled={geocoding || !form.address.trim()}
+                  onClick={handleGeocodeAddress}
+                  className="ghost-button px-3 py-1.5 text-[11px] disabled:opacity-50"
+                >
+                  {geocoding ? "Finding…" : "Find from Address"}
+                </button>
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-[#A9AEA7] -mt-1">
+                Used as the trip planner starting point.
+              </p>
+              <div className="grid sm:grid-cols-3 gap-3">
+                <div>
+                  <p className="text-xs font-medium text-slate-500 dark:text-[#A9AEA7] mb-1">Latitude</p>
+                  <input
+                    type="number"
+                    step="any"
+                    min={-90}
+                    max={90}
+                    value={form.latitude}
+                    onChange={(e) => setForm((prev) => ({ ...prev, latitude: e.target.value }))}
+                    className="luxury-input px-2.5 py-2 text-sm"
+                    placeholder="6.9271"
+                  />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-500 dark:text-[#A9AEA7] mb-1">Longitude</p>
+                  <input
+                    type="number"
+                    step="any"
+                    min={-180}
+                    max={180}
+                    value={form.longitude}
+                    onChange={(e) => setForm((prev) => ({ ...prev, longitude: e.target.value }))}
+                    className="luxury-input px-2.5 py-2 text-sm"
+                    placeholder="79.8612"
+                  />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-500 dark:text-[#A9AEA7] mb-1">Country</p>
+                  <input
+                    type="text"
+                    value={form.country}
+                    onChange={(e) => setForm((prev) => ({ ...prev, country: e.target.value }))}
+                    className="luxury-input px-2.5 py-2 text-sm"
+                    placeholder="Sri Lanka"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">

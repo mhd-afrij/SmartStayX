@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useAppContext } from '../../context/AppContext';
+import Sidebar from '../components/Sidebar';
 import ReceptionistNavbar from '../components/Navbar';
+import { useAppContext } from '../../context/AppContext';
 
 const Layout = () => {
   // Super admins and hotel managers may view the receptionist dashboard
@@ -29,10 +30,11 @@ const Layout = () => {
   if (!user || !canAccess) return null;
 
   return (
-    <div className="min-h-screen bg-[#F7F5F0] dark:bg-[#111412]">
-      <div className="flex flex-col">
+    <div className="flex min-h-screen bg-[#F7F5F0] dark:bg-[#111412]">
+      <Sidebar />
+      <div className="flex min-w-0 flex-1 flex-col">
         <ReceptionistNavbar />
-        <main className="flex-1 overflow-y-auto scrollbar-hide">
+        <main className="min-w-0 flex-1 overflow-y-auto scrollbar-hide">
           <div className="p-6 lg:p-8">
             <Outlet />
           </div>

@@ -20,6 +20,7 @@ const Dashboard = () => {
   const [submittingReport, setSubmittingReport] = useState(false);
   const [updatingStatusId, setUpdatingStatusId] = useState(null);
   const [confirmState, setConfirmState] = useState({ open: false, id: null, title: "", message: "" });
+  const [loading, setLoading] = useState(true);
 
   const requestConfirm = (id, title, message) => {
     setConfirmState({ open: true, id, title, message });
@@ -32,6 +33,7 @@ const Dashboard = () => {
   };
 
   const fetchDashboardData = useCallback(async () => {
+    setLoading(true);
     try {
       const { data } = await axios.get(`/api/bookings/hotel?hotelId=${selectedHotelId}`, {
         headers: { Authorization: `Bearer ${await getToken()}` },
@@ -52,6 +54,8 @@ const Dashboard = () => {
       }
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
   }, [axios, getToken, selectedHotelId, setDashboardData]);
 
@@ -154,6 +158,15 @@ const Dashboard = () => {
 
   const isLoading = !dashboardData.hotel && dashboardData.bookings.length === 0;
   const hasNoHotel = dashboardData.allHotels.length === 0;
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
+        <div className="w-10 h-10 rounded-full border-2 border-[#A67C52]/30 border-t-[#A67C52] animate-spin" />
+        <span className="text-sm text-slate-400 dark:text-[#A9AEA7] font-space">Loading dashboard...</span>
+      </div>
+    );
+  }
 
   return (
     <motion.div

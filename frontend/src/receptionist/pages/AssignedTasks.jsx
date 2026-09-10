@@ -39,9 +39,9 @@ const AssignedTasks = () => {
       });
       if (data.success) setTasks(data.services);
       else setError(true);
-    } catch {
+    } catch (error) {
       setError(true);
-      toast.error("Failed to load tasks");
+      toast.error(error.response?.data?.message || "Failed to load tasks");
     } finally {
       setLoading(false);
     }
@@ -61,7 +61,7 @@ const AssignedTasks = () => {
       } else {
         toast.error(data.message);
       }
-    } catch {
+    } catch (error) {
       toast.error("Failed to claim task");
     } finally {
       setUpdatingId(null);
@@ -80,7 +80,7 @@ const AssignedTasks = () => {
       } else {
         toast.error(data.message);
       }
-    } catch {
+    } catch (error) {
       toast.error("Failed to update task");
     } finally {
       setUpdatingId(null);

@@ -21,6 +21,10 @@ import {
   ShieldCheck,
   Globe,
   User,
+  Brush,
+  Package,
+  CalendarCheck,
+  Gift,
 } from "lucide-react";
 
 const links = [
@@ -36,6 +40,10 @@ const links = [
   { name: "Services Management", path: "/manager/service-management", icon: ConciergeBell },
   { name: "Guest Reviews", path: "/manager/reviews", icon: MessageSquare },
   { name: "Testimonials", path: "/manager/testimonials", icon: Award },
+  { name: "Housekeeping", path: "/manager/housekeeping", icon: Brush },
+  { name: "Inventory", path: "/manager/inventory", icon: Package },
+  { name: "Attendance", path: "/manager/attendance", icon: CalendarCheck },
+  { name: "Loyalty Management", path: "/manager/loyalty", icon: Gift },
   { name: "Role Management", path: "/manager/role-management", icon: ShieldCheck },
   { name: "Destinations", path: "/manager/destinations", icon: Globe },
   { name: "Profile", path: "/manager/profile", icon: User },

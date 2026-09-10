@@ -1,36 +1,65 @@
 import { motion } from "framer-motion";
 import { useUser, useClerk, OrganizationSwitcher } from "@clerk/clerk-react";
-import { NavLink } from "react-router-dom";
-import { CalendarDays, LogOut, User, Settings, Bell, CalendarCheck, DoorOpen, LayoutGrid, ClipboardList, Tag, MessageSquare, Wallet } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { CalendarDays, LogOut, User, Settings, Bell, Search } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import ThemeToggle from "../../components/ThemeToggle";
-
-const NAV_LINKS = [
-  { to: "/receptionist", label: "Reservations", icon: CalendarCheck, end: true },
-  { to: "/receptionist/rooms", label: "Rooms", icon: DoorOpen },
-  { to: "/receptionist/room-status", label: "Room Status", icon: LayoutGrid },
-  { to: "/receptionist/tasks", label: "Tasks", icon: ClipboardList },
-  { to: "/receptionist/services", label: "Services", icon: Bell },
-  { to: "/receptionist/payments", label: "Payments", icon: Wallet },
-  { to: "/receptionist/offers", label: "Offers", icon: Tag },
-  { to: "/receptionist/reviews", label: "Reviews", icon: MessageSquare },
-];
+import { useAppContext } from "../../context/AppContext";
 
 const Navbar = () => {
   const { user } = useUser();
   const { signOut } = useClerk();
+  const navigate = useNavigate();
+  const { axios, getToken } = useAppContext();
   const [showProfile, setShowProfile] = useState(false);
+  const [showBell, setShowBell] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const menuRef = useRef(null);
+  const bellRef = useRef(null);
+
+  const loadNotifications = async () => {
+    try {
+      const { data } = await axios.get("/api/notifications?limit=6", {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      });
+      if (data.success) {
+        setNotifications(data.notifications || []);
+        setUnreadCount(data.unreadCount || 0);
+      }
+    } catch {
+      setNotifications([]);
+    }
+  };
+
+  useEffect(() => {
+    loadNotifications();
+  }, []);
 
   useEffect(() => {
     const handleClick = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setShowProfile(false);
-      }
+      if (menuRef.current && !menuRef.current.contains(e.target)) setShowProfile(false);
+      if (bellRef.current && !bellRef.current.contains(e.target)) setShowBell(false);
     };
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      navigate(`/receptionist/reservations?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+    }
+  };
+
+  const markAllRead = async () => {
+    try {
+      await axios.put("/api/notifications/read-all", {}, { headers: { Authorization: `Bearer ${await getToken()}` } });
+      setUnreadCount(0);
+      await loadNotifications();
+    } catch {}
+  };
 
   return (
     <motion.header
@@ -48,28 +77,67 @@ const Navbar = () => {
           </span>
         </div>
 
-        <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
-          {NAV_LINKS.map(({ to, label, icon: Icon, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              className={({ isActive }) =>
-                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
-                  isActive
-                    ? "bg-[#EFEAE1] dark:bg-[#222823] text-[#183B35] dark:text-[#8FB8A8] border border-[#A67C52]/45 dark:border-[#303631]/45"
-                    : "text-slate-500 dark:text-[#A9AEA7] hover:text-slate-800 dark:hover:text-[#F2EFE8] hover:bg-[#EFEEE8] dark:hover:bg-[#222823] border border-transparent"
-                }`
-              }
-            >
-              <Icon className="w-3.5 h-3.5" />
-              {label}
-            </NavLink>
-          ))}
-        </nav>
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#A9AEA7]" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearch}
+            placeholder="Search guest or reservation... (Enter)"
+            className="luxury-input h-9 pl-9 pr-3 text-sm rounded-lg"
+          />
+        </div>
 
         <div className="flex items-center gap-2 shrink-0">
           <ThemeToggle />
+
+          <div className="relative" ref={bellRef}>
+            <button
+              onClick={() => setShowBell(!showBell)}
+              className="relative p-2 rounded-lg border border-black/[0.08] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] hover:bg-[#EFEEE8] dark:hover:bg-[#222823] transition-colors"
+            >
+              <Bell className="w-4 h-4 text-slate-500 dark:text-[#A9AEA7]" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-[#A67C52] dark:bg-[#C5A47E] text-white dark:text-[#1A1E1B] text-[9px] font-bold flex items-center justify-center">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </button>
+
+            {showBell && (
+              <motion.div
+                initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                className="absolute right-0 top-12 w-80 rounded-xl border border-black/[0.06] dark:border-[#303631] bg-white dark:bg-[#1A1E1B] shadow-2xl overflow-hidden"
+              >
+                <div className="p-3 border-b border-black/[0.06] dark:border-[#303631]">
+                  <p className="text-sm font-medium text-slate-800 dark:text-[#E8EDE6]">Notifications</p>
+                </div>
+                {notifications.length === 0 ? (
+                  <div className="p-4 text-sm text-slate-400 dark:text-[#A9AEA7] text-center">No notifications yet</div>
+                ) : (
+                  <div className="max-h-64 overflow-y-auto scrollbar-hide space-y-1 p-2">
+                    {notifications.map((n) => (
+                      <div key={n._id} className={`flex items-start gap-2 px-2 py-2 rounded-lg ${n.isRead ? "" : "bg-[#EFEAE1] dark:bg-[#222823]"}`}>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-slate-800 dark:text-[#E8EDE6] truncate">{n.title}</p>
+                          <p className="text-[11px] text-slate-500 dark:text-[#A9AEA7]">{n.message || ""}</p>
+                        </div>
+                        {!n.isRead && <span className="w-2 h-2 rounded-full bg-[#A67C52] dark:bg-[#C5A47E] shrink-0" />}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="p-2 border-t border-black/[0.06] dark:border-[#303631] flex items-center justify-between">
+                  <button onClick={markAllRead} className="text-xs text-slate-500 dark:text-[#A9AEA7] hover:text-slate-800 dark:hover:text-[#F2EFE8]">Mark all read</button>
+                  <button onClick={() => navigate("/receptionist/notifications")} className="text-xs text-[#183B35] dark:text-[#8FB8A8] font-medium">View all</button>
+                </div>
+              </motion.div>
+            )}
+          </div>
+
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setShowProfile(!showProfile)}

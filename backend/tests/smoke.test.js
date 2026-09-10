@@ -14,14 +14,14 @@ const read = (relativePath) => fs.readFileSync(path.join(serverRoot, relativePat
 test('route contract files expose the expected booking and pricing paths', () => {
   const bookingRoutes = read('routes/bookingRoutes.js')
   const pricingRoutes = read('routes/pricingRoutes.js')
-  const pricingMlRoutes = read('routes/pricingMLRoutes.js')
 
   assert.match(bookingRoutes, /\/check-availability/)
   assert.match(bookingRoutes, /\/calculate-price/)
   assert.match(bookingRoutes, /\/create-checkout-session/)
   assert.match(pricingRoutes, /\/suggest/)
   assert.match(pricingRoutes, /\/occupancy/)
-  assert.match(pricingMlRoutes, /\/enhanced/)
+  assert.match(pricingRoutes, /\/ml\/enhanced/)
+  assert.match(pricingRoutes, /\/forecast/)
 })
 
 test('root endpoint is reachable', async () => {

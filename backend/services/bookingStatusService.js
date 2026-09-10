@@ -49,12 +49,20 @@ export const transitionBookingStatus = async ({ booking, to, options = {} }) => 
 
   booking.status = to;
 
+  // Track workflow timestamps as side-effects of the transition (NOT as
+  // additional status values — the status enum stays the single source of
+  // truth). Centralized so every caller gets consistent timestamps.
+  const now = new Date();
+  if (to === BOOKING_STATUS.CONFIRMED && !booking.paymentReceivedAt) booking.paymentReceivedAt = now;
+  if (to === BOOKING_STATUS.CHECKED_IN && !booking.checkedInAt) booking.checkedInAt = now;
+  if (to === BOOKING_STATUS.CHECKED_OUT && !booking.checkedOutAt) booking.checkedOutAt = now;
+
   // Track status history if the model supports it
   if (booking.statusHistory && Array.isArray(booking.statusHistory)) {
     booking.statusHistory.push({
       from,
       to,
-      at: new Date(),
+      at: now,
       actor: actor || null,
       reason: reason || null,
     });

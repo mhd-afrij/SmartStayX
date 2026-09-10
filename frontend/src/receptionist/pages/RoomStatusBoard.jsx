@@ -43,9 +43,9 @@ const RoomStatusBoard = () => {
       } else {
         setError(true);
       }
-    } catch {
+    } catch (error) {
       setError(true);
-      toast.error("Failed to load rooms");
+      toast.error(error.response?.data?.message || "Failed to load rooms");
     } finally {
       setLoading(false);
     }
@@ -65,7 +65,7 @@ const RoomStatusBoard = () => {
       } else {
         toast.error(data.message);
       }
-    } catch {
+    } catch (error) {
       toast.error("Failed to update room status");
     } finally {
       setUpdatingId(null);

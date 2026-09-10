@@ -4,7 +4,9 @@ import User from "../models/User.js";
 import Role from "../models/Role.js";
 import Booking from "../models/Booking.js";
 import AuditLog from "../models/AuditLog.js";
+import Hotel from "../models/Hotel.js";
 import { resolveDashboardAccess, isAdminEmail } from "../configs/adminAccess.js";
+import escapeRegex from "../utils/escapeRegex.js";
 
 // Get authenticated user's role, profile, recent searches, and basic info
 export const getUserData = async (req, res) => {
@@ -142,9 +144,22 @@ export const searchUsers = async (req, res) => {
     if (!email || email.length < 3) {
       return res.json({ success: false, message: "Email must be at least 3 characters" });
     }
-    let users = await User.find({
-      email: { $regex: email, $options: "i" },
-    }).select("_id name email username role image");
+
+    const filter = { email: { $regex: escapeRegex(String(email)), $options: "i" } };
+
+    // Non-super-admins may only find users within their hotel scope:
+    // staff assigned to the hotel, or guests with bookings at the hotel.
+    if (req.user.role !== "super_admin") {
+      const hotelId = req.user.assignedHotel;
+      if (!hotelId) return res.json({ success: true, users: [] });
+      const bookingUsers = await Booking.distinct("user", { hotel: hotelId });
+      filter.$or = [
+        { _id: { $in: bookingUsers } },
+        { assignedHotel: hotelId },
+      ];
+    }
+
+    const users = await User.find(filter).select("_id name email username role image");
 
     res.json({ success: true, users });
   } catch (error) {
@@ -170,6 +185,17 @@ export const assignRole = async (req, res) => {
     // Hotel managers can only assign roles within their hotel scope
     if (req.user.role === "hotel_manager" && ["super_admin"].includes(role)) {
       return res.json({ success: false, message: "Hotel managers cannot assign super_admin roles." });
+    }
+
+    // A hotel manager may only assign a user to a hotel they own or are assigned to.
+    if (req.user.role === "hotel_manager" && assignedHotel) {
+      const ownedHotel = await Hotel.findOne({
+        _id: assignedHotel,
+        $or: [{ owner: req.user._id }, { _id: req.user.assignedHotel }],
+      });
+      if (!ownedHotel) {
+        return res.json({ success: false, message: "You can only assign users to hotels you manage." });
+      }
     }
 
     let user = await User.findById(userId).select("_id name email username role");
@@ -211,16 +237,25 @@ export const getTeam = async (req, res) => {
     const { page = 1, limit = 50, role, search } = req.query;
     const query = { role: { $ne: "guest" } };
 
-    // Hotel managers can only see their hotel's staff
-    if (req.user.role === "hotel_manager" && req.user.assignedHotel) {
-      query.assignedHotel = req.user.assignedHotel;
+    // Hotel managers can only see their hotel's staff. If the manager has no
+    // assigned hotel yet, resolve from owned hotels; otherwise return empty
+    // rather than leaking the entire platform's staff directory.
+    if (req.user.role === "hotel_manager") {
+      const managerHotels = req.user.assignedHotel
+        ? [req.user.assignedHotel]
+        : (await Hotel.find({ owner: req.user._id }).select("_id").lean()).map((h) => h._id);
+      if (managerHotels.length === 0) {
+        return res.json({ success: true, users: [], total: 0, page: Number(page), pages: 0 });
+      }
+      query.assignedHotel = { $in: managerHotels };
     }
 
     if (role) query.role = role;
     if (search) {
+      const safeSearch = escapeRegex(String(search));
       query.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
+        { name: { $regex: safeSearch, $options: "i" } },
+        { email: { $regex: safeSearch, $options: "i" } },
       ];
     }
     const [users, total] = await Promise.all([

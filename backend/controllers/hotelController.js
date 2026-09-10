@@ -7,15 +7,50 @@ import Booking from "../models/Booking.js";
 import ServiceRequest from "../models/ServiceRequest.js";
 import { v2 as cloudinary } from "cloudinary";
 import { clerkClient } from "@clerk/express";
+import escapeRegex from "../utils/escapeRegex.js";
+import { geocodeAddress } from "../services/googleMapsService.js";
 
 // Hotel CRUD, search, and owner operations — includes cascading delete.
-const escapeRegex = (value = "") =>
-  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// Parses optional latitude/longitude input (string or number) into a Hotel
+// location point. Returns undefined when no valid coordinates were provided.
+const parseLocationInput = (latitude, longitude) => {
+  const lat = Number(latitude);
+  const lng = Number(longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return undefined;
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return undefined;
+  return { type: "Point", coordinates: [lng, lat] };
+};
+
+// Best-effort geocoding: resolves an address to coordinates and persists them
+// when the hotel has no coordinates yet. Never fails the operation that calls
+// it — the Trip Planner surfaces the "location incomplete" state if it fails.
+const ensureHotelLocation = async (hotel, { force = false } = {}) => {
+  if (!hotel) return;
+  const coords = hotel.location?.coordinates;
+  if (!force && Array.isArray(coords) && coords.length === 2) return;
+
+  try {
+    const resolved = await geocodeAddress({
+      address: hotel.address,
+      city: hotel.city,
+      country: hotel.country,
+    });
+    if (resolved) {
+      hotel.location = { type: "Point", coordinates: [resolved.longitude, resolved.latitude] };
+      hotel.markModified("location");
+      await hotel.save();
+      console.log(`🗺️  Geocoded "${hotel.name}" → ${resolved.latitude},${resolved.longitude}`);
+    }
+  } catch (error) {
+    console.warn(`Geocoding failed for "${hotel?.name}":`, error.message);
+  }
+};
 
 // Register a new hotel and promote user to hotelOwner role.
 export const registerHotel = async (req, res) => {
   try {
-    const { name, address, contact, city, description } = req.body;
+    const { name, address, contact, city, description, latitude, longitude, country, timezone } = req.body;
     const owner = req.user?._id;
 
     if (!owner) {
@@ -31,7 +66,10 @@ export const registerHotel = async (req, res) => {
       address: String(address).trim(),
       contact: String(contact).trim(),
       city: String(city).trim(),
+      country: country ? String(country).trim() : "",
       description: description ? String(description).trim() : "",
+      location: parseLocationInput(latitude, longitude),
+      timezone: timezone ? String(timezone).trim() : "",
       owner,
     });
 
@@ -50,6 +88,10 @@ export const registerHotel = async (req, res) => {
     } catch (clerkError) {
       console.warn("Failed to sync hotel_manager role to Clerk metadata:", clerkError.message);
     }
+
+    // Geocode the address when the client did not supply coordinates, so the
+    // Trip Planner always has a database-anchored origin.
+    if (!parsedLocation) await ensureHotelLocation(hotel);
 
     res.json({ success: true, message: "Hotel Registered Successfully" });
   } catch (error) {
@@ -93,7 +135,7 @@ export const updateOwnerHotel = async (req, res) => {
   try {
     const ownerId = String(req.user?._id || "");
     const { id } = req.params;
-    const { name, address, contact, city, description } = req.body;
+    const { name, address, contact, city, description, latitude, longitude, country, clearLocation, timezone } = req.body;
 
     if (!ownerId) {
       return res.json({ success: false, message: "Not authenticated" });
@@ -112,7 +154,19 @@ export const updateOwnerHotel = async (req, res) => {
     if (address) hotel.address = String(address).trim();
     if (contact) hotel.contact = String(contact).trim();
     if (city) hotel.city = String(city).trim();
+    if (country !== undefined) hotel.country = String(country || "").trim();
+    if (timezone !== undefined) hotel.timezone = String(timezone || "").trim();
     hotel.description = description ? String(description).trim() : "";
+
+    // Coordinates: set when valid latitude+longitude arrive; removed when the
+    // client explicitly sends clearLocation (e.g. "true"). FormData sends
+    // strings, so empty strings are treated as "not provided".
+    const parsedLocation = parseLocationInput(latitude, longitude);
+    if (parsedLocation) {
+      hotel.location = parsedLocation;
+    } else if (String(clearLocation || "").toLowerCase() === "true") {
+      hotel.location = undefined;
+    }
 
     if (req.file) {
       const uploadRes = await cloudinary.uploader.upload(req.file.buffer, { resource_type: "auto" });
@@ -120,6 +174,13 @@ export const updateOwnerHotel = async (req, res) => {
     }
 
     await hotel.save();
+
+    // When coordinates were neither supplied nor cleared, backfill them from
+    // the (possibly updated) address so the Trip Planner has an origin.
+    if (!parsedLocation && String(clearLocation || "").toLowerCase() !== "true") {
+      await ensureHotelLocation(hotel);
+    }
+
     return res.json({ success: true, message: "Hotel updated successfully", hotel });
   } catch (error) {
     return res.json({ success: false, message: error.message });

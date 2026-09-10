@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAppContext } from "../context/AppContext";
 import { UserButton } from "@clerk/clerk-react";
-import { User, Bell, LifeBuoy, LogOut, CalendarDays, LayoutDashboard, Building2, ChevronDown, Menu } from "lucide-react";
+import { User, Bell, LifeBuoy, LogOut, CalendarDays, LayoutDashboard, Building2, ChevronDown, Menu, MapPin } from "lucide-react";
 import { assets } from "../assets/assets";
 import ThemeToggle from "./ThemeToggle";
 
@@ -11,7 +11,6 @@ const Navbar = () => {
   const navLinks = [
     { key: "home", path: "/" },
     { key: "hotels", path: "/rooms" },
-    { key: "itinerary", path: "/trip-planner" },
     { key: "blog", path: "/blog" },
     { key: "about", path: "/about" },
 
@@ -72,6 +71,13 @@ const Navbar = () => {
             {translate(link.key)}
           </a>
         ))}
+        <a
+          href="/trip-planner"
+          className="nav-link flex items-center gap-1.5 text-sm font-medium uppercase tracking-[0.18em] whitespace-nowrap"
+        >
+          <MapPin className="w-3.5 h-3.5" />
+          <span>Trip Planner</span>
+        </a>
       </div>
 
       <div className="flex items-center gap-2">
@@ -224,6 +230,14 @@ const Navbar = () => {
                 {translate(link.key)}
               </a>
             ))}
+            <a
+              href="/trip-planner"
+              onClick={() => setIsMenuOpen(false)}
+              className="nav-link flex items-center gap-1.5 text-sm uppercase tracking-[0.18em]"
+            >
+              <MapPin className="w-4 h-4" />
+              Trip Planner
+            </a>
             <div className="flex gap-3 pt-4 border-t border-black/[0.06] dark:border-[#303631]">
               <div className="flex gap-2 flex-1">
                 <select

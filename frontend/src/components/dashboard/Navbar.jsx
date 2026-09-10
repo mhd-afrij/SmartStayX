@@ -14,6 +14,7 @@ import {
   Loader2,
   Globe,
   DollarSign,
+  LayoutDashboard,
 } from "lucide-react";
 import { useUser, useClerk, OrganizationSwitcher } from "@clerk/clerk-react";
 import { useAppContext } from "../../context/AppContext";
@@ -335,6 +336,7 @@ const Navbar = () => {
                   </div>
                   <div className="p-1">
                     {[
+                      { icon: LayoutDashboard, label: "Dashboard", action: () => navigate("/manager") },
                       { icon: User, label: "Profile", action: () => navigate("/manager/profile") },
                       { icon: Settings, label: "Settings" },
                     ].map((item) => (

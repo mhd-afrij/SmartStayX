@@ -24,8 +24,9 @@ const createReport = async ({ hotel, room, issue, description, priority, reporte
     issue,
     description: description || '',
     priority: priority || 'medium',
-    status: 'open',
+    status: 'reported',
     reporter,
+    statusHistory: [{ from: null, to: 'reported', at: new Date(), actor: reporter }],
   });
 
   return report;
@@ -60,17 +61,34 @@ const getReport = async (reportId) => {
   return MaintenanceReport.findById(reportId).select('hotel status').lean();
 };
 
+// Valid transition map covering both the modern workflow and legacy statuses.
+const validTransitions = {
+  // Modern workflow
+  reported: ['assigned', 'repairing', 'completed', 'rejected'],
+  assigned: ['repairing', 'completed', 'rejected', 'reported'],
+  repairing: ['completed', 'rejected', 'assigned'],
+  completed: ['verified', 'repairing', 'rejected'],
+  verified: ['repairing'],
+  rejected: ['reported', 'assigned'],
+  // Legacy statuses kept working
+  open: ['in_progress', 'resolved', 'rejected', 'assigned'],
+  in_progress: ['resolved', 'rejected', 'open', 'repairing'],
+  resolved: ['open', 'in_progress', 'verified'],
+};
+
+// Map a legacy status onto the modern workflow for timestamp purposes.
+const stageTime = {
+  assigned: 'assignedAt',
+  repairing: 'repairingStartedAt',
+  completed: 'completedAt',
+  verified: 'verifiedAt',
+  resolved: 'resolvedAt',
+};
+
 // Update a maintenance report status
 const updateStatus = async ({ reportId, status, assignedTo, notes, actor }) => {
   const report = await MaintenanceReport.findById(reportId);
   if (!report) throw Object.assign(new Error('Maintenance report not found'), { status: 404 });
-
-  const validTransitions = {
-    open: ['in_progress', 'resolved', 'rejected'],
-    in_progress: ['resolved', 'rejected', 'open'],
-    resolved: ['open', 'in_progress'],
-    rejected: ['open'],
-  };
 
   if (status && !validTransitions[report.status]?.includes(status)) {
     throw Object.assign(
@@ -79,13 +97,21 @@ const updateStatus = async ({ reportId, status, assignedTo, notes, actor }) => {
     );
   }
 
-  if (status) report.status = status;
-  if (assignedTo) report.assignedTo = assignedTo;
+  if (status && status !== report.status) {
+    report.statusHistory.push({ from: report.status, to: status, at: new Date(), actor });
+    const timeField = stageTime[status];
+    if (timeField) report[timeField] = new Date();
+    report.status = status;
+  }
+  if (assignedTo) {
+    report.assignedTo = assignedTo;
+    if (report.status === 'reported') report.status = 'assigned';
+  }
   if (notes) {
     const noteStr = typeof notes === 'string' ? notes : JSON.stringify(notes);
     report.notes.push(noteStr);
   }
-  if (status === 'resolved') report.resolvedAt = new Date();
+  if (status === 'resolved' || status === 'completed') report.resolvedAt = new Date();
 
   await report.save();
   return report;

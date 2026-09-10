@@ -50,4 +50,5 @@ export const IconButton = forwardRef(function IconButton(
   );
 });
 
+export { Button };
 export default Button;
